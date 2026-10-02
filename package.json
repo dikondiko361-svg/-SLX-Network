@@ -1,0 +1,13 @@
+{
+  "name": "slx-network",
+  "version": "0.7.0",
+  "description": "SLX Network test network",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT"
+}
