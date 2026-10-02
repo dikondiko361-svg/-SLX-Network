@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SLX Network v0.7</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #070912;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 520px;
+      margin: auto;
+      padding: 22px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #672cff, #00d9ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    .version {
+      color: #8d93a7;
+      font-size: 13px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #8d93a7;
+      margin-bottom: 22px;
+    }
+
+    .card {
+      background: #101522;
+      border: 1px solid #20283a;
+      border-radius: 22px;
+      padding: 22px;
+      margin-bottom: 16px;
+    }
+
+    .balance-title {
+      color: #8d93a7;
+      font-size: 14px;
+      margin-bottom: 8px;
+    }
+
+    .balance {
+      font-size: 38px;
+      font-weight: 800;
+      margin-bottom: 5px;
+    }
+
+    .slx {
+      color: #9b6cff;
+      font-size: 16px;
+    }
+
+    .wallet {
+      margin-top: 18px;
+      color: #777f95;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 16px;
+      padding: 15px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      background: #20283a;
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #6737ff, #287cff);
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .stat {
+      display: flex;
+      justify-content: space-between;
+      padding: 13px 0;
+      border-bottom: 1px solid #20283a;
+    }
+
+    .stat:last-child {
+      border-bottom: 0;
+    }
+
+    .muted {
+      color: #8d93a7;
+    }
+
+    .status {
+      color: #42e879;
+    }
+
+    .history-item {
+      padding: 14px 0;
+      border-bottom: 1px solid #20283a;
+    }
+
+    .history-item:last-child {
+      border-bottom: 0;
+    }
+
+    .empty {
+      color: #777f95;
+      text-align: center;
+      padding: 12px 0;
+    }
+
+    .footer {
+      text-align: center;
+      color: #596176;
+      font-size: 12px;
+      margin-top: 28px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <main class="app">
+
+    <header>
+      <div class="logo">S</div>
+
+      <div style="text-align:right">
+        <h1>SLX Network</h1>
+        <div class="version">Test Network • v0.7</div>
+      </div>
+    </header>
+
+    <section class="card">
+      <div class="balance-title">Ваш баланс</div>
+
+      <div class="balance" id="balance">1000.00</div>
+      <div class="slx">SLX</div>
+
+      <div class="wallet">
+        Wallet:
+        <span id="wallet">SLX-TEST-7F92A1C4</span>
+      </div>
+    </section>
+
+    <div class="buttons">
+      <button class="primary" onclick="sendSLX()">Отправить</button>
+      <button onclick="receiveSLX()">Получить</button>
+    </div>
+
+    <section class="card">
+      <div class="section-title">Network</div>
+
+      <div class="stat">
+        <span class="muted">Status</span>
+        <span class="status">● Online</span>
+      </div>
+
+      <div class="stat">
+        <span class="muted">Network</span>
+        <span>SLX Testnet</span>
+      </div>
+
+      <div class="stat">
+        <span class="muted">Version</span>
+        <span>0.7</span>
+      </div>
+
+      <div class="stat">
+        <span class="muted">Storage</span>
+        <span>SQLite</span>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="section-title">История</div>
+
+      <div id="history">
+        <div class="empty">
+          Транзакций пока нет
+        </div>
+      </div>
+    </section>
+
+    <div class="footer">
+      SLX Network • Experimental Test Network
+    </div>
+
+  </main>
+
+  <script>
+    let balance = 1000;
+
+    function sendSLX() {
+      const amount = prompt("Сколько SLX отправить?");
+
+      if (!amount) return;
+
+      const value = Number(amount);
+
+      if (isNaN(value) || value <= 0) {
+        alert("Введите правильную сумму.");
+        return;
+      }
+
+      if (value > balance) {
+        alert("Недостаточно SLX.");
+        return;
+      }
+
+      balance -= value;
+
+      document.getElementById("balance").textContent =
+        balance.toFixed(2);
+
+      const history = document.getElementById("history");
+
+      history.innerHTML = `
+        <div class="history-item">
+          <div>Отправлено <b>${value.toFixed(2)} SLX</b></div>
+          <small class="muted">Test transaction</small>
+        </div>
+      `;
+    }
+
+    function receiveSLX() {
+      alert(
+        "Ваш тестовый адрес:\n\nSLX-TEST-7F92A1C4"
+      );
+    }
+  </script>
+
+</body>
+</html>
