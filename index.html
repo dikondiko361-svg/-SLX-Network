@@ -1,12 +1,18 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>SLX Network v0.9</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>SLX Network v1.0</title>
 
   <style>
+
     * {
       box-sizing: border-box;
       font-family: Arial, sans-serif;
@@ -35,7 +41,11 @@
       width: 58px;
       height: 58px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #6737ff, #00cfff);
+      background: linear-gradient(
+        135deg,
+        #6737ff,
+        #00cfff
+      );
       display: grid;
       place-items: center;
       font-size: 30px;
@@ -80,10 +90,18 @@
       color: #9b6cff;
     }
 
-    .wallet-address {
+    .id {
       margin-top: 14px;
+      color: #9b6cff;
+      font-size: 15px;
+      font-weight: 700;
+      word-break: break-all;
+    }
+
+    .address {
+      margin-top: 8px;
       color: #777f95;
-      font-size: 12px;
+      font-size: 11px;
       word-break: break-all;
     }
 
@@ -98,19 +116,48 @@
       width: 100%;
       border: 0;
       border-radius: 16px;
-      padding: 16px;
+      padding: 15px;
       color: white;
       font-size: 15px;
       font-weight: 700;
       background: #20283a;
+      cursor: pointer;
     }
 
     button:active {
-      transform: scale(0.98);
+      transform: scale(.98);
     }
 
     .primary {
-      background: linear-gradient(135deg, #6737ff, #287cff);
+      background: linear-gradient(
+        135deg,
+        #6737ff,
+        #287cff
+      );
+    }
+
+    .green {
+      background: linear-gradient(
+        135deg,
+        #149447,
+        #20c66a
+      );
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 7px 0 12px;
+      border-radius: 14px;
+      border: 1px solid #30394e;
+      background: #171e2d;
+      color: white;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #7b4cff;
     }
 
     .wallet-item {
@@ -119,27 +166,24 @@
       border-radius: 16px;
       padding: 15px;
       margin-top: 10px;
+      cursor: pointer;
     }
 
     .wallet-item.active {
       border-color: #7b4cff;
     }
 
-    .wallet-name {
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
     .wallet-balance {
       color: #9b6cff;
       font-size: 20px;
       font-weight: 800;
+      margin-top: 6px;
     }
 
-    .wallet-address-small {
-      color: #7f879b;
-      font-size: 11px;
-      margin-top: 8px;
+    .wallet-id {
+      color: #8d93a7;
+      font-size: 12px;
+      margin-top: 6px;
       word-break: break-all;
     }
 
@@ -171,46 +215,60 @@
       border-bottom: 0;
     }
 
-    .send-form {
-      display: none;
-    }
-
-    .send-form.show {
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 15px;
-      margin: 8px 0 12px;
-      border-radius: 14px;
-      border: 1px solid #30394e;
-      background: #171e2d;
-      color: white;
-      font-size: 14px;
-      outline: none;
-    }
-
-    input:focus {
-      border-color: #7b4cff;
-    }
-
-    .empty {
-      text-align: center;
-      color: #777f95;
-      padding: 12px;
-    }
-
     .success {
       color: #42e879;
-      font-size: 14px;
-      margin-top: 10px;
+      margin-top: 12px;
+      line-height: 1.5;
     }
 
     .error {
       color: #ff6b7a;
-      font-size: 14px;
-      margin-top: 10px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.88);
+      z-index: 100;
+      padding: 20px;
+      overflow: auto;
+    }
+
+    .modal.show {
+      display: block;
+    }
+
+    .modal-box {
+      max-width: 500px;
+      margin: 30px auto;
+      background: #101522;
+      border: 1px solid #30394e;
+      border-radius: 24px;
+      padding: 20px;
+    }
+
+    .qr-box {
+      background: white;
+      width: 260px;
+      height: 260px;
+      margin: 20px auto;
+      padding: 10px;
+      border-radius: 12px;
+    }
+
+    .qr-box img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .scanner {
+      width: 100%;
+      border-radius: 18px;
+      margin-top: 15px;
+      background: black;
     }
 
     footer {
@@ -219,24 +277,39 @@
       font-size: 12px;
       margin-top: 28px;
     }
+
   </style>
+
 </head>
+
 
 <body>
 
 <div class="app">
 
+
   <header>
-    <div class="logo">S</div>
+
+    <div class="logo">
+      S
+    </div>
 
     <div style="text-align:right">
-      <h1>SLX Network</h1>
-      <div class="version">Testnet • v0.9</div>
+
+      <h1>
+        SLX Network
+      </h1>
+
+      <div class="version">
+        Testnet • v1.0
+      </div>
+
     </div>
+
   </header>
 
 
-  <!-- CURRENT WALLET -->
+  <!-- BALANCE -->
 
   <section class="card">
 
@@ -245,28 +318,60 @@
     </div>
 
     <div class="balance">
-      <span id="balance">...</span>
-      <span class="coin">SLX</span>
+
+      <span id="balance">
+        ...
+      </span>
+
+      <span class="coin">
+        SLX
+      </span>
+
     </div>
 
-    <div class="wallet-address">
-      Wallet:
-      <span id="currentAddress">...</span>
+    <div class="id">
+
+      SLX-ID:
+      <span id="myId">
+        ...
+      </span>
+
     </div>
+
+    <div class="address">
+
+      Wallet:
+      <span id="myAddress">
+        ...
+      </span>
+
+    </div>
+
+    <br>
+
+    <button onclick="copyId()">
+      📋 Копировать ID
+    </button>
 
   </section>
 
 
-  <!-- ACTIONS -->
+  <!-- QR BUTTONS -->
 
   <div class="buttons">
 
-    <button class="primary" onclick="showSendForm()">
-      Отправить
+    <button
+      class="primary"
+      onclick="showMyQR()"
+    >
+      ▣ Мой QR
     </button>
 
-    <button onclick="createWallet()">
-      + Новый кошелёк
+    <button
+      class="green"
+      onclick="openScanner()"
+    >
+      📷 Сканировать QR
     </button>
 
   </div>
@@ -274,18 +379,20 @@
 
   <!-- SEND -->
 
-  <section class="card send-form" id="sendForm">
+  <section class="card">
 
-    <h2>Перевод SLX</h2>
+    <h2>
+      Перевод SLX
+    </h2>
 
     <div class="label">
-      Адрес получателя
+      Адрес / SLX-ID получателя
     </div>
 
     <input
       id="recipient"
-      type="text"
-      placeholder="SLX-..."
+      placeholder="SLX..."
+      autocomplete="off"
     >
 
     <div class="label">
@@ -300,22 +407,14 @@
       placeholder="Например: 100"
     >
 
-    <div class="buttons">
+    <button
+      class="primary"
+      onclick="sendSLX()"
+    >
+      Отправить SLX
+    </button>
 
-      <button
-        class="primary"
-        onclick="sendSLX()"
-      >
-        Отправить
-      </button>
-
-      <button onclick="hideSendForm()">
-        Отмена
-      </button>
-
-    </div>
-
-    <div id="sendMessage"></div>
+    <div id="message"></div>
 
   </section>
 
@@ -324,17 +423,23 @@
 
   <section class="card">
 
-    <h2>Кошельки</h2>
+    <h2>
+      Кошельки
+    </h2>
 
     <div class="muted">
       Все тестовые кошельки этого устройства
     </div>
 
     <div id="walletList">
-      <div class="empty">
-        Загрузка...
-      </div>
+      Загрузка...
     </div>
+
+    <br>
+
+    <button onclick="createWallet()">
+      + Новый кошелёк
+    </button>
 
   </section>
 
@@ -343,9 +448,12 @@
 
   <section class="card">
 
-    <h2>Network</h2>
+    <h2>
+      Network
+    </h2>
 
     <div class="row">
+
       <span class="muted">
         Status
       </span>
@@ -353,9 +461,11 @@
       <span class="online">
         ● Online
       </span>
+
     </div>
 
     <div class="row">
+
       <span class="muted">
         Network
       </span>
@@ -363,19 +473,23 @@
       <span>
         SLX Testnet
       </span>
+
     </div>
 
     <div class="row">
+
       <span class="muted">
         Version
       </span>
 
       <span>
-        0.9
+        1.0
       </span>
+
     </div>
 
     <div class="row">
+
       <span class="muted">
         Wallets
       </span>
@@ -383,6 +497,7 @@
       <span id="walletCount">
         0
       </span>
+
     </div>
 
   </section>
@@ -392,41 +507,151 @@
 
   <section class="card">
 
-    <h2>История</h2>
+    <h2>
+      История
+    </h2>
 
     <div id="history">
-      <div class="empty">
-        Транзакций пока нет
-      </div>
+      Транзакций пока нет
     </div>
 
   </section>
 
 
   <footer>
-    SLX Network • Experimental Test Network • v0.9
+    SLX Network • Experimental Test Network
   </footer>
 
 </div>
 
 
+
+<!-- MY QR -->
+
+<div
+  class="modal"
+  id="qrModal"
+>
+
+  <div class="modal-box">
+
+    <h2>
+      Мой SLX QR
+    </h2>
+
+    <div class="muted">
+      Покажите этот QR получателю
+    </div>
+
+    <div class="qr-box">
+
+      <img
+        id="qrImage"
+        alt="SLX QR"
+      >
+
+    </div>
+
+    <div
+      class="id"
+      id="qrId"
+    >
+      ...
+    </div>
+
+    <br>
+
+    <button onclick="copyId()">
+      📋 Копировать ID
+    </button>
+
+    <br><br>
+
+    <button onclick="closeModal('qrModal')">
+      Закрыть
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<!-- SCANNER -->
+
+<div
+  class="modal"
+  id="scannerModal"
+>
+
+  <div class="modal-box">
+
+    <h2>
+      Сканировать QR
+    </h2>
+
+    <div class="muted">
+      Наведите камеру на QR получателя.
+    </div>
+
+    <video
+      id="scannerVideo"
+      class="scanner"
+      playsinline
+    ></video>
+
+    <div
+      id="scannerMessage"
+      class="error"
+    ></div>
+
+    <br>
+
+    <button onclick="stopScanner()">
+      Закрыть сканер
+    </button>
+
+  </div>
+
+</div>
+
+
+
 <script>
 
-let currentWallet = null;
+/* =========================
+   GLOBAL
+========================= */
+
+let myId = null;
+
+let scannerStream = null;
+
+let scannerTimer = null;
 
 
 /* =========================
    API
 ========================= */
 
-async function api(url, options = {}) {
+async function api(
+  url,
+  options = {}
+) {
 
-  const response = await fetch(url, options);
+  const response =
+    await fetch(url, options);
 
-  const data = await response.json();
+  const data =
+    await response.json();
 
   if (!response.ok) {
-    throw new Error(data.error || "Ошибка сервера");
+
+    throw new Error(
+      data.error ||
+      "Ошибка сервера"
+    );
+
   }
 
   return data;
@@ -437,104 +662,235 @@ async function api(url, options = {}) {
    LOAD
 ========================= */
 
-async function loadStatus() {
+async function load() {
 
   try {
 
-    const data = await api("/api/status");
-
-    let wallets = data.wallets || [];
-
-    /*
-      Если сервер пустой после перезапуска,
-      автоматически создаём первый кошелёк.
-    */
-
-    if (wallets.length === 0) {
-
-      const result = await api(
-        "/api/wallet/create",
-        {
-          method: "POST"
-        }
+    const saved =
+      localStorage.getItem(
+        "slx_my_id"
       );
 
-      wallets = [result.wallet];
 
-      currentWallet = result.wallet.address;
+    if (saved) {
 
-      localStorage.setItem(
-        "slx_current_wallet",
-        currentWallet
-      );
+      try {
 
-    } else {
+        await loadWallet(saved);
 
-      const saved =
-        localStorage.getItem("slx_current_wallet");
+        myId = saved;
 
-      const exists = wallets.some(
-        wallet => wallet.address === saved
-      );
-
-      if (exists) {
-
-        currentWallet = saved;
-
-      } else {
-
-        currentWallet = wallets[0].address;
-
-        localStorage.setItem(
-          "slx_current_wallet",
-          currentWallet
-        );
       }
+
+      catch {
+
+        myId = null;
+
+      }
+
     }
 
-    await refreshWallet();
 
-    renderWallets(wallets);
+    if (!myId) {
 
-  } catch (error) {
+      const created =
+        await api(
+          "/api/wallet/create",
+          {
+            method: "POST"
+          }
+        );
 
-    document.getElementById("currentAddress").textContent =
-      "Сервер недоступен";
+      myId =
+        created.wallet.id;
+
+      localStorage.setItem(
+        "slx_my_id",
+        myId
+      );
+
+    }
+
+
+    await loadWallet(myId);
+
+    await loadWalletList();
 
   }
-}
 
-
-/* =========================
-   CURRENT WALLET
-========================= */
-
-async function refreshWallet() {
-
-  if (!currentWallet) return;
-
-  try {
-
-    const data = await api(
-      "/api/wallet/" +
-      encodeURIComponent(currentWallet)
-    );
-
-    const wallet = data.wallet;
-
-    document.getElementById("balance").textContent =
-      Number(wallet.balance).toFixed(2);
-
-    document.getElementById("currentAddress").textContent =
-      wallet.address;
-
-    renderHistory(wallet.transactions || []);
-
-  } catch (error) {
+  catch (error) {
 
     console.log(error);
 
   }
+
+}
+
+
+/* =========================
+   LOAD WALLET
+========================= */
+
+async function loadWallet(id) {
+
+  const data =
+    await api(
+      "/api/wallet/" +
+      encodeURIComponent(id)
+    );
+
+  const wallet =
+    data.wallet;
+
+
+  document.getElementById(
+    "balance"
+  ).textContent =
+    Number(
+      wallet.balance
+    ).toFixed(2);
+
+
+  document.getElementById(
+    "myId"
+  ).textContent =
+    wallet.id;
+
+
+  document.getElementById(
+    "myAddress"
+  ).textContent =
+    wallet.address;
+
+
+  myId =
+    wallet.id;
+
+
+  localStorage.setItem(
+    "slx_my_id",
+    myId
+  );
+
+
+  renderHistory(
+    wallet.transactions || []
+  );
+
+}
+
+
+/* =========================
+   WALLET LIST
+========================= */
+
+async function loadWalletList() {
+
+  const data =
+    await api(
+      "/api/status"
+    );
+
+  const wallets =
+    data.wallets || [];
+
+
+  document.getElementById(
+    "walletCount"
+  ).textContent =
+    wallets.length;
+
+
+  const container =
+    document.getElementById(
+      "walletList"
+    );
+
+
+  if (!wallets.length) {
+
+    container.innerHTML =
+      "Нет кошельков";
+
+    return;
+
+  }
+
+
+  container.innerHTML =
+    wallets.map(
+      wallet => `
+
+        <div
+          class="wallet-item ${
+            wallet.id === myId
+              ? "active"
+              : ""
+          }"
+          onclick="
+            selectWallet(
+              '${wallet.id}'
+            )
+          "
+        >
+
+          <b>
+
+            ${
+              wallet.id === myId
+                ? "Активный кошелёк"
+                : "Тестовый кошелёк"
+            }
+
+          </b>
+
+          <div
+            class="wallet-balance"
+          >
+
+            ${
+              Number(
+                wallet.balance
+              ).toFixed(2)
+            }
+
+            SLX
+
+          </div>
+
+          <div
+            class="wallet-id"
+          >
+
+            ${wallet.id}
+
+          </div>
+
+        </div>
+
+      `
+    ).join("");
+
+}
+
+
+/* =========================
+   SELECT WALLET
+========================= */
+
+async function selectWallet(id) {
+
+  myId = id;
+
+  localStorage.setItem(
+    "slx_my_id",
+    myId
+  );
+
+  await loadWallet(myId);
+
+  await loadWalletList();
+
 }
 
 
@@ -546,133 +902,337 @@ async function createWallet() {
 
   try {
 
-    const data = await api(
-      "/api/wallet/create",
-      {
-        method: "POST"
-      }
-    );
+    const data =
+      await api(
+        "/api/wallet/create",
+        {
+          method: "POST"
+        }
+      );
 
-    currentWallet = data.wallet.address;
+
+    myId =
+      data.wallet.id;
+
 
     localStorage.setItem(
-      "slx_current_wallet",
-      currentWallet
+      "slx_my_id",
+      myId
     );
+
+
+    await loadWallet(myId);
+
+    await loadWalletList();
+
 
     alert(
       "Новый кошелёк создан!\n\n" +
-      data.wallet.address +
+      data.wallet.id +
       "\n\nБаланс: 1000 SLX"
     );
 
-    await loadStatus();
+  }
 
-  } catch (error) {
+  catch (error) {
 
     alert(error.message);
 
   }
-}
-
-
-/* =========================
-   SELECT WALLET
-========================= */
-
-function selectWallet(address) {
-
-  currentWallet = address;
-
-  localStorage.setItem(
-    "slx_current_wallet",
-    address
-  );
-
-  refreshWallet();
-  loadStatus();
 
 }
 
 
 /* =========================
-   RENDER WALLETS
+   COPY ID
 ========================= */
 
-function renderWallets(wallets) {
+async function copyId() {
 
-  const container =
-    document.getElementById("walletList");
+  if (!myId) return;
 
-  document.getElementById("walletCount")
-    .textContent = wallets.length;
 
-  if (!wallets.length) {
+  try {
 
-    container.innerHTML =
-      '<div class="empty">Кошельков нет</div>';
+    await navigator.clipboard.writeText(
+      myId
+    );
 
-    return;
+    alert(
+      "SLX-ID скопирован:\n\n" +
+      myId
+    );
+
   }
 
-  container.innerHTML =
-    wallets.map((wallet, index) => {
+  catch {
 
-      const active =
-        wallet.address === currentWallet
-          ? "active"
-          : "";
+    alert(
+      "Не удалось скопировать ID"
+    );
 
-      return `
-        <div
-          class="wallet-item ${active}"
-          onclick="selectWallet('${wallet.address}')"
-        >
+  }
 
-          <div class="wallet-name">
-            Кошелёк ${index + 1}
-          </div>
-
-          <div class="wallet-balance">
-            ${Number(wallet.balance).toFixed(2)} SLX
-          </div>
-
-          <div class="wallet-address-small">
-            ${wallet.address}
-          </div>
-
-        </div>
-      `;
-
-    }).join("");
 }
 
 
 /* =========================
-   SEND FORM
+   SHOW QR
 ========================= */
 
-function showSendForm() {
+function showMyQR() {
 
-  document
-    .getElementById("sendForm")
-    .classList.add("show");
+  if (!myId) return;
 
-  document
-    .getElementById("recipient")
-    .focus();
+
+  const qrData =
+    encodeURIComponent(
+      "SLX:" + myId
+    );
+
+
+  const qrUrl =
+    "https://api.qrserver.com/v1/create-qr-code/" +
+    "?size=500x500&data=" +
+    qrData;
+
+
+  document.getElementById(
+    "qrImage"
+  ).src =
+    qrUrl;
+
+
+  document.getElementById(
+    "qrId"
+  ).textContent =
+    myId;
+
+
+  document.getElementById(
+    "qrModal"
+  ).classList.add(
+    "show"
+  );
 
 }
 
 
-function hideSendForm() {
+/* =========================
+   QR SCANNER
+========================= */
 
-  document
-    .getElementById("sendForm")
-    .classList.remove("show");
+async function openScanner() {
 
-  document.getElementById("sendMessage")
-    .innerHTML = "";
+  const modal =
+    document.getElementById(
+      "scannerModal"
+    );
+
+  const video =
+    document.getElementById(
+      "scannerVideo"
+    );
+
+  const message =
+    document.getElementById(
+      "scannerMessage"
+    );
+
+
+  modal.classList.add(
+    "show"
+  );
+
+
+  message.textContent =
+    "Запрашиваем камеру...";
+
+
+  if (
+    !("BarcodeDetector" in window)
+  ) {
+
+    message.textContent =
+      "Автоматический QR-сканер не поддерживается этим браузером. Введите SLX-ID вручную.";
+
+    return;
+
+  }
+
+
+  try {
+
+    scannerStream =
+      await navigator.mediaDevices.getUserMedia(
+        {
+          video: {
+            facingMode: {
+              ideal: "environment"
+            }
+          }
+        }
+      );
+
+
+    video.srcObject =
+      scannerStream;
+
+
+    await video.play();
+
+
+    const detector =
+      new BarcodeDetector(
+        {
+          formats: [
+            "qr_code"
+          ]
+        }
+      );
+
+
+    message.className =
+      "success";
+
+
+    message.textContent =
+      "Наведите камеру на QR-код";
+
+
+    scannerTimer =
+      setInterval(
+        async () => {
+
+          try {
+
+            const codes =
+              await detector.detect(
+                video
+              );
+
+
+            if (
+              !codes.length
+            ) {
+              return;
+            }
+
+
+            const value =
+              codes[0].rawValue;
+
+
+            handleQR(value);
+
+          }
+
+          catch {
+
+          }
+
+        },
+        500
+      );
+
+  }
+
+  catch {
+
+    message.className =
+      "error";
+
+    message.textContent =
+      "Камера недоступна. Разрешите доступ к камере или введите SLX-ID вручную.";
+
+  }
+
+}
+
+
+/* =========================
+   QR RESULT
+========================= */
+
+function handleQR(value) {
+
+  let id =
+    String(value || "")
+      .trim();
+
+
+  if (
+    id.startsWith("SLX:")
+  ) {
+
+    id =
+      id.substring(4);
+
+  }
+
+
+  stopScanner();
+
+
+  document.getElementById(
+    "recipient"
+  ).value =
+    id;
+
+
+  document.getElementById(
+    "amount"
+  ).focus();
+
+
+  alert(
+    "Получатель найден:\n\n" +
+    id +
+    "\n\nТеперь укажите сумму."
+  );
+
+}
+
+
+/* =========================
+   STOP SCANNER
+========================= */
+
+function stopScanner() {
+
+  if (scannerTimer) {
+
+    clearInterval(
+      scannerTimer
+    );
+
+    scannerTimer = null;
+
+  }
+
+
+  if (scannerStream) {
+
+    scannerStream
+      .getTracks()
+      .forEach(
+        track => track.stop()
+      );
+
+    scannerStream = null;
+
+  }
+
+
+  document.getElementById(
+    "scannerVideo"
+  ).srcObject =
+    null;
+
+
+  closeModal(
+    "scannerModal"
+  );
 
 }
 
@@ -684,88 +1244,139 @@ function hideSendForm() {
 async function sendSLX() {
 
   const recipient =
-    document
-      .getElementById("recipient")
-      .value
-      .trim();
+    document.getElementById(
+      "recipient"
+    ).value.trim();
+
 
   const amount =
     Number(
-      document
-        .getElementById("amount")
-        .value
+      document.getElementById(
+        "amount"
+      ).value
     );
 
+
   const message =
-    document.getElementById("sendMessage");
+    document.getElementById(
+      "message"
+    );
+
+
+  message.className = "";
 
 
   if (!recipient) {
 
-    message.className = "error";
+    message.className =
+      "error";
+
     message.textContent =
-      "Введите адрес получателя.";
+      "Укажите SLX-ID получателя.";
 
     return;
+
   }
 
 
-  if (!Number.isFinite(amount) || amount <= 0) {
+  if (
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ) {
 
-    message.className = "error";
+    message.className =
+      "error";
+
     message.textContent =
       "Введите правильную сумму.";
 
     return;
+
   }
 
 
   try {
 
-    const data = await api(
-      "/api/send",
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-
-          sender: currentWallet,
-
-          recipient: recipient,
-
-          amount: amount
-
-        })
-      }
+    await api(
+      "/api/find/" +
+      encodeURIComponent(
+        recipient
+      )
     );
 
 
-    message.className = "success";
+    const confirmed =
+      confirm(
+        "Подтвердить перевод?\n\n" +
+        "Получатель:\n" +
+        recipient +
+        "\n\n" +
+        "Сумма:\n" +
+        amount +
+        " SLX"
+      );
 
-    message.innerHTML =
-      "✓ Перевод выполнен!<br>" +
+
+    if (!confirmed) {
+
+      return;
+
+    }
+
+
+    const data =
+      await api(
+        "/api/send",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify(
+              {
+                sender: myId,
+                recipient,
+                amount
+              }
+            )
+        }
+      );
+
+
+    message.className =
+      "success";
+
+
+    message.textContent =
+      "✓ Перевод выполнен!\n" +
       "TX: " +
       data.transaction.id;
 
 
-    document.getElementById("recipient")
-      .value = "";
-
-    document.getElementById("amount")
-      .value = "";
+    document.getElementById(
+      "recipient"
+    ).value = "";
 
 
-    await loadStatus();
+    document.getElementById(
+      "amount"
+    ).value = "";
 
 
-  } catch (error) {
+    await load();
 
-    message.className = "error";
+    await loadWalletList();
+
+  }
+
+  catch (error) {
+
+    message.className =
+      "error";
 
     message.textContent =
       error.message;
@@ -779,62 +1390,128 @@ async function sendSLX() {
    HISTORY
 ========================= */
 
-function renderHistory(transactions) {
+function renderHistory(
+  transactions
+) {
 
   const history =
-    document.getElementById("history");
+    document.getElementById(
+      "history"
+    );
 
 
-  if (!transactions.length) {
+  if (
+    !transactions.length
+  ) {
 
     history.innerHTML =
-      '<div class="empty">Транзакций пока нет</div>';
+      "Транзакций пока нет";
 
     return;
+
   }
 
 
   history.innerHTML =
-    transactions.map(tx => {
+    transactions.map(
+      tx => {
 
-      let title;
+        let title;
 
-      if (tx.type === "send") {
 
-        title =
-          `Отправлено ${Number(tx.amount).toFixed(2)} SLX`;
+        if (
+          tx.type === "send"
+        ) {
 
-      } else {
+          title =
+            "Отправлено";
 
-        title =
-          `Получено ${Number(tx.amount).toFixed(2)} SLX`;
+        }
+
+        else if (
+          tx.type === "receive"
+        ) {
+
+          title =
+            "Получено";
+
+        }
+
+        else {
+
+          title =
+            "Faucet";
+
+        }
+
+
+        return `
+
+          <div class="tx">
+
+            <b>
+
+              ${title}
+
+              ${
+                Number(
+                  tx.amount
+                ).toFixed(2)
+              }
+
+              SLX
+
+            </b>
+
+            <br>
+
+            <small
+              class="muted"
+            >
+
+              TX:
+              ${tx.id}
+
+            </small>
+
+            <br>
+
+            <small
+              class="muted"
+            >
+
+              ${
+                tx.type === "send"
+                  ? "Кому: " + tx.to
+                  : tx.type === "receive"
+                  ? "От: " + tx.from
+                  : "Источник: Faucet"
+              }
+
+            </small>
+
+          </div>
+
+        `;
 
       }
+    ).join("");
+
+}
 
 
-      return `
-        <div class="tx">
+/* =========================
+   MODAL
+========================= */
 
-          <b>${title}</b>
+function closeModal(id) {
 
-          <br>
+  document
+    .getElementById(id)
+    .classList.remove(
+      "show"
+    );
 
-          <small class="muted">
-            TX: ${tx.id}
-          </small>
-
-          <br>
-
-          <small class="muted">
-            ${tx.type === "send"
-              ? "Кому: " + tx.to
-              : "От: " + tx.from}
-          </small>
-
-        </div>
-      `;
-
-    }).join("");
 }
 
 
@@ -842,9 +1519,10 @@ function renderHistory(transactions) {
    START
 ========================= */
 
-loadStatus();
+load();
 
 </script>
 
 </body>
+
 </html>
