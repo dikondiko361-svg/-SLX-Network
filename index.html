@@ -8,21 +8,19 @@
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       font-family: Arial, sans-serif;
     }
 
     body {
+      margin: 0;
       background: #070912;
       color: white;
-      min-height: 100vh;
     }
 
     .app {
       max-width: 520px;
       margin: auto;
-      padding: 22px 16px 40px;
+      padding: 24px 16px 40px;
     }
 
     header {
@@ -36,56 +34,49 @@
       width: 52px;
       height: 52px;
       border-radius: 16px;
-      background: linear-gradient(135deg, #672cff, #00d9ff);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: linear-gradient(135deg, #6737ff, #00cfff);
+      display: grid;
+      place-items: center;
       font-size: 28px;
       font-weight: 900;
     }
 
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
     .version {
       color: #8d93a7;
+      margin-top: 4px;
       font-size: 13px;
-    }
-
-    h1 {
-      font-size: 30px;
-      margin-bottom: 5px;
-    }
-
-    .subtitle {
-      color: #8d93a7;
-      margin-bottom: 22px;
     }
 
     .card {
       background: #101522;
       border: 1px solid #20283a;
       border-radius: 22px;
-      padding: 22px;
+      padding: 20px;
       margin-bottom: 16px;
     }
 
-    .balance-title {
+    .label {
       color: #8d93a7;
       font-size: 14px;
-      margin-bottom: 8px;
     }
 
     .balance {
       font-size: 38px;
       font-weight: 800;
-      margin-bottom: 5px;
+      margin-top: 8px;
     }
 
-    .slx {
+    .coin {
       color: #9b6cff;
-      font-size: 16px;
     }
 
     .wallet {
-      margin-top: 18px;
+      margin-top: 16px;
       color: #777f95;
       font-size: 12px;
       word-break: break-all;
@@ -101,31 +92,25 @@
     button {
       border: 0;
       border-radius: 16px;
-      padding: 15px;
+      padding: 16px;
       color: white;
       font-size: 16px;
       font-weight: 700;
       background: #20283a;
     }
 
-    button.primary {
+    .primary {
       background: linear-gradient(135deg, #6737ff, #287cff);
     }
 
-    .section-title {
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 14px;
-    }
-
-    .stat {
+    .row {
       display: flex;
       justify-content: space-between;
       padding: 13px 0;
       border-bottom: 1px solid #20283a;
     }
 
-    .stat:last-child {
+    .row:last-child {
       border-bottom: 0;
     }
 
@@ -133,145 +118,182 @@
       color: #8d93a7;
     }
 
-    .status {
+    .online {
       color: #42e879;
     }
 
-    .history-item {
-      padding: 14px 0;
+    .tx {
+      padding: 13px 0;
       border-bottom: 1px solid #20283a;
     }
 
-    .history-item:last-child {
-      border-bottom: 0;
-    }
-
     .empty {
-      color: #777f95;
       text-align: center;
-      padding: 12px 0;
+      color: #777f95;
+      padding: 10px;
     }
 
-    .footer {
+    footer {
       text-align: center;
       color: #596176;
       font-size: 12px;
-      margin-top: 28px;
+      margin-top: 25px;
     }
   </style>
 </head>
 
 <body>
 
-  <main class="app">
+<div class="app">
 
-    <header>
-      <div class="logo">S</div>
+  <header>
+    <div class="logo">S</div>
 
-      <div style="text-align:right">
-        <h1>SLX Network</h1>
-        <div class="version">Test Network • v0.7</div>
-      </div>
-    </header>
+    <div style="text-align:right">
+      <h1>SLX Network</h1>
+      <div class="version">Testnet • v0.7</div>
+    </div>
+  </header>
 
-    <section class="card">
-      <div class="balance-title">Ваш баланс</div>
-
-      <div class="balance" id="balance">1000.00</div>
-      <div class="slx">SLX</div>
-
-      <div class="wallet">
-        Wallet:
-        <span id="wallet">SLX-TEST-7F92A1C4</span>
-      </div>
-    </section>
-
-    <div class="buttons">
-      <button class="primary" onclick="sendSLX()">Отправить</button>
-      <button onclick="receiveSLX()">Получить</button>
+  <section class="card">
+    <div class="label">Ваш баланс</div>
+    <div class="balance">
+      <span id="balance">...</span>
+      <span class="coin">SLX</span>
     </div>
 
-    <section class="card">
-      <div class="section-title">Network</div>
+    <div class="wallet">
+      Wallet:
+      <span id="wallet">...</span>
+    </div>
+  </section>
 
-      <div class="stat">
-        <span class="muted">Status</span>
-        <span class="status">● Online</span>
-      </div>
+  <div class="buttons">
+    <button class="primary" onclick="sendSLX()">Отправить</button>
+    <button onclick="faucet()">+100 SLX</button>
+  </div>
 
-      <div class="stat">
-        <span class="muted">Network</span>
-        <span>SLX Testnet</span>
-      </div>
+  <section class="card">
+    <h2>Network</h2>
 
-      <div class="stat">
-        <span class="muted">Version</span>
-        <span>0.7</span>
-      </div>
-
-      <div class="stat">
-        <span class="muted">Storage</span>
-        <span>SQLite</span>
-      </div>
-    </section>
-
-    <section class="card">
-      <div class="section-title">История</div>
-
-      <div id="history">
-        <div class="empty">
-          Транзакций пока нет
-        </div>
-      </div>
-    </section>
-
-    <div class="footer">
-      SLX Network • Experimental Test Network
+    <div class="row">
+      <span class="muted">Status</span>
+      <span class="online">● Online</span>
     </div>
 
-  </main>
+    <div class="row">
+      <span class="muted">Network</span>
+      <span>SLX Testnet</span>
+    </div>
 
-  <script>
-    let balance = 1000;
+    <div class="row">
+      <span class="muted">Version</span>
+      <span>0.7</span>
+    </div>
+  </section>
 
-    function sendSLX() {
-      const amount = prompt("Сколько SLX отправить?");
+  <section class="card">
+    <h2>История</h2>
+    <div id="history">
+      <div class="empty">Загрузка...</div>
+    </div>
+  </section>
 
-      if (!amount) return;
+  <footer>
+    SLX Network • Experimental Test Network
+  </footer>
 
-      const value = Number(amount);
+</div>
 
-      if (isNaN(value) || value <= 0) {
-        alert("Введите правильную сумму.");
-        return;
-      }
+<script>
+async function loadStatus() {
+  try {
+    const response = await fetch("/api/status");
+    const data = await response.json();
 
-      if (value > balance) {
-        alert("Недостаточно SLX.");
-        return;
-      }
+    document.getElementById("balance").textContent =
+      Number(data.balance).toFixed(2);
 
-      balance -= value;
+    document.getElementById("wallet").textContent =
+      data.wallet;
 
-      document.getElementById("balance").textContent =
-        balance.toFixed(2);
+    const history = document.getElementById("history");
 
-      const history = document.getElementById("history");
-
-      history.innerHTML = `
-        <div class="history-item">
-          <div>Отправлено <b>${value.toFixed(2)} SLX</b></div>
-          <small class="muted">Test transaction</small>
-        </div>
-      `;
+    if (!data.transactions.length) {
+      history.innerHTML =
+        '<div class="empty">Транзакций пока нет</div>';
+      return;
     }
 
-    function receiveSLX() {
-      alert(
-        "Ваш тестовый адрес:\n\nSLX-TEST-7F92A1C4"
-      );
+    history.innerHTML = data.transactions.map(tx => `
+      <div class="tx">
+        ${tx.type === "send" ? "Отправлено" : "Получено"}
+        <b>${Number(tx.amount).toFixed(2)} SLX</b>
+        <br>
+        <small class="muted">${tx.id}</small>
+      </div>
+    `).join("");
+
+  } catch (error) {
+    document.getElementById("history").innerHTML =
+      '<div class="empty">Сервер пока недоступен</div>';
+  }
+}
+
+async function sendSLX() {
+  const amount = prompt("Сколько SLX отправить?");
+  if (!amount) return;
+
+  const recipient = prompt("Адрес получателя:");
+  if (!recipient) return;
+
+  try {
+    const response = await fetch("/api/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        amount: Number(amount),
+        recipient: recipient
+      })
+    });
+
+    const data = await response.json();
+
+    if (!data.success) {
+      alert(data.error);
+      return;
     }
-  </script>
+
+    await loadStatus();
+    alert("Транзакция создана!");
+
+  } catch {
+    alert("Сервер недоступен.");
+  }
+}
+
+async function faucet() {
+  try {
+    const response = await fetch("/api/faucet", {
+      method: "POST"
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      await loadStatus();
+      alert("Получено 100 тестовых SLX!");
+    }
+
+  } catch {
+    alert("Сервер недоступен.");
+  }
+}
+
+loadStatus();
+</script>
 
 </body>
 </html>
