@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>SLX Network v0.8</title>
+  <title>SLX Network v0.9</title>
 
   <style>
     * {
@@ -19,9 +19,9 @@
     }
 
     .app {
-      max-width: 520px;
+      max-width: 560px;
       margin: auto;
-      padding: 24px 16px 40px;
+      padding: 24px 16px 50px;
     }
 
     header {
@@ -32,13 +32,13 @@
     }
 
     .logo {
-      width: 52px;
-      height: 52px;
-      border-radius: 16px;
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
       background: linear-gradient(135deg, #6737ff, #00cfff);
       display: grid;
       place-items: center;
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 900;
     }
 
@@ -53,7 +53,7 @@
 
     .version {
       color: #8d93a7;
-      margin-top: 4px;
+      margin-top: 5px;
       font-size: 13px;
     }
 
@@ -80,8 +80,8 @@
       color: #9b6cff;
     }
 
-    .wallet {
-      margin-top: 16px;
+    .wallet-address {
+      margin-top: 14px;
       color: #777f95;
       font-size: 12px;
       word-break: break-all;
@@ -100,7 +100,7 @@
       border-radius: 16px;
       padding: 16px;
       color: white;
-      font-size: 16px;
+      font-size: 15px;
       font-weight: 700;
       background: #20283a;
     }
@@ -113,10 +113,43 @@
       background: linear-gradient(135deg, #6737ff, #287cff);
     }
 
+    .wallet-item {
+      background: #171e2d;
+      border: 1px solid #273149;
+      border-radius: 16px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+
+    .wallet-item.active {
+      border-color: #7b4cff;
+    }
+
+    .wallet-name {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .wallet-balance {
+      color: #9b6cff;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .wallet-address-small {
+      color: #7f879b;
+      font-size: 11px;
+      margin-top: 8px;
+      word-break: break-all;
+    }
+
+    .online {
+      color: #42e879;
+    }
+
     .row {
       display: flex;
       justify-content: space-between;
-      gap: 16px;
       padding: 13px 0;
       border-bottom: 1px solid #20283a;
     }
@@ -129,10 +162,6 @@
       color: #8d93a7;
     }
 
-    .online {
-      color: #42e879;
-    }
-
     .tx {
       padding: 13px 0;
       border-bottom: 1px solid #20283a;
@@ -142,32 +171,53 @@
       border-bottom: 0;
     }
 
-    .empty {
-      text-align: center;
-      color: #777f95;
-      padding: 10px;
+    .send-form {
+      display: none;
+    }
+
+    .send-form.show {
+      display: block;
     }
 
     input {
       width: 100%;
-      background: #070912;
+      padding: 15px;
+      margin: 8px 0 12px;
+      border-radius: 14px;
+      border: 1px solid #30394e;
+      background: #171e2d;
       color: white;
-      border: 1px solid #30394f;
-      border-radius: 12px;
-      padding: 14px;
-      margin: 7px 0;
-      font-size: 15px;
+      font-size: 14px;
+      outline: none;
     }
 
-    .small {
-      font-size: 12px;
+    input:focus {
+      border-color: #7b4cff;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777f95;
+      padding: 12px;
+    }
+
+    .success {
+      color: #42e879;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    .error {
+      color: #ff6b7a;
+      font-size: 14px;
+      margin-top: 10px;
     }
 
     footer {
       text-align: center;
       color: #596176;
       font-size: 12px;
-      margin-top: 25px;
+      margin-top: 28px;
     }
   </style>
 </head>
@@ -181,17 +231,17 @@
 
     <div style="text-align:right">
       <h1>SLX Network</h1>
-      <div class="version">Testnet • v0.8</div>
+      <div class="version">Testnet • v0.9</div>
     </div>
   </header>
 
 
-  <!-- BALANCE -->
+  <!-- CURRENT WALLET -->
 
   <section class="card">
 
     <div class="label">
-      Ваш баланс
+      Активный кошелёк
     </div>
 
     <div class="balance">
@@ -199,9 +249,9 @@
       <span class="coin">SLX</span>
     </div>
 
-    <div class="wallet">
+    <div class="wallet-address">
       Wallet:
-      <span id="wallet">...</span>
+      <span id="currentAddress">...</span>
     </div>
 
   </section>
@@ -211,35 +261,80 @@
 
   <div class="buttons">
 
-    <button
-      class="primary"
-      onclick="sendSLX()">
+    <button class="primary" onclick="showSendForm()">
       Отправить
     </button>
 
-    <button
-      onclick="faucet()">
-      +100 SLX
+    <button onclick="createWallet()">
+      + Новый кошелёк
     </button>
 
   </div>
 
 
-  <!-- WALLET -->
+  <!-- SEND -->
+
+  <section class="card send-form" id="sendForm">
+
+    <h2>Перевод SLX</h2>
+
+    <div class="label">
+      Адрес получателя
+    </div>
+
+    <input
+      id="recipient"
+      type="text"
+      placeholder="SLX-..."
+    >
+
+    <div class="label">
+      Сумма
+    </div>
+
+    <input
+      id="amount"
+      type="number"
+      min="0.01"
+      step="0.01"
+      placeholder="Например: 100"
+    >
+
+    <div class="buttons">
+
+      <button
+        class="primary"
+        onclick="sendSLX()"
+      >
+        Отправить
+      </button>
+
+      <button onclick="hideSendForm()">
+        Отмена
+      </button>
+
+    </div>
+
+    <div id="sendMessage"></div>
+
+  </section>
+
+
+  <!-- WALLETS -->
 
   <section class="card">
 
-    <h2>Кошелёк</h2>
+    <h2>Кошельки</h2>
 
-    <div class="muted small">
-      Ваш тестовый кошелёк SLX.
+    <div class="muted">
+      Все тестовые кошельки этого устройства
     </div>
 
-    <br>
-
-    <button onclick="newWallet()">
-      Создать новый кошелёк
-    </button>
+    <div id="walletList">
+      <div class="empty">
+        Загрузка...
+      </div>
+    </div>
 
   </section>
 
@@ -276,7 +371,17 @@
       </span>
 
       <span>
-        0.8
+        0.9
+      </span>
+    </div>
+
+    <div class="row">
+      <span class="muted">
+        Wallets
+      </span>
+
+      <span id="walletCount">
+        0
       </span>
     </div>
 
@@ -287,13 +392,11 @@
 
   <section class="card">
 
-    <h2>
-      История
-    </h2>
+    <h2>История</h2>
 
     <div id="history">
       <div class="empty">
-        Загрузка...
+        Транзакций пока нет
       </div>
     </div>
 
@@ -301,7 +404,7 @@
 
 
   <footer>
-    SLX Network • Experimental Test Network
+    SLX Network • Experimental Test Network • v0.9
   </footer>
 
 </div>
@@ -309,436 +412,435 @@
 
 <script>
 
-let address = localStorage.getItem("slx_wallet");
+let currentWallet = null;
 
 
-/* API */
+/* =========================
+   API
+========================= */
 
 async function api(url, options = {}) {
 
-  const response = await fetch(
-    url,
-    options
-  );
+  const response = await fetch(url, options);
 
-  return response.json();
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.error || "Ошибка сервера");
+  }
+
+  return data;
 }
 
 
-/* CHECK / CREATE WALLET */
-
-async function ensureWallet() {
-
-  if (address) {
-
-    try {
-
-      const check = await api(
-        "/api/status?address=" +
-        encodeURIComponent(address)
-      );
-
-      if (check.success) {
-        return;
-      }
-
-    } catch {
-      // Создадим новый кошелёк ниже
-    }
-  }
-
-
-  const data = await api(
-    "/api/wallet/create",
-    {
-      method: "POST"
-    }
-  );
-
-
-  if (!data.success) {
-
-    throw new Error(
-      data.error ||
-      "Wallet creation failed"
-    );
-
-  }
-
-
-  address =
-    data.wallet.address;
-
-
-  localStorage.setItem(
-    "slx_wallet",
-    address
-  );
-
-}
-
-
-/* LOAD WALLET */
+/* =========================
+   LOAD
+========================= */
 
 async function loadStatus() {
 
   try {
 
-    await ensureWallet();
+    const data = await api("/api/status");
 
+    let wallets = data.wallets || [];
 
-    const data = await api(
-      "/api/status?address=" +
-      encodeURIComponent(address)
-    );
+    /*
+      Если сервер пустой после перезапуска,
+      автоматически создаём первый кошелёк.
+    */
 
+    if (wallets.length === 0) {
 
-    if (!data.success) {
-      throw new Error(data.error);
-    }
-
-
-    document.getElementById(
-      "balance"
-    ).textContent =
-      Number(data.balance).toFixed(2);
-
-
-    document.getElementById(
-      "wallet"
-    ).textContent =
-      data.wallet;
-
-
-    const history =
-      document.getElementById(
-        "history"
-      );
-
-
-    if (
-      !data.transactions ||
-      data.transactions.length === 0
-    ) {
-
-      history.innerHTML =
-        '<div class="empty">' +
-        'Транзакций пока нет' +
-        '</div>';
-
-      return;
-
-    }
-
-
-    history.innerHTML =
-      data.transactions.map(
-        tx => {
-
-          let title =
-            "Получено";
-
-
-          if (
-            tx.type === "send"
-          ) {
-
-            title =
-              "Отправлено";
-
-          }
-
-
-          if (
-            tx.type === "receive"
-          ) {
-
-            title =
-              "Получено от";
-
-          }
-
-
-          let details = "";
-
-
-          if (
-            tx.type === "send"
-          ) {
-
-            details =
-              "Кому: " +
-              tx.to;
-
-          }
-
-
-          else if (
-            tx.type === "receive"
-          ) {
-
-            details =
-              "От: " +
-              tx.from;
-
-          }
-
-
-          else {
-
-            details =
-              "Источник: Faucet";
-
-          }
-
-
-          return `
-
-            <div class="tx">
-
-              ${title}
-              <b>
-                ${Number(tx.amount).toFixed(2)}
-                SLX
-              </b>
-
-              <br>
-
-              <small class="muted">
-                ${tx.id}
-              </small>
-
-              <br>
-
-              <small class="muted">
-                ${details}
-              </small>
-
-            </div>
-
-          `;
-
-        }
-      ).join("");
-
-  }
-
-
-  catch (error) {
-
-    document.getElementById(
-      "history"
-    ).innerHTML =
-      '<div class="empty">' +
-      'Сервер пока недоступен' +
-      '</div>';
-
-  }
-
-}
-
-
-/* SEND SLX */
-
-async function sendSLX() {
-
-  const recipient =
-    prompt(
-      "Адрес кошелька получателя:"
-    );
-
-
-  if (!recipient) {
-    return;
-  }
-
-
-  const amount =
-    prompt(
-      "Сколько SLX отправить?"
-    );
-
-
-  if (!amount) {
-    return;
-  }
-
-
-  try {
-
-    const data =
-      await api(
-        "/api/send",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              sender: address,
-              recipient: recipient,
-              amount: Number(amount)
-            })
-        }
-      );
-
-
-    if (!data.success) {
-
-      alert(data.error);
-
-      return;
-
-    }
-
-
-    await loadStatus();
-
-
-    alert(
-      "Транзакция создана!"
-    );
-
-  }
-
-
-  catch {
-
-    alert(
-      "Сервер недоступен."
-    );
-
-  }
-
-}
-
-
-/* FAUCET */
-
-async function faucet() {
-
-  try {
-
-    const data =
-      await api(
-        "/api/faucet",
-        {
-          method: "POST",
-
-          headers: {
-            "Content-Type":
-              "application/json"
-          },
-
-          body:
-            JSON.stringify({
-              address: address
-            })
-        }
-      );
-
-
-    if (!data.success) {
-
-      alert(data.error);
-
-      return;
-
-    }
-
-
-    await loadStatus();
-
-
-    alert(
-      "Получено 100 тестовых SLX!"
-    );
-
-  }
-
-
-  catch {
-
-    alert(
-      "Сервер недоступен."
-    );
-
-  }
-
-}
-
-
-/* NEW WALLET */
-
-async function newWallet() {
-
-  const ok =
-    confirm(
-      "Создать новый тестовый кошелёк?"
-    );
-
-
-  if (!ok) {
-    return;
-  }
-
-
-  try {
-
-    const data =
-      await api(
+      const result = await api(
         "/api/wallet/create",
         {
           method: "POST"
         }
       );
 
+      wallets = [result.wallet];
 
-    if (!data.success) {
+      currentWallet = result.wallet.address;
 
-      alert(data.error);
+      localStorage.setItem(
+        "slx_current_wallet",
+        currentWallet
+      );
 
-      return;
+    } else {
 
+      const saved =
+        localStorage.getItem("slx_current_wallet");
+
+      const exists = wallets.some(
+        wallet => wallet.address === saved
+      );
+
+      if (exists) {
+
+        currentWallet = saved;
+
+      } else {
+
+        currentWallet = wallets[0].address;
+
+        localStorage.setItem(
+          "slx_current_wallet",
+          currentWallet
+        );
+      }
     }
 
+    await refreshWallet();
 
-    address =
-      data.wallet.address;
+    renderWallets(wallets);
 
+  } catch (error) {
+
+    document.getElementById("currentAddress").textContent =
+      "Сервер недоступен";
+
+  }
+}
+
+
+/* =========================
+   CURRENT WALLET
+========================= */
+
+async function refreshWallet() {
+
+  if (!currentWallet) return;
+
+  try {
+
+    const data = await api(
+      "/api/wallet/" +
+      encodeURIComponent(currentWallet)
+    );
+
+    const wallet = data.wallet;
+
+    document.getElementById("balance").textContent =
+      Number(wallet.balance).toFixed(2);
+
+    document.getElementById("currentAddress").textContent =
+      wallet.address;
+
+    renderHistory(wallet.transactions || []);
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+}
+
+
+/* =========================
+   CREATE WALLET
+========================= */
+
+async function createWallet() {
+
+  try {
+
+    const data = await api(
+      "/api/wallet/create",
+      {
+        method: "POST"
+      }
+    );
+
+    currentWallet = data.wallet.address;
 
     localStorage.setItem(
-      "slx_wallet",
-      address
+      "slx_current_wallet",
+      currentWallet
     );
+
+    alert(
+      "Новый кошелёк создан!\n\n" +
+      data.wallet.address +
+      "\n\nБаланс: 1000 SLX"
+    );
+
+    await loadStatus();
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+}
+
+
+/* =========================
+   SELECT WALLET
+========================= */
+
+function selectWallet(address) {
+
+  currentWallet = address;
+
+  localStorage.setItem(
+    "slx_current_wallet",
+    address
+  );
+
+  refreshWallet();
+  loadStatus();
+
+}
+
+
+/* =========================
+   RENDER WALLETS
+========================= */
+
+function renderWallets(wallets) {
+
+  const container =
+    document.getElementById("walletList");
+
+  document.getElementById("walletCount")
+    .textContent = wallets.length;
+
+  if (!wallets.length) {
+
+    container.innerHTML =
+      '<div class="empty">Кошельков нет</div>';
+
+    return;
+  }
+
+  container.innerHTML =
+    wallets.map((wallet, index) => {
+
+      const active =
+        wallet.address === currentWallet
+          ? "active"
+          : "";
+
+      return `
+        <div
+          class="wallet-item ${active}"
+          onclick="selectWallet('${wallet.address}')"
+        >
+
+          <div class="wallet-name">
+            Кошелёк ${index + 1}
+          </div>
+
+          <div class="wallet-balance">
+            ${Number(wallet.balance).toFixed(2)} SLX
+          </div>
+
+          <div class="wallet-address-small">
+            ${wallet.address}
+          </div>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================
+   SEND FORM
+========================= */
+
+function showSendForm() {
+
+  document
+    .getElementById("sendForm")
+    .classList.add("show");
+
+  document
+    .getElementById("recipient")
+    .focus();
+
+}
+
+
+function hideSendForm() {
+
+  document
+    .getElementById("sendForm")
+    .classList.remove("show");
+
+  document.getElementById("sendMessage")
+    .innerHTML = "";
+
+}
+
+
+/* =========================
+   SEND SLX
+========================= */
+
+async function sendSLX() {
+
+  const recipient =
+    document
+      .getElementById("recipient")
+      .value
+      .trim();
+
+  const amount =
+    Number(
+      document
+        .getElementById("amount")
+        .value
+    );
+
+  const message =
+    document.getElementById("sendMessage");
+
+
+  if (!recipient) {
+
+    message.className = "error";
+    message.textContent =
+      "Введите адрес получателя.";
+
+    return;
+  }
+
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+
+    message.className = "error";
+    message.textContent =
+      "Введите правильную сумму.";
+
+    return;
+  }
+
+
+  try {
+
+    const data = await api(
+      "/api/send",
+      {
+        method: "POST",
+
+        headers: {
+          "Content-Type":
+            "application/json"
+        },
+
+        body: JSON.stringify({
+
+          sender: currentWallet,
+
+          recipient: recipient,
+
+          amount: amount
+
+        })
+      }
+    );
+
+
+    message.className = "success";
+
+    message.innerHTML =
+      "✓ Перевод выполнен!<br>" +
+      "TX: " +
+      data.transaction.id;
+
+
+    document.getElementById("recipient")
+      .value = "";
+
+    document.getElementById("amount")
+      .value = "";
 
 
     await loadStatus();
 
 
-    alert(
-      "Новый кошелёк создан!"
-    );
+  } catch (error) {
 
-  }
+    message.className = "error";
 
-
-  catch {
-
-    alert(
-      "Сервер недоступен."
-    );
+    message.textContent =
+      error.message;
 
   }
 
 }
 
 
-/* START */
+/* =========================
+   HISTORY
+========================= */
+
+function renderHistory(transactions) {
+
+  const history =
+    document.getElementById("history");
+
+
+  if (!transactions.length) {
+
+    history.innerHTML =
+      '<div class="empty">Транзакций пока нет</div>';
+
+    return;
+  }
+
+
+  history.innerHTML =
+    transactions.map(tx => {
+
+      let title;
+
+      if (tx.type === "send") {
+
+        title =
+          `Отправлено ${Number(tx.amount).toFixed(2)} SLX`;
+
+      } else {
+
+        title =
+          `Получено ${Number(tx.amount).toFixed(2)} SLX`;
+
+      }
+
+
+      return `
+        <div class="tx">
+
+          <b>${title}</b>
+
+          <br>
+
+          <small class="muted">
+            TX: ${tx.id}
+          </small>
+
+          <br>
+
+          <small class="muted">
+            ${tx.type === "send"
+              ? "Кому: " + tx.to
+              : "От: " + tx.from}
+          </small>
+
+        </div>
+      `;
+
+    }).join("");
+}
+
+
+/* =========================
+   START
+========================= */
 
 loadStatus();
 
