@@ -1,345 +1,748 @@
-const http = require("http");
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-const PORT = process.env.PORT || 3000;
+  <title>SLX Network v0.8</title>
 
-const wallets = new Map();
-
-function makeAddress() {
-  return "SLX-" + crypto.randomBytes(8).toString("hex").toUpperCase();
-}
-
-function createWallet() {
-  const address = makeAddress();
-
-  const wallet = {
-    address,
-    balance: 1000,
-    transactions: []
-  };
-
-  wallets.set(address, wallet);
-  return wallet;
-}
-
-function getWallet(address) {
-  return wallets.get(String(address || "").trim());
-}
-
-function addTransaction(wallet, transaction) {
-  wallet.transactions.unshift(transaction);
-  wallet.transactions = wallet.transactions.slice(0, 50);
-}
-
-function sendJSON(res, data, status = 200) {
-  res.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Access-Control-Allow-Origin": "*"
-  });
-
-  res.end(JSON.stringify(data));
-}
-
-function sendHTML(res) {
-  fs.readFile(path.join(__dirname, "index.html"), "utf8", (err, html) => {
-    if (err) {
-      sendJSON(
-        res,
-        {
-          success: false,
-          error: "index.html not found"
-        },
-        500
-      );
-      return;
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
     }
 
-    res.writeHead(200, {
-      "Content-Type": "text/html; charset=utf-8"
-    });
+    body {
+      margin: 0;
+      background: #070912;
+      color: white;
+    }
 
-    res.end(html);
-  });
+    .app {
+      max-width: 520px;
+      margin: auto;
+      padding: 24px 16px 40px;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, #6737ff, #00cfff);
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      font-weight: 900;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+
+    h2 {
+      margin-top: 0;
+    }
+
+    .version {
+      color: #8d93a7;
+      margin-top: 4px;
+      font-size: 13px;
+    }
+
+    .card {
+      background: #101522;
+      border: 1px solid #20283a;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .label {
+      color: #8d93a7;
+      font-size: 14px;
+    }
+
+    .balance {
+      font-size: 38px;
+      font-weight: 800;
+      margin-top: 8px;
+    }
+
+    .coin {
+      color: #9b6cff;
+    }
+
+    .wallet {
+      margin-top: 16px;
+      color: #777f95;
+      font-size: 12px;
+      word-break: break-all;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 16px;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      background: #20283a;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #6737ff, #287cff);
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 0;
+      border-bottom: 1px solid #20283a;
+    }
+
+    .row:last-child {
+      border-bottom: 0;
+    }
+
+    .muted {
+      color: #8d93a7;
+    }
+
+    .online {
+      color: #42e879;
+    }
+
+    .tx {
+      padding: 13px 0;
+      border-bottom: 1px solid #20283a;
+    }
+
+    .tx:last-child {
+      border-bottom: 0;
+    }
+
+    .empty {
+      text-align: center;
+      color: #777f95;
+      padding: 10px;
+    }
+
+    input {
+      width: 100%;
+      background: #070912;
+      color: white;
+      border: 1px solid #30394f;
+      border-radius: 12px;
+      padding: 14px;
+      margin: 7px 0;
+      font-size: 15px;
+    }
+
+    .small {
+      font-size: 12px;
+    }
+
+    footer {
+      text-align: center;
+      color: #596176;
+      font-size: 12px;
+      margin-top: 25px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="app">
+
+  <header>
+    <div class="logo">S</div>
+
+    <div style="text-align:right">
+      <h1>SLX Network</h1>
+      <div class="version">Testnet • v0.8</div>
+    </div>
+  </header>
+
+
+  <!-- BALANCE -->
+
+  <section class="card">
+
+    <div class="label">
+      Ваш баланс
+    </div>
+
+    <div class="balance">
+      <span id="balance">...</span>
+      <span class="coin">SLX</span>
+    </div>
+
+    <div class="wallet">
+      Wallet:
+      <span id="wallet">...</span>
+    </div>
+
+  </section>
+
+
+  <!-- ACTIONS -->
+
+  <div class="buttons">
+
+    <button
+      class="primary"
+      onclick="sendSLX()">
+      Отправить
+    </button>
+
+    <button
+      onclick="faucet()">
+      +100 SLX
+    </button>
+
+  </div>
+
+
+  <!-- WALLET -->
+
+  <section class="card">
+
+    <h2>Кошелёк</h2>
+
+    <div class="muted small">
+      Ваш тестовый кошелёк SLX.
+    </div>
+
+    <br>
+
+    <button onclick="newWallet()">
+      Создать новый кошелёк
+    </button>
+
+  </section>
+
+
+  <!-- NETWORK -->
+
+  <section class="card">
+
+    <h2>Network</h2>
+
+    <div class="row">
+      <span class="muted">
+        Status
+      </span>
+
+      <span class="online">
+        ● Online
+      </span>
+    </div>
+
+    <div class="row">
+      <span class="muted">
+        Network
+      </span>
+
+      <span>
+        SLX Testnet
+      </span>
+    </div>
+
+    <div class="row">
+      <span class="muted">
+        Version
+      </span>
+
+      <span>
+        0.8
+      </span>
+    </div>
+
+  </section>
+
+
+  <!-- HISTORY -->
+
+  <section class="card">
+
+    <h2>
+      История
+    </h2>
+
+    <div id="history">
+      <div class="empty">
+        Загрузка...
+      </div>
+    </div>
+
+  </section>
+
+
+  <footer>
+    SLX Network • Experimental Test Network
+  </footer>
+
+</div>
+
+
+<script>
+
+let address = localStorage.getItem("slx_wallet");
+
+
+/* API */
+
+async function api(url, options = {}) {
+
+  const response = await fetch(
+    url,
+    options
+  );
+
+  return response.json();
 }
 
-function getBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = "";
 
-    req.on("data", chunk => {
-      body += chunk;
+/* CHECK / CREATE WALLET */
 
-      if (body.length > 100000) {
-        req.destroy();
+async function ensureWallet() {
+
+  if (address) {
+
+    try {
+
+      const check = await api(
+        "/api/status?address=" +
+        encodeURIComponent(address)
+      );
+
+      if (check.success) {
+        return;
       }
-    });
 
-    req.on("end", () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch {
-        reject(new Error("Invalid JSON"));
-      }
-    });
-
-    req.on("error", reject);
-  });
-}
-
-const server = http.createServer(async (req, res) => {
-
-  // Главная страница
-  if (req.method === "GET" && req.url === "/") {
-    sendHTML(res);
-    return;
+    } catch {
+      // Создадим новый кошелёк ниже
+    }
   }
 
-  // Создание нового кошелька
-  if (req.method === "POST" && req.url === "/api/wallet/create") {
-    const wallet = createWallet();
 
-    sendJSON(res, {
-      success: true,
-      wallet: {
-        address: wallet.address,
-        balance: wallet.balance,
-        transactions: wallet.transactions
-      }
-    });
+  const data = await api(
+    "/api/wallet/create",
+    {
+      method: "POST"
+    }
+  );
 
-    return;
-  }
 
-  // Получение информации о кошельке
-  if (req.method === "GET" && req.url.startsWith("/api/status")) {
-    const url = new URL(
-      req.url,
-      `http://${req.headers.host || "localhost"}`
+  if (!data.success) {
+
+    throw new Error(
+      data.error ||
+      "Wallet creation failed"
     );
 
-    const address = url.searchParams.get("address");
-    const wallet = getWallet(address);
+  }
 
-    if (!wallet) {
-      sendJSON(
-        res,
-        {
-          success: false,
-          error: "Wallet not found"
-        },
-        404
+
+  address =
+    data.wallet.address;
+
+
+  localStorage.setItem(
+    "slx_wallet",
+    address
+  );
+
+}
+
+
+/* LOAD WALLET */
+
+async function loadStatus() {
+
+  try {
+
+    await ensureWallet();
+
+
+    const data = await api(
+      "/api/status?address=" +
+      encodeURIComponent(address)
+    );
+
+
+    if (!data.success) {
+      throw new Error(data.error);
+    }
+
+
+    document.getElementById(
+      "balance"
+    ).textContent =
+      Number(data.balance).toFixed(2);
+
+
+    document.getElementById(
+      "wallet"
+    ).textContent =
+      data.wallet;
+
+
+    const history =
+      document.getElementById(
+        "history"
       );
+
+
+    if (
+      !data.transactions ||
+      data.transactions.length === 0
+    ) {
+
+      history.innerHTML =
+        '<div class="empty">' +
+        'Транзакций пока нет' +
+        '</div>';
 
       return;
+
     }
 
-    sendJSON(res, {
-      success: true,
-      network: "SLX Testnet",
-      version: "0.8",
-      status: "online",
-      wallet: wallet.address,
-      balance: wallet.balance,
-      transactions: wallet.transactions
-    });
 
+    history.innerHTML =
+      data.transactions.map(
+        tx => {
+
+          let title =
+            "Получено";
+
+
+          if (
+            tx.type === "send"
+          ) {
+
+            title =
+              "Отправлено";
+
+          }
+
+
+          if (
+            tx.type === "receive"
+          ) {
+
+            title =
+              "Получено от";
+
+          }
+
+
+          let details = "";
+
+
+          if (
+            tx.type === "send"
+          ) {
+
+            details =
+              "Кому: " +
+              tx.to;
+
+          }
+
+
+          else if (
+            tx.type === "receive"
+          ) {
+
+            details =
+              "От: " +
+              tx.from;
+
+          }
+
+
+          else {
+
+            details =
+              "Источник: Faucet";
+
+          }
+
+
+          return `
+
+            <div class="tx">
+
+              ${title}
+              <b>
+                ${Number(tx.amount).toFixed(2)}
+                SLX
+              </b>
+
+              <br>
+
+              <small class="muted">
+                ${tx.id}
+              </small>
+
+              <br>
+
+              <small class="muted">
+                ${details}
+              </small>
+
+            </div>
+
+          `;
+
+        }
+      ).join("");
+
+  }
+
+
+  catch (error) {
+
+    document.getElementById(
+      "history"
+    ).innerHTML =
+      '<div class="empty">' +
+      'Сервер пока недоступен' +
+      '</div>';
+
+  }
+
+}
+
+
+/* SEND SLX */
+
+async function sendSLX() {
+
+  const recipient =
+    prompt(
+      "Адрес кошелька получателя:"
+    );
+
+
+  if (!recipient) {
     return;
   }
 
-  // Faucet +100 SLX
-  if (req.method === "POST" && req.url === "/api/faucet") {
-    try {
-      const body = await getBody(req);
-      const wallet = getWallet(body.address);
 
-      if (!wallet) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Wallet not found"
-          },
-          404
-        );
+  const amount =
+    prompt(
+      "Сколько SLX отправить?"
+    );
 
-        return;
-      }
 
-      const amount = 100;
+  if (!amount) {
+    return;
+  }
 
-      wallet.balance += amount;
 
-      const transaction = {
-        id:
-          "TX-" +
-          Date.now() +
-          "-" +
-          crypto.randomBytes(3).toString("hex"),
+  try {
 
-        type: "faucet",
-        amount,
-        from: "FAUCET",
-        to: wallet.address,
-        time: new Date().toISOString()
-      };
-
-      addTransaction(wallet, transaction);
-
-      sendJSON(res, {
-        success: true,
-        transaction,
-        balance: wallet.balance
-      });
-
-    } catch {
-      sendJSON(
-        res,
+    const data =
+      await api(
+        "/api/send",
         {
-          success: false,
-          error: "Invalid request"
-        },
-        400
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              sender: address,
+              recipient: recipient,
+              amount: Number(amount)
+            })
+        }
       );
+
+
+    if (!data.success) {
+
+      alert(data.error);
+
+      return;
+
     }
 
-    return;
+
+    await loadStatus();
+
+
+    alert(
+      "Транзакция создана!"
+    );
+
   }
 
-  // Перевод SLX
-  if (req.method === "POST" && req.url === "/api/send") {
-    try {
-      const body = await getBody(req);
 
-      const sender = getWallet(body.sender);
-      const recipient = getWallet(body.recipient);
-      const amount = Number(body.amount);
+  catch {
 
-      if (!sender) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Sender wallet not found"
-          },
-          404
-        );
+    alert(
+      "Сервер недоступен."
+    );
 
-        return;
-      }
+  }
 
-      if (!recipient) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Recipient wallet not found"
-          },
-          404
-        );
+}
 
-        return;
-      }
 
-      if (sender.address === recipient.address) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Cannot send to the same wallet"
-          },
-          400
-        );
+/* FAUCET */
 
-        return;
-      }
+async function faucet() {
 
-      if (!Number.isFinite(amount) || amount <= 0) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Invalid amount"
-          },
-          400
-        );
+  try {
 
-        return;
-      }
-
-      if (amount > sender.balance) {
-        sendJSON(
-          res,
-          {
-            success: false,
-            error: "Insufficient SLX balance"
-          },
-          400
-        );
-
-        return;
-      }
-
-      // Списываем у отправителя
-      sender.balance -= amount;
-
-      // Добавляем получателю
-      recipient.balance += amount;
-
-      const transaction = {
-        id:
-          "TX-" +
-          Date.now() +
-          "-" +
-          crypto.randomBytes(3).toString("hex"),
-
-        type: "send",
-        amount,
-        from: sender.address,
-        to: recipient.address,
-        time: new Date().toISOString()
-      };
-
-      addTransaction(sender, transaction);
-
-      addTransaction(recipient, {
-        ...transaction,
-        type: "receive"
-      });
-
-      sendJSON(res, {
-        success: true,
-        transaction,
-        senderBalance: sender.balance,
-        recipientBalance: recipient.balance
-      });
-
-    } catch {
-      sendJSON(
-        res,
+    const data =
+      await api(
+        "/api/faucet",
         {
-          success: false,
-          error: "Invalid request"
-        },
-        400
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              address: address
+            })
+        }
       );
+
+
+    if (!data.success) {
+
+      alert(data.error);
+
+      return;
+
     }
 
+
+    await loadStatus();
+
+
+    alert(
+      "Получено 100 тестовых SLX!"
+    );
+
+  }
+
+
+  catch {
+
+    alert(
+      "Сервер недоступен."
+    );
+
+  }
+
+}
+
+
+/* NEW WALLET */
+
+async function newWallet() {
+
+  const ok =
+    confirm(
+      "Создать новый тестовый кошелёк?"
+    );
+
+
+  if (!ok) {
     return;
   }
 
-  // Неизвестный адрес
-  sendJSON(
-    res,
-    {
-      success: false,
-      error: "Not found"
-    },
-    404
-  );
-});
 
-server.listen(PORT, "0.0.0.0", () => {
-  console.log(`SLX Network v0.8 running on port ${PORT}`);
-});
+  try {
+
+    const data =
+      await api(
+        "/api/wallet/create",
+        {
+          method: "POST"
+        }
+      );
+
+
+    if (!data.success) {
+
+      alert(data.error);
+
+      return;
+
+    }
+
+
+    address =
+      data.wallet.address;
+
+
+    localStorage.setItem(
+      "slx_wallet",
+      address
+    );
+
+
+    await loadStatus();
+
+
+    alert(
+      "Новый кошелёк создан!"
+    );
+
+  }
+
+
+  catch {
+
+    alert(
+      "Сервер недоступен."
+    );
+
+  }
+
+}
+
+
+/* START */
+
+loadStatus();
+
+</script>
+
+</body>
+</html>
