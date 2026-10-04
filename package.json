@@ -1,6 +1,6 @@
 {
   "name": "slx-network",
-  "version": "0.7.0",
+  "version": "1.3.0",
   "description": "SLX Network test network",
   "main": "server.js",
   "scripts": {
@@ -8,6 +8,9 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "dependencies": {
+    "pg": "^8.16.3"
   },
   "license": "MIT"
 }
