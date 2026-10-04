@@ -32,6 +32,130 @@
       padding: 24px 16px 50px;
     }
 
+    .auth {
+      max-width: 430px;
+      margin: 45px auto;
+    }
+
+    .auth-logo {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 20px;
+      border-radius: 22px;
+      background: linear-gradient(135deg, #6737ff, #00cfff);
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      font-weight: 900;
+    }
+
+    .auth-title {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .auth-title h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .auth-title p {
+      color: #8d93a7;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: #101522;
+      border: 1px solid #20283a;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 22px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 16px;
+      padding: 15px;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      background: #20283a;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    button:active {
+      transform: scale(.98);
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, #6737ff, #287cff);
+    }
+
+    .primary {
+      background: linear-gradient(135deg, #6737ff, #287cff);
+    }
+
+    .green {
+      background: linear-gradient(135deg, #149447, #20c66a);
+    }
+
+    .red {
+      background: linear-gradient(135deg, #d9344f, #ff526b);
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .label {
+      color: #8d93a7;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin: 7px 0 14px;
+      border-radius: 14px;
+      border: 1px solid #30394e;
+      background: #171e2d;
+      color: white;
+      font-size: 16px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #7b4cff;
+    }
+
+    .message {
+      min-height: 22px;
+      margin-top: 12px;
+      line-height: 1.5;
+    }
+
+    .success {
+      color: #42e879;
+    }
+
+    .error {
+      color: #ff6b7a;
+    }
+
     header {
       display: flex;
       justify-content: space-between;
@@ -43,11 +167,7 @@
       width: 58px;
       height: 58px;
       border-radius: 18px;
-      background: linear-gradient(
-        135deg,
-        #6737ff,
-        #00cfff
-      );
+      background: linear-gradient(135deg, #6737ff, #00cfff);
       display: grid;
       place-items: center;
       font-size: 30px;
@@ -67,19 +187,6 @@
       color: #8d93a7;
       margin-top: 5px;
       font-size: 13px;
-    }
-
-    .card {
-      background: #101522;
-      border: 1px solid #20283a;
-      border-radius: 22px;
-      padding: 20px;
-      margin-bottom: 16px;
-    }
-
-    .label {
-      color: #8d93a7;
-      font-size: 14px;
     }
 
     .balance {
@@ -114,144 +221,12 @@
       margin-bottom: 16px;
     }
 
-    button {
-      width: 100%;
-      border: 0;
-      border-radius: 16px;
-      padding: 15px;
-      color: white;
-      font-size: 15px;
-      font-weight: 700;
-      background: #20283a;
-      cursor: pointer;
-    }
-
-    button:active {
-      transform: scale(.98);
-    }
-
-    .primary {
-      background: linear-gradient(
-        135deg,
-        #6737ff,
-        #287cff
-      );
-    }
-
-    .green {
-      background: linear-gradient(
-        135deg,
-        #149447,
-        #20c66a
-      );
-    }
-
-    .red {
-      background: linear-gradient(
-        135deg,
-        #d9344f,
-        #ff526b
-      );
-    }
-
-    input {
-      width: 100%;
-      padding: 15px;
-      margin: 7px 0 12px;
-      border-radius: 14px;
-      border: 1px solid #30394e;
-      background: #171e2d;
-      color: white;
-      font-size: 15px;
-    }
-
-    input:focus {
-      outline: none;
-      border-color: #7b4cff;
-    }
-
-    .auth {
-      max-width: 430px;
-      margin: 50px auto;
-    }
-
-    .auth-logo {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 20px;
-      border-radius: 22px;
-      background: linear-gradient(
-        135deg,
-        #6737ff,
-        #00cfff
-      );
-      display: grid;
-      place-items: center;
-      font-size: 36px;
-      font-weight: 900;
-    }
-
-    .auth-title {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .auth-title h1 {
-      font-size: 30px;
-    }
-
-    .auth-title p {
-      color: #8d93a7;
-      margin-top: 8px;
-    }
-
-    .auth-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .auth-buttons button.active {
-      background: linear-gradient(
-        135deg,
-        #6737ff,
-        #287cff
-      );
-    }
-
-    .auth-form {
-      display: none;
-    }
-
-    .auth-form.active {
-      display: block;
-    }
-
-    .auth-message {
-      margin-top: 14px;
-      line-height: 1.5;
-    }
-
-    .success {
-      color: #42e879;
-      margin-top: 12px;
-      line-height: 1.5;
-    }
-
-    .error {
-      color: #ff6b7a;
-      margin-top: 12px;
-      line-height: 1.5;
-    }
-
     .wallet-item {
       background: #171e2d;
       border: 1px solid #273149;
       border-radius: 16px;
       padding: 15px;
       margin-top: 10px;
-      cursor: pointer;
     }
 
     .wallet-item.active {
@@ -354,16 +329,15 @@
     }
 
   </style>
-
 </head>
 
 
 <body>
 
 
-<!-- =========================
-     AUTH SCREEN
-========================= -->
+<!-- ==================================================
+     AUTH
+================================================== -->
 
 <div
   id="authScreen"
@@ -391,19 +365,20 @@
 
     <section class="card">
 
-      <div class="auth-buttons">
+      <div class="auth-tabs">
 
         <button
           id="loginTab"
-          class="active"
-          onclick="showAuthForm('login')"
+          class="tab active"
+          type="button"
         >
           Войти
         </button>
 
         <button
           id="registerTab"
-          onclick="showAuthForm('register')"
+          class="tab"
+          type="button"
         >
           Регистрация
         </button>
@@ -441,15 +416,16 @@
         >
 
         <button
+          id="loginButton"
           class="primary"
-          onclick="login()"
+          type="button"
         >
           🔐 Войти
         </button>
 
         <div
           id="loginMessage"
-          class="auth-message"
+          class="message"
         ></div>
 
       </div>
@@ -496,15 +472,16 @@
         >
 
         <button
+          id="registerButton"
           class="green"
-          onclick="register()"
+          type="button"
         >
           ✨ Создать аккаунт
         </button>
 
         <div
           id="registerMessage"
-          class="auth-message"
+          class="message"
         ></div>
 
       </div>
@@ -517,16 +494,15 @@
 
 
 
-<!-- =========================
+<!-- ==================================================
      WALLET APP
-========================= -->
+================================================== -->
 
 <div
   id="walletApp"
   class="app"
   style="display:none"
 >
-
 
   <header>
 
@@ -558,16 +534,17 @@
     </div>
 
     <div
-      class="id"
       id="usernameDisplay"
+      class="id"
     >
       ...
     </div>
 
     <button
+      id="logoutButton"
       class="red"
+      type="button"
       style="margin-top:15px"
-      onclick="logout()"
     >
       🚪 Выйти
     </button>
@@ -615,27 +592,32 @@
 
     <br>
 
-    <button onclick="copyId()">
+    <button
+      id="copyButton"
+      type="button"
+    >
       📋 Копировать ID
     </button>
 
   </section>
 
 
-  <!-- QR BUTTONS -->
+  <!-- QR -->
 
   <div class="buttons">
 
     <button
+      id="myQrButton"
       class="primary"
-      onclick="showMyQR()"
+      type="button"
     >
       ▣ Мой QR
     </button>
 
     <button
+      id="scannerButton"
       class="green"
-      onclick="openScanner()"
+      type="button"
     >
       📷 Сканировать QR
     </button>
@@ -674,8 +656,9 @@
     >
 
     <button
+      id="sendButton"
       class="primary"
-      onclick="sendSLX()"
+      type="button"
     >
       Отправить SLX
     </button>
@@ -798,13 +781,13 @@
 
 
 
-<!-- =========================
+<!-- ==================================================
      QR MODAL
-========================= -->
+================================================== -->
 
 <div
-  class="modal"
   id="qrModal"
+  class="modal"
 >
 
   <div class="modal-box">
@@ -827,21 +810,27 @@
     </div>
 
     <div
-      class="id"
       id="qrId"
+      class="id"
     >
       ...
     </div>
 
     <br>
 
-    <button onclick="copyId()">
+    <button
+      id="copyQrButton"
+      type="button"
+    >
       📋 Копировать ID
     </button>
 
     <br><br>
 
-    <button onclick="closeModal('qrModal')">
+    <button
+      id="closeQrButton"
+      type="button"
+    >
       Закрыть
     </button>
 
@@ -851,13 +840,13 @@
 
 
 
-<!-- =========================
+<!-- ==================================================
      SCANNER MODAL
-========================= -->
+================================================== -->
 
 <div
-  class="modal"
   id="scannerModal"
+  class="modal"
 >
 
   <div class="modal-box">
@@ -880,12 +869,15 @@
 
     <div
       id="scannerMessage"
-      class="error"
+      class="message"
     ></div>
 
     <br>
 
-    <button onclick="stopScanner()">
+    <button
+      id="closeScannerButton"
+      type="button"
+    >
       Закрыть сканер
     </button>
 
@@ -897,9 +889,9 @@
 
 <script>
 
-/* =========================
+/* ==================================================
    GLOBAL
-========================= */
+================================================== */
 
 let myId = null;
 let myUser = null;
@@ -908,9 +900,9 @@ let scannerStream = null;
 let scannerTimer = null;
 
 
-/* =========================
-   AUTH STORAGE
-========================= */
+/* ==================================================
+   TOKEN
+================================================== */
 
 function getToken() {
 
@@ -940,9 +932,9 @@ function clearToken() {
 }
 
 
-/* =========================
+/* ==================================================
    API
-========================= */
+================================================== */
 
 async function api(
   url,
@@ -952,8 +944,11 @@ async function api(
   const token =
     getToken();
 
-  const headers =
-    options.headers || {};
+
+  const headers = {
+    ...(options.headers || {})
+  };
+
 
   if (token) {
 
@@ -961,6 +956,7 @@ async function api(
       "Bearer " + token;
 
   }
+
 
   options.headers =
     headers;
@@ -973,15 +969,30 @@ async function api(
     );
 
 
-  const data =
-    await response.json();
+  let data;
+
+
+  try {
+
+    data =
+      await response.json();
+
+  }
+
+  catch {
+
+    throw new Error(
+      "Сервер вернул неправильный ответ."
+    );
+
+  }
 
 
   if (!response.ok) {
 
     throw new Error(
       data.error ||
-      "Ошибка сервера"
+      "Ошибка сервера."
     );
 
   }
@@ -992,12 +1003,12 @@ async function api(
 }
 
 
-/* =========================
-   AUTH SCREEN
-========================= */
+/* ==================================================
+   AUTH TABS
+================================================== */
 
 function showAuthForm(
-  form
+  type
 ) {
 
   const loginForm =
@@ -1021,26 +1032,13 @@ function showAuthForm(
     );
 
 
-  loginForm.classList.remove(
-    "active"
-  );
-
-  registerForm.classList.remove(
-    "active"
-  );
-
-  loginTab.classList.remove(
-    "active"
-  );
-
-  registerTab.classList.remove(
-    "active"
-  );
-
-
-  if (form === "login") {
+  if (type === "login") {
 
     loginForm.classList.add(
+      "active"
+    );
+
+    registerForm.classList.remove(
       "active"
     );
 
@@ -1048,9 +1046,23 @@ function showAuthForm(
       "active"
     );
 
-  } else {
+    registerTab.classList.remove(
+      "active"
+    );
+
+  }
+
+  else {
+
+    loginForm.classList.remove(
+      "active"
+    );
 
     registerForm.classList.add(
+      "active"
+    );
+
+    loginTab.classList.remove(
       "active"
     );
 
@@ -1063,9 +1075,9 @@ function showAuthForm(
 }
 
 
-/* =========================
+/* ==================================================
    REGISTER
-========================= */
+================================================== */
 
 async function register() {
 
@@ -1091,13 +1103,13 @@ async function register() {
 
 
   message.className =
-    "auth-message";
+    "message";
 
 
   if (!username) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
       "Введите имя пользователя.";
@@ -1107,26 +1119,26 @@ async function register() {
   }
 
 
-  if (password !== password2) {
+  if (password.length < 6) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
-      "Пароли не совпадают.";
+      "Пароль должен содержать минимум 6 символов.";
 
     return;
 
   }
 
 
-  if (password.length < 6) {
+  if (password !== password2) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
-      "Пароль должен содержать минимум 6 символов.";
+      "Пароли не совпадают.";
 
     return;
 
@@ -1165,13 +1177,13 @@ async function register() {
 
 
     message.className =
-      "success";
+      "message success";
 
     message.textContent =
       "Аккаунт создан!";
 
 
-    await showWalletApp(
+    await openWallet(
       data
     );
 
@@ -1180,7 +1192,7 @@ async function register() {
   catch (error) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
       error.message;
@@ -1190,9 +1202,9 @@ async function register() {
 }
 
 
-/* =========================
+/* ==================================================
    LOGIN
-========================= */
+================================================== */
 
 async function login() {
 
@@ -1213,13 +1225,13 @@ async function login() {
 
 
   message.className =
-    "auth-message";
+    "message";
 
 
   if (!username || !password) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
       "Введите имя и пароль.";
@@ -1260,7 +1272,7 @@ async function login() {
     );
 
 
-    await showWalletApp(
+    await openWallet(
       data
     );
 
@@ -1269,7 +1281,7 @@ async function login() {
   catch (error) {
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
       error.message;
@@ -1279,25 +1291,13 @@ async function login() {
 }
 
 
-/* =========================
-   SHOW WALLET
-========================= */
+/* ==================================================
+   OPEN WALLET
+================================================== */
 
-async function showWalletApp(
+async function openWallet(
   data
 ) {
-
-  document.getElementById(
-    "authScreen"
-  ).style.display =
-    "none";
-
-
-  document.getElementById(
-    "walletApp"
-  ).style.display =
-    "block";
-
 
   myUser =
     data.user;
@@ -1312,6 +1312,28 @@ async function showWalletApp(
       data.wallet.id;
 
   }
+
+  else if (
+    data.user &&
+    data.user.walletId
+  ) {
+
+    myId =
+      data.user.walletId;
+
+  }
+
+
+  document.getElementById(
+    "authScreen"
+  ).style.display =
+    "none";
+
+
+  document.getElementById(
+    "walletApp"
+  ).style.display =
+    "block";
 
 
   document.getElementById(
@@ -1330,9 +1352,9 @@ async function showWalletApp(
 }
 
 
-/* =========================
-   CHECK SESSION
-========================= */
+/* ==================================================
+   SESSION
+================================================== */
 
 async function checkSession() {
 
@@ -1355,15 +1377,7 @@ async function checkSession() {
       );
 
 
-    myUser =
-      data.user;
-
-
-    myId =
-      data.user.walletId;
-
-
-    await showWalletApp(
+    await openWallet(
       data
     );
 
@@ -1378,9 +1392,9 @@ async function checkSession() {
 }
 
 
-/* =========================
+/* ==================================================
    LOGOUT
-========================= */
+================================================== */
 
 async function logout() {
 
@@ -1396,15 +1410,13 @@ async function logout() {
   }
 
   catch {
-    // Даже если сервер недоступен,
-    // локальную сессию всё равно удаляем.
   }
 
 
   clearToken();
 
-  myUser = null;
   myId = null;
+  myUser = null;
 
 
   document.getElementById(
@@ -1426,16 +1438,20 @@ async function logout() {
 }
 
 
-/* =========================
+/* ==================================================
    LOAD WALLET
-========================= */
+================================================== */
 
 async function loadWallet(
   id
 ) {
 
   if (!id) {
-    return;
+
+    throw new Error(
+      "Кошелёк не найден."
+    );
+
   }
 
 
@@ -1470,6 +1486,12 @@ async function loadWallet(
     wallet.address;
 
 
+  document.getElementById(
+    "qrId"
+  ).textContent =
+    wallet.id;
+
+
   myId =
     wallet.id;
 
@@ -1481,9 +1503,9 @@ async function loadWallet(
 }
 
 
-/* =========================
-   WALLET LIST
-========================= */
+/* ==================================================
+   LOAD WALLET LIST
+================================================== */
 
 async function loadWalletList() {
 
@@ -1513,8 +1535,8 @@ async function loadWalletList() {
 
     if (!wallets.length) {
 
-      container.innerHTML =
-        "Нет кошельков";
+      container.textContent =
+        "Нет кошельков.";
 
       return;
 
@@ -1522,58 +1544,106 @@ async function loadWalletList() {
 
 
     container.innerHTML =
-      wallets.map(
-        wallet => `
+      "";
 
-          <div
-            class="wallet-item ${
-              wallet.id === myId
-                ? "active"
-                : ""
-            }"
-            onclick="
-              selectWallet(
-                '${wallet.id}'
-              )
-            "
-          >
 
-            <b>
+    wallets.forEach(
+      wallet => {
 
-              ${
-                wallet.id === myId
-                  ? "Активный кошелёк"
-                  : "Тестовый кошелёк"
-              }
+        const item =
+          document.createElement(
+            "div"
+          );
 
-            </b>
 
-            <div
-              class="wallet-balance"
-            >
+        item.className =
+          "wallet-item" +
+          (
+            wallet.id === myId
+              ? " active"
+              : ""
+          );
 
-              ${
-                Number(
-                  wallet.balance
-                ).toFixed(2)
-              }
 
-              SLX
+        const title =
+          document.createElement(
+            "b"
+          );
 
-            </div>
 
-            <div
-              class="wallet-id"
-            >
+        title.textContent =
+          wallet.id === myId
+            ? "Активный кошелёк"
+            : "Тестовый кошелёк";
 
-              ${wallet.id}
 
-            </div>
+        const balance =
+          document.createElement(
+            "div"
+          );
 
-          </div>
 
-        `
-      ).join("");
+        balance.className =
+          "wallet-balance";
+
+
+        balance.textContent =
+          Number(
+            wallet.balance
+          ).toFixed(2) +
+          " SLX";
+
+
+        const id =
+          document.createElement(
+            "div"
+          );
+
+
+        id.className =
+          "wallet-id";
+
+
+        id.textContent =
+          wallet.id;
+
+
+        item.appendChild(
+          title
+        );
+
+        item.appendChild(
+          balance
+        );
+
+        item.appendChild(
+          id
+        );
+
+
+        item.addEventListener(
+          "click",
+          async function () {
+
+            myId =
+              wallet.id;
+
+            await loadWallet(
+              myId
+            );
+
+            await loadWalletList();
+
+          }
+        );
+
+
+        container.appendChild(
+          item
+        );
+
+      }
+    );
 
 
   }
@@ -1589,29 +1659,9 @@ async function loadWalletList() {
 }
 
 
-/* =========================
-   SELECT WALLET
-========================= */
-
-async function selectWallet(
-  id
-) {
-
-  myId =
-    id;
-
-  await loadWallet(
-    myId
-  );
-
-  await loadWalletList();
-
-}
-
-
-/* =========================
+/* ==================================================
    COPY ID
-========================= */
+================================================== */
 
 async function copyId() {
 
@@ -1637,7 +1687,7 @@ async function copyId() {
   catch {
 
     alert(
-      "Не удалось скопировать ID"
+      "Не удалось скопировать ID."
     );
 
   }
@@ -1645,9 +1695,9 @@ async function copyId() {
 }
 
 
-/* =========================
-   SHOW QR
-========================= */
+/* ==================================================
+   QR
+================================================== */
 
 function showMyQR() {
 
@@ -1656,22 +1706,22 @@ function showMyQR() {
   }
 
 
-  const qrData =
+  const data =
     encodeURIComponent(
       "SLX:" + myId
     );
 
 
-  const qrUrl =
+  const url =
     "https://api.qrserver.com/v1/create-qr-code/" +
     "?size=500x500&data=" +
-    qrData;
+    data;
 
 
   document.getElementById(
     "qrImage"
   ).src =
-    qrUrl;
+    url;
 
 
   document.getElementById(
@@ -1689,9 +1739,9 @@ function showMyQR() {
 }
 
 
-/* =========================
+/* ==================================================
    QR SCANNER
-========================= */
+================================================== */
 
 async function openScanner() {
 
@@ -1717,7 +1767,7 @@ async function openScanner() {
 
 
   message.className =
-    "error";
+    "message";
 
   message.textContent =
     "Запрашиваем камеру...";
@@ -1731,7 +1781,7 @@ async function openScanner() {
     ) {
 
       throw new Error(
-        "Камера не поддерживается этим браузером."
+        "Камера не поддерживается."
       );
 
     }
@@ -1742,7 +1792,7 @@ async function openScanner() {
     ) {
 
       throw new Error(
-        "QR-модуль не загрузился. Проверьте интернет-соединение."
+        "QR-модуль не загрузился."
       );
 
     }
@@ -1778,7 +1828,7 @@ async function openScanner() {
 
 
     message.className =
-      "success";
+      "message success";
 
     message.textContent =
       "Наведите камеру на QR-код";
@@ -1908,26 +1958,21 @@ async function openScanner() {
   catch (error) {
 
     console.error(
+      "Scanner error:",
       error
     );
 
 
-    if (scannerStream) {
+    stopScanner();
 
-      scannerStream
-        .getTracks()
-        .forEach(
-          track => track.stop()
-        );
 
-      scannerStream =
-        null;
-
-    }
+    modal.classList.add(
+      "show"
+    );
 
 
     message.className =
-      "error";
+      "message error";
 
     message.textContent =
       "Не удалось открыть камеру. " +
@@ -1938,9 +1983,9 @@ async function openScanner() {
 }
 
 
-/* =========================
+/* ==================================================
    QR RESULT
-========================= */
+================================================== */
 
 function handleQR(
   value
@@ -1953,7 +1998,9 @@ function handleQR(
 
 
   if (
-    id.startsWith("SLX:")
+    id.startsWith(
+      "SLX:"
+    )
   ) {
 
     id =
@@ -1970,4 +2017,530 @@ function handleQR(
   stopScanner();
 
 
- 
+  document.getElementById(
+    "recipient"
+  ).value =
+    id;
+
+
+  document.getElementById(
+    "amount"
+  ).focus();
+
+
+  alert(
+    "Получатель найден:\n\n" +
+    id
+  );
+
+}
+
+
+/* ==================================================
+   STOP SCANNER
+================================================== */
+
+function stopScanner() {
+
+  if (scannerTimer) {
+
+    cancelAnimationFrame(
+      scannerTimer
+    );
+
+    scannerTimer =
+      null;
+
+  }
+
+
+  if (scannerStream) {
+
+    scannerStream
+      .getTracks()
+      .forEach(
+        track => track.stop()
+      );
+
+    scannerStream =
+      null;
+
+  }
+
+
+  const video =
+    document.getElementById(
+      "scannerVideo"
+    );
+
+
+  if (video) {
+
+    video.pause();
+
+    video.srcObject =
+      null;
+
+  }
+
+
+  document.getElementById(
+    "scannerModal"
+  ).classList.remove(
+    "show"
+  );
+
+}
+
+
+/* ==================================================
+   SEND SLX
+================================================== */
+
+async function sendSLX() {
+
+  const recipient =
+    document.getElementById(
+      "recipient"
+    ).value.trim();
+
+  const amount =
+    Number(
+      document.getElementById(
+        "amount"
+      ).value
+    );
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.className =
+    "";
+
+
+  if (!recipient) {
+
+    message.className =
+      "error";
+
+    message.textContent =
+      "Укажите SLX-ID получателя.";
+
+    return;
+
+  }
+
+
+  if (
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ) {
+
+    message.className =
+      "error";
+
+    message.textContent =
+      "Введите правильную сумму.";
+
+    return;
+
+  }
+
+
+  try {
+
+    await api(
+      "/api/find/" +
+      encodeURIComponent(
+        recipient
+      )
+    );
+
+
+    const confirmed =
+      confirm(
+        "Подтвердить перевод?\n\n" +
+        "Получатель:\n" +
+        recipient +
+        "\n\n" +
+        "Сумма:\n" +
+        amount +
+        " SLX"
+      );
+
+
+    if (!confirmed) {
+      return;
+    }
+
+
+    const data =
+      await api(
+        "/api/send",
+        {
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              sender: myId,
+              recipient,
+              amount
+            })
+        }
+      );
+
+
+    message.className =
+      "success";
+
+    message.textContent =
+      "✓ Перевод выполнен!\n" +
+      "TX: " +
+      data.transaction.id;
+
+
+    document.getElementById(
+      "recipient"
+    ).value =
+      "";
+
+    document.getElementById(
+      "amount"
+    ).value =
+      "";
+
+
+    await loadWallet(
+      myId
+    );
+
+    await loadWalletList();
+
+  }
+
+  catch (error) {
+
+    message.className =
+      "error";
+
+    message.textContent =
+      error.message;
+
+  }
+
+}
+
+
+/* ==================================================
+   HISTORY
+================================================== */
+
+function renderHistory(
+  transactions
+) {
+
+  const history =
+    document.getElementById(
+      "history"
+    );
+
+
+  if (
+    !transactions ||
+    !transactions.length
+  ) {
+
+    history.textContent =
+      "Транзакций пока нет";
+
+    return;
+
+  }
+
+
+  history.innerHTML =
+    "";
+
+
+  transactions.forEach(
+    tx => {
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        "tx";
+
+
+      let title =
+        "Faucet";
+
+
+      if (
+        tx.type === "send"
+      ) {
+
+        title =
+          "Отправлено";
+
+      }
+
+      else if (
+        tx.type === "receive"
+      ) {
+
+        title =
+          "Получено";
+
+      }
+
+
+      const titleLine =
+        document.createElement(
+          "b"
+        );
+
+
+      titleLine.textContent =
+        title +
+        " " +
+        Number(
+          tx.amount
+        ).toFixed(2) +
+        " SLX";
+
+
+      const txLine =
+        document.createElement(
+          "small"
+        );
+
+
+      txLine.className =
+        "muted";
+
+
+      txLine.textContent =
+        "TX: " +
+        tx.id;
+
+
+      const whoLine =
+        document.createElement(
+          "small"
+        );
+
+
+      whoLine.className =
+        "muted";
+
+
+      if (
+        tx.type === "send"
+      ) {
+
+        whoLine.textContent =
+          "Кому: " +
+          tx.to;
+
+      }
+
+      else if (
+        tx.type === "receive"
+      ) {
+
+        whoLine.textContent =
+          "От: " +
+          tx.from;
+
+      }
+
+      else {
+
+        whoLine.textContent =
+          "Источник: Faucet";
+
+      }
+
+
+      item.appendChild(
+        titleLine
+      );
+
+      item.appendChild(
+        document.createElement(
+          "br"
+        )
+      );
+
+      item.appendChild(
+        txLine
+      );
+
+      item.appendChild(
+        document.createElement(
+          "br"
+        )
+      );
+
+      item.appendChild(
+        whoLine
+      );
+
+
+      history.appendChild(
+        item
+      );
+
+    }
+  );
+
+}
+
+
+/* ==================================================
+   EVENTS
+================================================== */
+
+function setupEvents() {
+
+  document.getElementById(
+    "loginTab"
+  ).addEventListener(
+    "click",
+    function () {
+      showAuthForm("login");
+    }
+  );
+
+
+  document.getElementById(
+    "registerTab"
+  ).addEventListener(
+    "click",
+    function () {
+      showAuthForm("register");
+    }
+  );
+
+
+  document.getElementById(
+    "loginButton"
+  ).addEventListener(
+    "click",
+    login
+  );
+
+
+  document.getElementById(
+    "registerButton"
+  ).addEventListener(
+    "click",
+    register
+  );
+
+
+  document.getElementById(
+    "logoutButton"
+  ).addEventListener(
+    "click",
+    logout
+  );
+
+
+  document.getElementById(
+    "copyButton"
+  ).addEventListener(
+    "click",
+    copyId
+  );
+
+
+  document.getElementById(
+    "copyQrButton"
+  ).addEventListener(
+    "click",
+    copyId
+  );
+
+
+  document.getElementById(
+    "myQrButton"
+  ).addEventListener(
+    "click",
+    showMyQR
+  );
+
+
+  document.getElementById(
+    "scannerButton"
+  ).addEventListener(
+    "click",
+    openScanner
+  );
+
+
+  document.getElementById(
+    "sendButton"
+  ).addEventListener(
+    "click",
+    sendSLX
+  );
+
+
+  document.getElementById(
+    "closeQrButton"
+  ).addEventListener(
+    "click",
+    function () {
+
+      document.getElementById(
+        "qrModal"
+      ).classList.remove(
+        "show"
+      );
+
+    }
+  );
+
+
+  document.getElementById(
+    "closeScannerButton"
+  ).addEventListener(
+    "click",
+    stopScanner
+  );
+
+}
+
+
+/* ==================================================
+   START
+================================================== */
+
+document.addEventListener(
+  "DOMContentLoaded",
+  function () {
+
+    setupEvents();
+
+    checkSession();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
