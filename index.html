@@ -25,6 +25,16 @@ input {
     font: inherit;
 }
 
+button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
 .container {
     width: min(700px, 100%);
     margin: auto;
@@ -100,7 +110,6 @@ button {
     border: 0;
     border-radius: 15px;
     padding: 15px;
-    cursor: pointer;
     color: white;
     font-weight: bold;
 }
@@ -154,6 +163,11 @@ button {
     padding: 15px;
     margin-top: 10px;
     cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.wallet-item:active {
+    transform: scale(.99);
 }
 
 .wallet-item.active {
@@ -176,10 +190,6 @@ button {
     font-size: 12px;
     word-break: break-all;
     margin-top: 5px;
-}
-
-.wallet-actions {
-    margin-top: 12px;
 }
 
 .qr-buttons {
@@ -281,331 +291,355 @@ button {
 
 <div class="container">
 
-    <!-- AUTH -->
-    <div id="authScreen">
+<!-- ================= AUTH ================= -->
 
-        <div class="logo">S</div>
+<div id="authScreen">
 
-        <h1>SLX Network</h1>
+    <div class="logo">S</div>
 
-        <div class="card">
+    <h1>SLX Network</h1>
 
-            <div class="auth-tabs">
-                <button id="loginTab" class="active">
-                    Войти
-                </button>
+    <div class="card">
 
-                <button id="registerTab">
-                    Регистрация
-                </button>
-            </div>
-
-            <div id="loginForm">
-
-                <input
-                    id="loginUsername"
-                    type="text"
-                    placeholder="Имя пользователя"
-                    autocomplete="username"
-                >
-
-                <input
-                    id="loginPassword"
-                    type="password"
-                    placeholder="Пароль"
-                    autocomplete="current-password"
-                >
-
-                <button
-                    id="loginButton"
-                    class="primary"
-                >
-                    🔐 Войти
-                </button>
-
-            </div>
-
-            <div id="registerForm" class="hidden">
-
-                <input
-                    id="registerUsername"
-                    type="text"
-                    placeholder="Имя пользователя"
-                    autocomplete="username"
-                >
-
-                <input
-                    id="registerPassword"
-                    type="password"
-                    placeholder="Пароль"
-                    autocomplete="new-password"
-                >
-
-                <input
-                    id="registerPassword2"
-                    type="password"
-                    placeholder="Повторите пароль"
-                    autocomplete="new-password"
-                >
-
-                <button
-                    id="registerButton"
-                    class="primary"
-                >
-                    ✨ Создать аккаунт
-                </button>
-
-            </div>
-
-            <div id="authMessage"></div>
-
-        </div>
-
-    </div>
-
-
-    <!-- APP -->
-    <div id="appScreen" class="hidden">
-
-        <div class="logo">S</div>
-
-        <h1>SLX Network</h1>
-
-
-        <!-- ACCOUNT -->
-
-        <div class="card">
-
-            <div class="card-title">
-                Аккаунт
-            </div>
-
-            <div style="font-size:18px;">
-                👤 <strong id="username"></strong>
-            </div>
-
-            <br>
-
-            <button
-                id="logoutButton"
-                class="red"
-            >
-                🚪 Выйти
+        <div class="auth-tabs">
+            <button id="loginTab" class="active" onclick="showLogin()">
+                Войти
             </button>
 
-        </div>
-
-
-        <!-- ACTIVE WALLET -->
-
-        <div class="card">
-
-            <div class="card-title">
-                Активный кошелёк
-            </div>
-
-            <div class="balance">
-                <span id="balance">0.00</span>
-                <span class="purple">SLX</span>
-            </div>
-
-            <div>
-                <span class="purple">
-                    SLX-ID:
-                </span>
-                <strong id="walletId"></strong>
-            </div>
-
-            <div class="small" style="margin-top:7px;">
-                Wallet:
-                <span id="walletAddress"></span>
-            </div>
-
-            <button
-                id="copyIdButton"
-                class="secondary"
-                style="width:100%;margin-top:15px;"
-            >
-                📋 Копировать ID
+            <button id="registerTab" onclick="showRegister()">
+                Регистрация
             </button>
-
         </div>
 
-
-        <!-- QR -->
-
-        <div class="qr-buttons">
-
-            <button
-                id="myQrButton"
-                class="primary"
-            >
-                ▣ Мой QR
-            </button>
-
-            <button
-                id="scanButton"
-                class="green"
-            >
-                📷 Сканировать QR
-            </button>
-
-        </div>
-
-
-        <!-- MY WALLETS -->
-
-        <div class="card" style="margin-top:16px;">
-
-            <div class="row" style="align-items:center;">
-
-                <div>
-                    <div class="card-title" style="margin:0;">
-                        Мои кошельки
-                    </div>
-
-                    <div class="small">
-                        Кошельки этого аккаунта
-                    </div>
-                </div>
-
-                <button
-                    id="newWalletButton"
-                    class="primary"
-                    style="padding:12px;"
-                >
-                    ＋ Новый кошелёк
-                </button>
-
-            </div>
-
-            <div id="walletList"></div>
-
-        </div>
-
-
-        <!-- SEND -->
-
-        <div class="card">
-
-            <h2>Перевод SLX</h2>
+        <div id="loginForm">
 
             <input
-                id="recipientInput"
+                id="loginUsername"
                 type="text"
-                placeholder="SLX-ID получателя"
+                placeholder="Имя пользователя"
+                autocomplete="username"
             >
 
             <input
-                id="amountInput"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="Сумма"
+                id="loginPassword"
+                type="password"
+                placeholder="Пароль"
+                autocomplete="current-password"
             >
 
             <button
-                id="sendButton"
+                id="loginButton"
                 class="primary"
+                onclick="login()"
             >
-                💸 Отправить SLX
+                🔐 Войти
             </button>
-
-            <div id="appMessage"></div>
 
         </div>
 
+        <div id="registerForm" class="hidden">
 
-        <!-- FAUCET -->
+            <input
+                id="registerUsername"
+                type="text"
+                placeholder="Имя пользователя"
+                autocomplete="username"
+            >
 
-        <div class="card">
+            <input
+                id="registerPassword"
+                type="password"
+                placeholder="Пароль"
+                autocomplete="new-password"
+            >
 
-            <h2>Тестовый Faucet</h2>
-
-            <div class="small">
-                Получить тестовые 100 SLX.
-            </div>
-
-            <br>
+            <input
+                id="registerPassword2"
+                type="password"
+                placeholder="Повторите пароль"
+                autocomplete="new-password"
+            >
 
             <button
-                id="faucetButton"
-                class="green"
-                style="width:100%;"
+                id="registerButton"
+                class="primary"
+                onclick="register()"
             >
-                💧 Получить 100 SLX
+                ✨ Создать аккаунт
             </button>
 
         </div>
 
-
-        <!-- HISTORY -->
-
-        <div class="card">
-
-            <h2>История</h2>
-
-            <div id="history">
-                Нет операций.
-            </div>
-
-        </div>
-
-
-        <!-- NETWORK -->
-
-        <div class="card">
-
-            <h3>Сеть</h3>
-
-            <div class="status">
-
-                <div class="dot"></div>
-
-                <span>
-                    SLX Testnet
-                </span>
-
-            </div>
-
-            <div
-                class="small"
-                style="margin-top:8px;"
-            >
-                Version:
-                <span id="networkVersion">
-                    -
-                </span>
-            </div>
-
-            <div
-                class="small"
-                style="margin-top:5px;"
-            >
-                Accounts:
-                <span id="networkAccounts">
-                    -
-                </span>
-            </div>
-
-            <div
-                class="small"
-                style="margin-top:5px;"
-            >
-                Wallets:
-                <span id="networkWallets">
-                    -
-                </span>
-            </div>
-
-        </div>
+        <div id="authMessage"></div>
 
     </div>
 
 </div>
 
 
-<!-- QR MODAL -->
+<!-- ================= APP ================= -->
+
+<div id="appScreen" class="hidden">
+
+    <div class="logo">S</div>
+
+    <h1>SLX Network</h1>
+
+
+    <!-- ACCOUNT -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Аккаунт
+        </div>
+
+        <div style="font-size:18px;">
+            👤 <strong id="username"></strong>
+        </div>
+
+        <br>
+
+        <button
+            id="logoutButton"
+            class="red"
+            onclick="logout()"
+        >
+            🚪 Выйти
+        </button>
+
+    </div>
+
+
+    <!-- ACTIVE WALLET -->
+
+    <div class="card">
+
+        <div class="card-title">
+            Активный кошелёк
+        </div>
+
+        <div class="balance">
+            <span id="balance">0.00</span>
+            <span class="purple">SLX</span>
+        </div>
+
+        <div>
+            <span class="purple">
+                SLX-ID:
+            </span>
+
+            <strong id="walletId"></strong>
+        </div>
+
+        <div class="small" style="margin-top:7px;">
+            Wallet:
+            <span id="walletAddress"></span>
+        </div>
+
+        <button
+            id="copyIdButton"
+            class="secondary"
+            style="width:100%;margin-top:15px;"
+            onclick="copyId()"
+        >
+            📋 Копировать ID
+        </button>
+
+    </div>
+
+
+    <!-- QR -->
+
+    <div class="qr-buttons">
+
+        <button
+            id="myQrButton"
+            class="primary"
+            onclick="showQR()"
+        >
+            ▣ Мой QR
+        </button>
+
+        <button
+            id="scanButton"
+            class="green"
+            onclick="startScanner()"
+        >
+            📷 Сканировать QR
+        </button>
+
+    </div>
+
+
+    <!-- MY WALLETS -->
+
+    <div class="card" style="margin-top:16px;">
+
+        <div
+            class="row"
+            style="align-items:center;"
+        >
+
+            <div>
+                <div
+                    class="card-title"
+                    style="margin:0;"
+                >
+                    Мои кошельки
+                </div>
+
+                <div class="small">
+                    Кошельки этого аккаунта
+                </div>
+            </div>
+
+        </div>
+
+
+        <!-- ИСПРАВЛЕННАЯ КНОПКА -->
+
+        <button
+            id="newWalletButton"
+            type="button"
+            class="primary"
+            style="
+                margin-top:15px;
+                width:100%;
+                padding:17px;
+                font-size:17px;
+                cursor:pointer;
+                touch-action:manipulation;
+            "
+            onclick="createNewWallet()"
+        >
+            ＋ Новый кошелёк
+        </button>
+
+
+        <div id="walletList"></div>
+
+    </div>
+
+
+    <!-- SEND -->
+
+    <div class="card">
+
+        <h2>Перевод SLX</h2>
+
+        <input
+            id="recipientInput"
+            type="text"
+            placeholder="SLX-ID получателя"
+        >
+
+        <input
+            id="amountInput"
+            type="number"
+            step="0.01"
+            min="0"
+            placeholder="Сумма"
+        >
+
+        <button
+            id="sendButton"
+            class="primary"
+            onclick="sendSLX()"
+        >
+            💸 Отправить SLX
+        </button>
+
+        <div id="appMessage"></div>
+
+    </div>
+
+
+    <!-- FAUCET -->
+
+    <div class="card">
+
+        <h2>Тестовый Faucet</h2>
+
+        <div class="small">
+            Получить тестовые 100 SLX.
+        </div>
+
+        <br>
+
+        <button
+            id="faucetButton"
+            class="green"
+            style="width:100%;"
+            onclick="faucet()"
+        >
+            💧 Получить 100 SLX
+        </button>
+
+    </div>
+
+
+    <!-- HISTORY -->
+
+    <div class="card">
+
+        <h2>История</h2>
+
+        <div id="history">
+            Нет операций.
+        </div>
+
+    </div>
+
+
+    <!-- NETWORK -->
+
+    <div class="card">
+
+        <h3>Сеть</h3>
+
+        <div class="status">
+
+            <div class="dot"></div>
+
+            <span>
+                SLX Testnet
+            </span>
+
+        </div>
+
+        <div
+            class="small"
+            style="margin-top:8px;"
+        >
+            Version:
+            <span id="networkVersion">-</span>
+        </div>
+
+        <div
+            class="small"
+            style="margin-top:5px;"
+        >
+            Accounts:
+            <span id="networkAccounts">-</span>
+        </div>
+
+        <div
+            class="small"
+            style="margin-top:5px;"
+        >
+            Wallets:
+            <span id="networkWallets">-</span>
+        </div>
+
+    </div>
+
+</div>
+
+</div>
+
+
+<!-- ================= QR MODAL ================= -->
 
 <div
     id="qrModal"
@@ -626,9 +660,9 @@ button {
         <br>
 
         <button
-            id="closeQrButton"
             class="secondary"
             style="width:100%;"
+            onclick="closeQR()"
         >
             Закрыть
         </button>
@@ -638,7 +672,7 @@ button {
 </div>
 
 
-<!-- SCANNER MODAL -->
+<!-- ================= SCANNER MODAL ================= -->
 
 <div
     id="scannerModal"
@@ -671,9 +705,9 @@ button {
         <br>
 
         <button
-            id="closeScannerButton"
             class="secondary"
             style="width:100%;"
+            onclick="stopScanner()"
         >
             Закрыть
         </button>
@@ -687,10 +721,6 @@ button {
 
 const API = "";
 
-/* =========================
-   STATE
-========================= */
-
 let token =
     localStorage.getItem("slx_token") || "";
 
@@ -702,19 +732,12 @@ let scannerStream = null;
 let scannerRunning = false;
 
 
-/* =========================
-   API
-========================= */
+/* ================= API ================= */
 
-async function api(
-    url,
-    options = {}
-) {
+async function api(url, options = {}) {
 
     const headers = {
-        "Content-Type":
-            "application/json",
-
+        "Content-Type": "application/json",
         ...(options.headers || {})
     };
 
@@ -723,62 +746,62 @@ async function api(
             "Bearer " + token;
     }
 
-    const response =
-        await fetch(
-            API + url,
-            {
-                ...options,
-                headers
-            }
-        );
-
-    let data;
-
     try {
-        data =
-            await response.json();
-    } catch {
-        data = {
-            success: false,
-            error: "Ошибка сервера."
+
+        const response =
+            await fetch(
+                API + url,
+                {
+                    ...options,
+                    headers
+                }
+            );
+
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            data = {
+                success: false,
+                error: "Ошибка сервера."
+            };
+        }
+
+        return {
+            ok: response.ok,
+            data
+        };
+
+    } catch (error) {
+
+        return {
+            ok: false,
+            data: {
+                success: false,
+                error: "Нет соединения с сервером."
+            }
         };
     }
-
-    return {
-        ok: response.ok,
-        data
-    };
 }
 
 
-/* =========================
-   ELEMENTS
-========================= */
+/* ================= ELEMENTS ================= */
 
 const authScreen =
-    document.getElementById(
-        "authScreen"
-    );
+    document.getElementById("authScreen");
 
 const appScreen =
-    document.getElementById(
-        "appScreen"
-    );
+    document.getElementById("appScreen");
 
 const authMessage =
-    document.getElementById(
-        "authMessage"
-    );
+    document.getElementById("authMessage");
 
 const appMessage =
-    document.getElementById(
-        "appMessage"
-    );
+    document.getElementById("appMessage");
 
 
-/* =========================
-   AUTH TABS
-========================= */
+/* ================= AUTH TABS ================= */
 
 function showLogin() {
 
@@ -800,6 +823,7 @@ function showLogin() {
 
     authMessage.textContent = "";
 }
+
 
 function showRegister() {
 
@@ -823,25 +847,19 @@ function showRegister() {
 }
 
 
-/* =========================
-   LOGIN
-========================= */
+/* ================= LOGIN ================= */
 
 async function login() {
 
     const username =
         document
-            .getElementById(
-                "loginUsername"
-            )
+            .getElementById("loginUsername")
             .value
             .trim();
 
     const password =
         document
-            .getElementById(
-                "loginPassword"
-            )
+            .getElementById("loginPassword")
             .value;
 
     if (!username || !password) {
@@ -868,8 +886,10 @@ async function login() {
             }
         );
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         authMessage.textContent =
             result.data.error ||
@@ -887,41 +907,34 @@ async function login() {
     );
 
     await loadApp();
-
 }
 
 
-/* =========================
-   REGISTER
-========================= */
+/* ================= REGISTER ================= */
 
 async function register() {
 
     const username =
         document
-            .getElementById(
-                "registerUsername"
-            )
+            .getElementById("registerUsername")
             .value
             .trim();
 
     const password =
         document
-            .getElementById(
-                "registerPassword"
-            )
+            .getElementById("registerPassword")
             .value;
 
     const password2 =
         document
-            .getElementById(
-                "registerPassword2"
-            )
+            .getElementById("registerPassword2")
             .value;
 
-    if (!username ||
+    if (
+        !username ||
         !password ||
-        !password2) {
+        !password2
+    ) {
 
         authMessage.textContent =
             "Заполни все поля.";
@@ -953,8 +966,10 @@ async function register() {
             }
         );
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         authMessage.textContent =
             result.data.error ||
@@ -975,19 +990,17 @@ async function register() {
 }
 
 
-/* =========================
-   LOAD APP
-========================= */
+/* ================= LOAD APP ================= */
 
 async function loadApp() {
 
     const result =
-        await api(
-            "/api/auth/me"
-        );
+        await api("/api/auth/me");
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         logoutLocal();
         return;
@@ -996,13 +1009,8 @@ async function loadApp() {
     currentUser =
         result.data.user;
 
-    authScreen.classList.add(
-        "hidden"
-    );
-
-    appScreen.classList.remove(
-        "hidden"
-    );
+    authScreen.classList.add("hidden");
+    appScreen.classList.remove("hidden");
 
     document
         .getElementById("username")
@@ -1010,24 +1018,21 @@ async function loadApp() {
         currentUser.username;
 
     await loadWallets();
-
     await loadNetwork();
 }
 
 
-/* =========================
-   LOAD WALLETS
-========================= */
+/* ================= LOAD WALLETS ================= */
 
 async function loadWallets() {
 
     const result =
-        await api(
-            "/api/wallets"
-        );
+        await api("/api/wallets");
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         appMessage.textContent =
             result.data.error ||
@@ -1039,7 +1044,7 @@ async function loadWallets() {
     myWallets =
         result.data.wallets || [];
 
-    let savedWallet =
+    const savedWallet =
         localStorage.getItem(
             "slx_active_wallet"
         );
@@ -1059,8 +1064,10 @@ async function loadWallets() {
             );
     }
 
-    if (!wallet &&
-        myWallets.length > 0) {
+    if (
+        !wallet &&
+        myWallets.length > 0
+    ) {
 
         wallet =
             myWallets[0];
@@ -1080,9 +1087,7 @@ async function loadWallets() {
 }
 
 
-/* =========================
-   SELECT WALLET
-========================= */
+/* ================= SELECT WALLET ================= */
 
 async function selectWallet(
     walletId,
@@ -1101,8 +1106,10 @@ async function selectWallet(
             }
         );
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         appMessage.textContent =
             result.data.error ||
@@ -1130,19 +1137,17 @@ async function selectWallet(
 }
 
 
-/* =========================
-   REFRESH WALLETS
-========================= */
+/* ================= REFRESH WALLETS ================= */
 
 async function refreshWallets() {
 
     const result =
-        await api(
-            "/api/wallets"
-        );
+        await api("/api/wallets");
 
-    if (result.ok &&
-        result.data.success) {
+    if (
+        result.ok &&
+        result.data.success
+    ) {
 
         myWallets =
             result.data.wallets || [];
@@ -1152,9 +1157,7 @@ async function refreshWallets() {
 }
 
 
-/* =========================
-   WALLET LIST
-========================= */
+/* ================= WALLET LIST ================= */
 
 function renderWalletList() {
 
@@ -1167,10 +1170,11 @@ function renderWalletList() {
 
     if (!myWallets.length) {
 
-        list.innerHTML =
-            `<div class="notice">
+        list.innerHTML = `
+            <div class="notice">
                 У аккаунта пока нет кошельков.
-            </div>`;
+            </div>
+        `;
 
         return;
     }
@@ -1191,6 +1195,7 @@ function renderWalletList() {
                 wallet.id ===
                 currentWallet.id
             ) {
+
                 item.classList.add(
                     "active"
                 );
@@ -1198,10 +1203,11 @@ function renderWalletList() {
 
             item.innerHTML = `
                 <strong>
-                    ${wallet.id ===
-                    (currentWallet?.id || "")
-                        ? "🟣 "
-                        : "👛 "
+                    ${
+                        wallet.id ===
+                        (currentWallet?.id || "")
+                            ? "🟣 "
+                            : "👛 "
                     }${wallet.id}
                 </strong>
 
@@ -1214,14 +1220,13 @@ function renderWalletList() {
                 </div>
             `;
 
-            item.addEventListener(
-                "click",
-                () => {
-                    selectWallet(
-                        wallet.id
-                    );
-                }
-            );
+            item.onclick = function() {
+
+                selectWallet(
+                    wallet.id
+                );
+
+            };
 
             list.appendChild(item);
         }
@@ -1229,9 +1234,7 @@ function renderWalletList() {
 }
 
 
-/* =========================
-   UPDATE ACTIVE WALLET
-========================= */
+/* ================= UPDATE WALLET UI ================= */
 
 function updateWalletUI() {
 
@@ -1261,9 +1264,7 @@ function updateWalletUI() {
 }
 
 
-/* =========================
-   NEW WALLET
-========================= */
+/* ================= NEW WALLET ================= */
 
 async function createNewWallet() {
 
@@ -1272,9 +1273,17 @@ async function createNewWallet() {
             "newWalletButton"
         );
 
+    if (!button) {
+        return;
+    }
+
     button.disabled = true;
+
     button.textContent =
-        "Создание...";
+        "⏳ Создание...";
+
+    appMessage.textContent =
+        "";
 
     const result =
         await api(
@@ -1284,12 +1293,15 @@ async function createNewWallet() {
             }
         );
 
-    button.disabled = false;
-    button.textContent =
-        "＋ Новый кошелёк";
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
-    if (!result.ok ||
-        !result.data.success) {
+        button.disabled = false;
+
+        button.textContent =
+            "＋ Новый кошелёк";
 
         appMessage.textContent =
             result.data.error ||
@@ -1304,16 +1316,24 @@ async function createNewWallet() {
     currentWallet =
         newWallet;
 
-    currentUser.walletIds =
-        result.data.walletIds;
+    if (result.data.walletIds) {
+
+        currentUser.walletIds =
+            result.data.walletIds;
+    }
 
     localStorage.setItem(
         "slx_active_wallet",
         newWallet.id
     );
 
+    button.disabled = false;
+
+    button.textContent =
+        "＋ Новый кошелёк";
+
     appMessage.textContent =
-        "Новый кошелёк создан!";
+        "✅ Новый кошелёк создан!";
 
     await refreshWallets();
 
@@ -1321,9 +1341,7 @@ async function createNewWallet() {
 }
 
 
-/* =========================
-   HISTORY
-========================= */
+/* ================= HISTORY ================= */
 
 async function loadCurrentWalletDetails() {
 
@@ -1350,6 +1368,7 @@ async function loadCurrentWalletDetails() {
         updateWalletUI();
     }
 }
+
 
 function renderHistory() {
 
@@ -1439,9 +1458,7 @@ function renderHistory() {
 }
 
 
-/* =========================
-   SEND
-========================= */
+/* ================= SEND ================= */
 
 async function sendSLX() {
 
@@ -1509,8 +1526,10 @@ async function sendSLX() {
             }
         );
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         appMessage.textContent =
             result.data.error ||
@@ -1539,9 +1558,7 @@ async function sendSLX() {
 }
 
 
-/* =========================
-   FAUCET
-========================= */
+/* ================= FAUCET ================= */
 
 async function faucet() {
 
@@ -1562,8 +1579,10 @@ async function faucet() {
             }
         );
 
-    if (!result.ok ||
-        !result.data.success) {
+    if (
+        !result.ok ||
+        !result.data.success
+    ) {
 
         appMessage.textContent =
             result.data.error ||
@@ -1580,9 +1599,7 @@ async function faucet() {
 }
 
 
-/* =========================
-   COPY ID
-========================= */
+/* ================= COPY ID ================= */
 
 async function copyId() {
 
@@ -1607,9 +1624,7 @@ async function copyId() {
 }
 
 
-/* =========================
-   QR
-========================= */
+/* ================= QR ================= */
 
 function showQR() {
 
@@ -1653,9 +1668,19 @@ function showQR() {
 }
 
 
-/* =========================
-   SCANNER
-========================= */
+function closeQR() {
+
+    document
+        .getElementById(
+            "qrModal"
+        )
+        .classList.add(
+            "hidden"
+        );
+}
+
+
+/* ================= SCANNER ================= */
 
 async function startScanner() {
 
@@ -1712,7 +1737,6 @@ async function startScanner() {
 
         status.textContent =
             "Не удалось открыть камеру.";
-
     }
 }
 
@@ -1758,8 +1782,7 @@ function scanFrame() {
         canvas.getContext(
             "2d",
             {
-                willReadFrequently:
-                    true
+                willReadFrequently: true
             }
         );
 
@@ -1792,10 +1815,9 @@ function scanFrame() {
             code.data.trim();
 
         if (
-            value.startsWith(
-                "SLX:"
-            )
+            value.startsWith("SLX:")
         ) {
+
             value =
                 value.substring(4);
         }
@@ -1853,16 +1875,12 @@ function stopScanner() {
 }
 
 
-/* =========================
-   NETWORK
-========================= */
+/* ================= NETWORK ================= */
 
 async function loadNetwork() {
 
     const result =
-        await api(
-            "/api/status"
-        );
+        await api("/api/status");
 
     if (
         !result.ok ||
@@ -1894,23 +1912,24 @@ async function loadNetwork() {
 }
 
 
-/* =========================
-   LOGOUT
-========================= */
+/* ================= LOGOUT ================= */
 
 async function logout() {
 
     try {
+
         await api(
             "/api/auth/logout",
             {
                 method: "POST"
             }
         );
+
     } catch {}
 
     logoutLocal();
 }
+
 
 function logoutLocal() {
 
@@ -1940,145 +1959,11 @@ function logoutLocal() {
 }
 
 
-/* =========================
-   EVENTS
-========================= */
+/* ================= START ================= */
 
-document.addEventListener(
-    "DOMContentLoaded",
-    () => {
-
-        document
-            .getElementById(
-                "loginTab"
-            )
-            .addEventListener(
-                "click",
-                showLogin
-            );
-
-        document
-            .getElementById(
-                "registerTab"
-            )
-            .addEventListener(
-                "click",
-                showRegister
-            );
-
-        document
-            .getElementById(
-                "loginButton"
-            )
-            .addEventListener(
-                "click",
-                login
-            );
-
-        document
-            .getElementById(
-                "registerButton"
-            )
-            .addEventListener(
-                "click",
-                register
-            );
-
-        document
-            .getElementById(
-                "logoutButton"
-            )
-            .addEventListener(
-                "click",
-                logout
-            );
-
-        document
-            .getElementById(
-                "newWalletButton"
-            )
-            .addEventListener(
-                "click",
-                createNewWallet
-            );
-
-        document
-            .getElementById(
-                "sendButton"
-            )
-            .addEventListener(
-                "click",
-                sendSLX
-            );
-
-        document
-            .getElementById(
-                "faucetButton"
-            )
-            .addEventListener(
-                "click",
-                faucet
-            );
-
-        document
-            .getElementById(
-                "copyIdButton"
-            )
-            .addEventListener(
-                "click",
-                copyId
-            );
-
-        document
-            .getElementById(
-                "myQrButton"
-            )
-            .addEventListener(
-                "click",
-                showQR
-            );
-
-        document
-            .getElementById(
-                "closeQrButton"
-            )
-            .addEventListener(
-                "click",
-                () => {
-                    document
-                        .getElementById(
-                            "qrModal"
-                        )
-                        .classList.add(
-                            "hidden"
-                        );
-                }
-            );
-
-        document
-            .getElementById(
-                "scanButton"
-            )
-            .addEventListener(
-                "click",
-                startScanner
-            );
-
-        document
-            .getElementById(
-                "closeScannerButton"
-            )
-            .addEventListener(
-                "click",
-                stopScanner
-            );
-
-        if (token) {
-            loadApp();
-        }
-
-    }
-);
+if (token) {
+    loadApp();
+}
 
 </script>
 
