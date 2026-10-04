@@ -1,1969 +1,2597 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>SLX Network</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080b12">
+<title>SLX Network v1.6</title>
+
+<style>
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  padding:0;
+  background:#07090f;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+body{min-height:100vh}
+.app{max-width:640px;margin:auto;padding:18px 15px 90px}
+.hidden{display:none!important}
+.badge{
+  display:inline-block;
+  padding:6px 10px;
+  border:1px solid #303748;
+  border-radius:999px;
+  font-size:12px;
+  color:#9ee7ff
+}
+h1{font-size:31px;margin:14px 0 5px}
+h2{font-size:20px;margin:0 0 12px}
+.muted{color:#919aac;line-height:1.45}
+.card{
+  background:#101521;
+  border:1px solid #202838;
+  border-radius:18px;
+  padding:17px;
+  margin-top:15px
+}
+.balance{
+  font-size:34px;
+  font-weight:800;
+  margin:7px 0 2px;
+  word-break:break-word
+}
+.slx{color:#7de3ff}
+.small{font-size:12px;color:#778197}
+input,button{font:inherit}
+input{
+  width:100%;
+  padding:13px 14px;
+  border-radius:12px;
+  border:1px solid #30394b;
+  background:#090d15;
+  color:#fff;
+  font-size:16px;
+  margin-top:9px;
+  outline:none
+}
+input:focus{border-color:#61d7ff}
+button{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  padding:13px 14px;
+  margin-top:9px;
+  font-size:15px;
+  font-weight:750;
+  background:#fff;
+  color:#080a10;
+  cursor:pointer
+}
+button.secondary{
+  background:#1a2130;
+  color:#fff;
+  border:1px solid #30394b
+}
+button.danger{
+  background:#2a1216;
+  color:#fff;
+  border:1px solid #63303a
+}
+button:disabled{
+  opacity:.55;
+  cursor:default
+}
+.row{display:flex;gap:9px;align-items:center}
+.row>*{flex:1}
+.status{
+  padding:10px 12px;
+  border-radius:10px;
+  background:#0b111b;
+  margin-top:10px;
+  color:#9ee7ff;
+  font-size:13px;
+  word-break:break-word
+}
+.ok{color:#9ef0b4}
+.err{color:#ff9a9a}
+
+.wallet-list{
+  display:grid;
+  gap:9px;
+  margin-top:10px
+}
+.wallet-item{
+  width:100%;
+  text-align:left;
+  background:#0c111a;
+  border:1px solid #283244;
+  color:#fff;
+  border-radius:13px;
+  padding:12px;
+  cursor:pointer;
+  margin:0
+}
+.wallet-item.active{
+  border-color:#66dcff;
+  box-shadow:0 0 0 1px #66dcff inset
+}
+.wallet-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center
+}
+.wallet-id{
+  font-weight:750;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap
+}
+.wallet-bal{
+  font-weight:800;
+  white-space:nowrap;
+  color:#b9f3ff
+}
+.addr{
+  font-size:12px;
+  color:#8994a7;
+  margin-top:5px;
+  word-break:break-all
+}
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px
+}
+.kv{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  padding:9px 0;
+  border-bottom:1px solid #1d2533;
+  font-size:14px
+}
+.kv:last-child{border-bottom:0}
+.qr-wrap{
+  display:flex;
+  justify-content:center;
+  padding:6px 0 2px
+}
+#qrcode img,#qrcode canvas{
+  max-width:100%;
+  height:auto
+}
+.scan-box{
+  display:flex;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:14px;
+  background:#05070b;
+  margin-top:10px
+}
+#scanVideo{
+  width:100%;
+  max-height:360px;
+  object-fit:cover;
+  display:block
+}
+#scanCanvas{display:none}
+.tx{
+  padding:12px 0;
+  border-bottom:1px solid #1d2533
+}
+.tx:last-child{border-bottom:0}
+.tx-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+.tx-amount{font-weight:800}
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12px;
+  word-break:break-all
+}
+.nav{
+  position:fixed;
+  left:0;
+  right:0;
+  bottom:0;
+  background:rgba(7,9,15,.94);
+  backdrop-filter:blur(14px);
+  border-top:1px solid #1d2533;
+  padding:8px max(10px,env(safe-area-inset-left))
+    calc(8px + env(safe-area-inset-bottom));
+  z-index:20
+}
+.nav-inner{
+  max-width:640px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:7px
+}
+.nav button{
+  margin:0;
+  padding:10px 5px;
+  background:#111722;
+  color:#9ca7ba;
+  border:1px solid #202a3a;
+  font-size:12px
+}
+.nav button.active{
+  color:#fff;
+  border-color:#66dcff
+}
+.auth{
+  max-width:480px;
+  margin:0 auto;
+  padding-top:10vh
+}
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px
+}
+.tabs button{
+  margin:0;
+  background:#111722;
+  color:#9ca7ba;
+  border:1px solid #202a3a
+}
+.tabs button.active{
+  background:#fff;
+  color:#080a10
+}
+.footer-note{
+  margin-top:18px;
+  text-align:center;
+  color:#687286;
+  font-size:12px;
+  line-height:1.4
+}
+@media(max-width:420px){
+  .balance{font-size:30px}
+  .grid2{grid-template-columns:1fr}
+}
+</style>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-
-<style>
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #080b14;
-    color: white;
-}
-
-button,
-input {
-    font: inherit;
-}
-
-button {
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-button:disabled {
-    opacity: .6;
-    cursor: not-allowed;
-}
-
-.container {
-    width: min(700px, 100%);
-    margin: auto;
-    padding: 20px;
-}
-
-.hidden {
-    display: none !important;
-}
-
-.logo {
-    width: 58px;
-    height: 58px;
-    border-radius: 18px;
-    background: linear-gradient(135deg, #744cff, #00a8ff);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 34px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-h1 {
-    margin: 0 0 20px;
-}
-
-.card {
-    background: #101522;
-    border: 1px solid #20283a;
-    border-radius: 22px;
-    padding: 20px;
-    margin-bottom: 16px;
-    box-shadow: 0 10px 30px rgba(0,0,0,.2);
-}
-
-.card-title {
-    color: #8f96a8;
-    margin-bottom: 12px;
-}
-
-.balance {
-    font-size: 38px;
-    font-weight: bold;
-    margin: 8px 0;
-}
-
-.purple {
-    color: #a56cff;
-}
-
-.small {
-    color: #9ba3b7;
-    font-size: 14px;
-}
-
-input {
-    width: 100%;
-    padding: 15px;
-    margin: 7px 0;
-    border-radius: 14px;
-    border: 1px solid #2a344b;
-    background: #171d2b;
-    color: white;
-    outline: none;
-}
-
-input:focus {
-    border-color: #7255ff;
-}
-
-button {
-    border: 0;
-    border-radius: 15px;
-    padding: 15px;
-    color: white;
-    font-weight: bold;
-}
-
-.primary {
-    background: linear-gradient(135deg, #744cff, #3e8cff);
-    width: 100%;
-}
-
-.green {
-    background: linear-gradient(135deg, #08a85a, #00c878);
-}
-
-.red {
-    background: linear-gradient(135deg, #ef3340, #ff416c);
-    width: 100%;
-}
-
-.secondary {
-    background: #202a3e;
-}
-
-.row {
-    display: flex;
-    gap: 12px;
-}
-
-.row > * {
-    flex: 1;
-}
-
-.auth-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 15px;
-}
-
-.auth-tabs button {
-    flex: 1;
-    background: #171d2b;
-}
-
-.auth-tabs button.active {
-    background: linear-gradient(135deg, #744cff, #3e8cff);
-}
-
-.wallet-item {
-    background: #171d2b;
-    border: 1px solid #29334a;
-    border-radius: 16px;
-    padding: 15px;
-    margin-top: 10px;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-}
-
-.wallet-item:active {
-    transform: scale(.99);
-}
-
-.wallet-item.active {
-    border-color: #865cff;
-    background: #1c1832;
-}
-
-.wallet-item strong {
-    display: block;
-    margin-bottom: 5px;
-}
-
-.wallet-balance {
-    color: #a56cff;
-    font-weight: bold;
-}
-
-.wallet-address {
-    color: #7e879c;
-    font-size: 12px;
-    word-break: break-all;
-    margin-top: 5px;
-}
-
-.qr-buttons {
-    display: flex;
-    gap: 12px;
-}
-
-.qr-buttons button {
-    flex: 1;
-}
-
-.history-item {
-    padding: 13px 0;
-    border-bottom: 1px solid #222b3d;
-}
-
-.history-item:last-child {
-    border-bottom: 0;
-}
-
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.78);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-    z-index: 100;
-}
-
-.modal-box {
-    width: min(500px, 100%);
-    background: #101522;
-    border-radius: 22px;
-    padding: 20px;
-    text-align: center;
-}
-
-#qrcode {
-    background: white;
-    padding: 15px;
-    width: fit-content;
-    margin: 20px auto;
-    border-radius: 12px;
-}
-
-#scannerVideo {
-    width: 100%;
-    border-radius: 16px;
-    background: black;
-}
-
-.status {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.dot {
-    width: 10px;
-    height: 10px;
-    background: #00d878;
-    border-radius: 50%;
-}
-
-.notice {
-    padding: 12px;
-    border-radius: 12px;
-    background: #171d2b;
-    color: #b8bfd0;
-    margin-top: 10px;
-}
-
-#authMessage,
-#appMessage {
-    margin-top: 10px;
-    color: #ff8791;
-}
-
-@media (max-width: 500px) {
-    .container {
-        padding: 14px;
-    }
-
-    .balance {
-        font-size: 32px;
-    }
-
-    .row,
-    .qr-buttons {
-        flex-direction: column;
-    }
-}
-</style>
 </head>
 
 <body>
 
-<div class="container">
+<!-- AUTH -->
 
-<!-- ================= AUTH ================= -->
+<div id="authScreen" class="app auth">
 
-<div id="authScreen">
+  <span class="badge">SLX NETWORK • TESTNET v1.6</span>
 
-    <div class="logo">S</div>
+  <h1>SLX Account</h1>
 
-    <h1>SLX Network</h1>
+  <div class="muted">
+    Аккаунт, несколько кошельков, переводы и тестовый блокчейн.
+  </div>
 
-    <div class="card">
+  <div class="card">
 
-        <div class="auth-tabs">
-            <button id="loginTab" class="active" onclick="showLogin()">
-                Войти
-            </button>
+    <div class="tabs">
+      <button id="loginTab"
+              class="active"
+              onclick="showAuth('login')">
+        Войти
+      </button>
 
-            <button id="registerTab" onclick="showRegister()">
-                Регистрация
-            </button>
-        </div>
+      <button id="registerTab"
+              onclick="showAuth('register')">
+        Регистрация
+      </button>
+    </div>
 
-        <div id="loginForm">
+    <div id="loginForm">
 
-            <input
-                id="loginUsername"
-                type="text"
-                placeholder="Имя пользователя"
-                autocomplete="username"
-            >
+      <input
+        id="loginUsername"
+        autocomplete="username"
+        placeholder="Имя пользователя">
 
-            <input
-                id="loginPassword"
-                type="password"
-                placeholder="Пароль"
-                autocomplete="current-password"
-            >
+      <input
+        id="loginPassword"
+        autocomplete="current-password"
+        type="password"
+        placeholder="Пароль">
 
-            <button
-                id="loginButton"
-                class="primary"
-                onclick="login()"
-            >
-                🔐 Войти
-            </button>
-
-        </div>
-
-        <div id="registerForm" class="hidden">
-
-            <input
-                id="registerUsername"
-                type="text"
-                placeholder="Имя пользователя"
-                autocomplete="username"
-            >
-
-            <input
-                id="registerPassword"
-                type="password"
-                placeholder="Пароль"
-                autocomplete="new-password"
-            >
-
-            <input
-                id="registerPassword2"
-                type="password"
-                placeholder="Повторите пароль"
-                autocomplete="new-password"
-            >
-
-            <button
-                id="registerButton"
-                class="primary"
-                onclick="register()"
-            >
-                ✨ Создать аккаунт
-            </button>
-
-        </div>
-
-        <div id="authMessage"></div>
+      <button id="loginBtn" onclick="login()">
+        Войти
+      </button>
 
     </div>
+
+    <div id="registerForm" class="hidden">
+
+      <input
+        id="registerUsername"
+        autocomplete="username"
+        placeholder="Имя пользователя">
+
+      <input
+        id="registerPassword"
+        autocomplete="new-password"
+        type="password"
+        placeholder="Пароль">
+
+      <button id="registerBtn" onclick="register()">
+        Создать аккаунт
+      </button>
+
+    </div>
+
+    <div id="authStatus" class="status">
+      Готово.
+    </div>
+
+  </div>
+
+  <div class="footer-note">
+    SLX v1.6 — тестовая сеть. SLX здесь не является реальными деньгами.
+  </div>
 
 </div>
 
 
-<!-- ================= APP ================= -->
+<!-- MAIN -->
 
-<div id="appScreen" class="hidden">
+<div id="mainScreen" class="app hidden">
 
-    <div class="logo">S</div>
+  <span class="badge">
+    SLX NETWORK • TESTNET v1.6
+  </span>
 
-    <h1>SLX Network</h1>
+  <h1>Кошелёк SLX</h1>
 
-
-    <!-- ACCOUNT -->
-
-    <div class="card">
-
-        <div class="card-title">
-            Аккаунт
-        </div>
-
-        <div style="font-size:18px;">
-            👤 <strong id="username"></strong>
-        </div>
-
-        <br>
-
-        <button
-            id="logoutButton"
-            class="red"
-            onclick="logout()"
-        >
-            🚪 Выйти
-        </button>
-
-    </div>
+  <div id="topStatus" class="status">
+    Подключение…
+  </div>
 
 
-    <!-- ACTIVE WALLET -->
+  <!-- HOME -->
+
+  <section id="pageHome">
 
     <div class="card">
 
-        <div class="card-title">
-            Активный кошелёк
-        </div>
+      <div class="small">
+        Активный кошелёк
+      </div>
 
-        <div class="balance">
-            <span id="balance">0.00</span>
-            <span class="purple">SLX</span>
-        </div>
+      <div id="activeAddress"
+           class="mono"
+           style="margin-top:7px">
+        —
+      </div>
 
-        <div>
-            <span class="purple">
-                SLX-ID:
-            </span>
+      <div class="balance">
+        <span id="balance">0.000000</span>
+        <span class="slx">SLX</span>
+      </div>
 
-            <strong id="walletId"></strong>
-        </div>
-
-        <div class="small" style="margin-top:7px;">
-            Wallet:
-            <span id="walletAddress"></span>
-        </div>
-
-        <button
-            id="copyIdButton"
-            class="secondary"
-            style="width:100%;margin-top:15px;"
-            onclick="copyId()"
-        >
-            📋 Копировать ID
-        </button>
+      <div class="small">
+        Тестовый баланс
+      </div>
 
     </div>
 
-
-    <!-- QR -->
-
-    <div class="qr-buttons">
-
-        <button
-            id="myQrButton"
-            class="primary"
-            onclick="showQR()"
-        >
-            ▣ Мой QR
-        </button>
-
-        <button
-            id="scanButton"
-            class="green"
-            onclick="startScanner()"
-        >
-            📷 Сканировать QR
-        </button>
-
-    </div>
-
-
-    <!-- MY WALLETS -->
-
-    <div class="card" style="margin-top:16px;">
-
-        <div
-            class="row"
-            style="align-items:center;"
-        >
-
-            <div>
-                <div
-                    class="card-title"
-                    style="margin:0;"
-                >
-                    Мои кошельки
-                </div>
-
-                <div class="small">
-                    Кошельки этого аккаунта
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- ИСПРАВЛЕННАЯ КНОПКА -->
-
-        <button
-            id="newWalletButton"
-            type="button"
-            class="primary"
-            style="
-                margin-top:15px;
-                width:100%;
-                padding:17px;
-                font-size:17px;
-                cursor:pointer;
-                touch-action:manipulation;
-            "
-            onclick="createNewWallet()"
-        >
-            ＋ Новый кошелёк
-        </button>
-
-
-        <div id="walletList"></div>
-
-    </div>
-
-
-    <!-- SEND -->
 
     <div class="card">
 
-        <h2>Перевод SLX</h2>
+      <h2>Мои кошельки</h2>
 
-        <input
-            id="recipientInput"
-            type="text"
-            placeholder="SLX-ID получателя"
-        >
+      <div id="walletList"
+           class="wallet-list">
+      </div>
 
-        <input
-            id="amountInput"
-            type="number"
-            step="0.01"
-            min="0"
-            placeholder="Сумма"
-        >
-
-        <button
-            id="sendButton"
-            class="primary"
-            onclick="sendSLX()"
-        >
-            💸 Отправить SLX
-        </button>
-
-        <div id="appMessage"></div>
+      <button
+        id="newWalletBtn"
+        class="secondary"
+        onclick="createNewWallet()">
+        ＋ Новый кошелёк
+      </button>
 
     </div>
 
 
-    <!-- FAUCET -->
+    <div class="card">
+
+      <h2>Быстрые действия</h2>
+
+      <div class="grid2">
+
+        <button
+          class="secondary"
+          onclick="copyActiveAddress()">
+          Скопировать адрес
+        </button>
+
+        <button
+          class="secondary"
+          onclick="goPage('send')">
+          Отправить SLX
+        </button>
+
+        <button
+          class="secondary"
+          onclick="showQR()">
+          Показать QR
+        </button>
+
+        <button
+          class="secondary"
+          onclick="goPage('network')">
+          Сеть
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- SEND -->
+
+  <section id="pageSend" class="hidden">
 
     <div class="card">
 
-        <h2>Тестовый Faucet</h2>
+      <h2>Отправить SLX</h2>
+
+      <div class="small">
+        Отправитель
+      </div>
+
+      <div id="sendFrom"
+           class="mono"
+           style="margin-top:5px">
+        —
+      </div>
+
+      <input
+        id="sendTo"
+        placeholder="Адрес кошелька получателя">
+
+      <input
+        id="sendAmount"
+        type="number"
+        min="0.00000001"
+        step="0.00000001"
+        placeholder="Количество SLX">
+
+      <div class="small" style="margin-top:8px">
+        Комиссия сети:
+        <span id="feeLabel">0.1</span> SLX
+      </div>
+
+      <button
+        id="sendBtn"
+        onclick="sendSLX()">
+        Отправить
+      </button>
+
+      <button
+        class="secondary"
+        onclick="startScanner()">
+        📷 Сканировать QR
+      </button>
+
+      <div id="sendStatus"
+           class="status">
+        Укажи адрес и количество.
+      </div>
+
+
+      <div id="scannerCard"
+           class="hidden"
+           style="margin-top:12px">
 
         <div class="small">
-            Получить тестовые 100 SLX.
+          Наведите камеру на QR-код адреса.
         </div>
 
-        <br>
+        <div class="scan-box">
 
-        <button
-            id="faucetButton"
-            class="green"
-            style="width:100%;"
-            onclick="faucet()"
-        >
-            💧 Получить 100 SLX
-        </button>
-
-    </div>
-
-
-    <!-- HISTORY -->
-
-    <div class="card">
-
-        <h2>История</h2>
-
-        <div id="history">
-            Нет операций.
-        </div>
-
-    </div>
-
-
-    <!-- NETWORK -->
-
-    <div class="card">
-
-        <h3>Сеть</h3>
-
-        <div class="status">
-
-            <div class="dot"></div>
-
-            <span>
-                SLX Testnet
-            </span>
-
-        </div>
-
-        <div
-            class="small"
-            style="margin-top:8px;"
-        >
-            Version:
-            <span id="networkVersion">-</span>
-        </div>
-
-        <div
-            class="small"
-            style="margin-top:5px;"
-        >
-            Accounts:
-            <span id="networkAccounts">-</span>
-        </div>
-
-        <div
-            class="small"
-            style="margin-top:5px;"
-        >
-            Wallets:
-            <span id="networkWallets">-</span>
-        </div>
-
-    </div>
-
-</div>
-
-</div>
-
-
-<!-- ================= QR MODAL ================= -->
-
-<div
-    id="qrModal"
-    class="modal hidden"
->
-
-    <div class="modal-box">
-
-        <h2>Мой SLX QR</h2>
-
-        <div id="qrcode"></div>
-
-        <div
-            class="small"
-            id="qrText"
-        ></div>
-
-        <br>
-
-        <button
-            class="secondary"
-            style="width:100%;"
-            onclick="closeQR()"
-        >
-            Закрыть
-        </button>
-
-    </div>
-
-</div>
-
-
-<!-- ================= SCANNER MODAL ================= -->
-
-<div
-    id="scannerModal"
-    class="modal hidden"
->
-
-    <div class="modal-box">
-
-        <h2>Сканирование QR</h2>
-
-        <video
-            id="scannerVideo"
-            autoplay
+          <video
+            id="scanVideo"
             playsinline
-            muted
-        ></video>
+            autoplay
+            muted>
+          </video>
 
-        <canvas
-            id="scannerCanvas"
-            class="hidden"
-        ></canvas>
-
-        <div
-            class="notice"
-            id="scannerStatus"
-        >
-            Наведи камеру на QR-код.
         </div>
 
-        <br>
+        <canvas id="scanCanvas"></canvas>
 
         <button
-            class="secondary"
-            style="width:100%;"
-            onclick="stopScanner()"
-        >
-            Закрыть
+          class="danger"
+          onclick="stopScanner()">
+          Остановить сканер
         </button>
 
+      </div>
+
     </div>
+
+
+    <div class="card">
+
+      <h2>Faucet</h2>
+
+      <div class="muted">
+        Получить тестовые SLX на активный кошелёк.
+      </div>
+
+      <button
+        class="secondary"
+        onclick="useFaucet()">
+        Получить 10 SLX
+      </button>
+
+      <div id="faucetStatus"
+           class="status">
+        Готово.
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- WALLET -->
+
+  <section id="pageWallet" class="hidden">
+
+    <div class="card">
+
+      <h2>QR моего кошелька</h2>
+
+      <div id="qrcode"
+           class="qr-wrap">
+      </div>
+
+      <div id="qrText"
+           class="mono"
+           style="text-align:center">
+        —
+      </div>
+
+      <button
+        class="secondary"
+        onclick="copyActiveAddress()">
+        Скопировать адрес
+      </button>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Данные кошелька</h2>
+
+      <div class="kv">
+        <span>Адрес</span>
+        <span id="walletDataAddress"
+              class="mono">
+          —
+        </span>
+      </div>
+
+      <div class="kv">
+        <span>Баланс</span>
+        <span id="walletDataBalance">
+          0
+        </span>
+      </div>
+
+      <div class="kv">
+        <span>Владелец</span>
+        <span id="walletDataOwner">
+          —
+        </span>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- HISTORY -->
+
+  <section id="pageHistory" class="hidden">
+
+    <div class="card">
+
+      <h2>История</h2>
+
+      <div id="historyList"
+           class="muted">
+        Загрузка…
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- NETWORK -->
+
+  <section id="pageNetwork" class="hidden">
+
+    <div class="card">
+
+      <h2>Сеть</h2>
+
+      <div id="networkInfo">
+        Загрузка…
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Последние блоки</h2>
+
+      <div id="blocksList"
+           class="muted">
+        Загрузка…
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <h2>Экономика SLX</h2>
+
+      <div id="economyInfo">
+        Загрузка…
+      </div>
+
+    </div>
+
+
+    <div class="card">
+
+      <button
+        class="danger"
+        onclick="logout()">
+        Выйти из аккаунта
+      </button>
+
+    </div>
+
+  </section>
+
+</div>
+
+
+<!-- NAV -->
+
+<div id="bottomNav"
+     class="nav hidden">
+
+  <div class="nav-inner">
+
+    <button
+      data-page="home"
+      class="active"
+      onclick="goPage('home')">
+      🏠<br>Главная
+    </button>
+
+    <button
+      data-page="wallet"
+      onclick="goPage('wallet')">
+      👛<br>Кошелёк
+    </button>
+
+    <button
+      data-page="send"
+      onclick="goPage('send')">
+      📤<br>Отправить
+    </button>
+
+    <button
+      data-page="history"
+      onclick="goPage('history')">
+      📜<br>История
+    </button>
+
+    <button
+      data-page="network"
+      onclick="goPage('network')">
+      🌐<br>Сеть
+    </button>
+
+  </div>
 
 </div>
 
 
 <script>
 
-const API = "";
+const TOKEN_KEY = 'slx_token';
+const ACTIVE_WALLET_KEY = 'slx_active_wallet';
 
-let token =
-    localStorage.getItem("slx_token") || "";
+let token = localStorage.getItem(TOKEN_KEY) || '';
 
 let currentUser = null;
-let currentWallet = null;
-let myWallets = [];
+let wallets = [];
+let activeWallet = null;
 
 let scannerStream = null;
 let scannerRunning = false;
 
+let fee = 0.1;
 
-/* ================= API ================= */
 
-async function api(url, options = {}) {
+function $(id){
+  return document.getElementById(id);
+}
 
-    const headers = {
-        "Content-Type": "application/json",
-        ...(options.headers || {})
-    };
 
-    if (token) {
-        headers.Authorization =
-            "Bearer " + token;
+function esc(value){
+
+  return String(value ?? '')
+    .replace(
+      /[&<>'"]/g,
+      c => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        "'":'&#39;',
+        '"':'&quot;'
+      }[c])
+    );
+
+}
+
+
+function num(v){
+
+  const n = Number(v);
+
+  return Number.isFinite(n) ? n : 0;
+
+}
+
+
+function fmt(v){
+
+  return num(v).toLocaleString(
+    'ru-RU',
+    {
+      minimumFractionDigits:6,
+      maximumFractionDigits:8
     }
+  );
 
-    try {
+}
 
-        const response =
-            await fetch(
-                API + url,
-                {
-                    ...options,
-                    headers
-                }
-            );
 
-        let data;
+function shortAddr(v){
 
-        try {
-            data = await response.json();
-        } catch {
-            data = {
-                success: false,
-                error: "Ошибка сервера."
-            };
+  const s = String(v ?? '');
+
+  return s.length > 28
+    ? s.slice(0,14) + '…' + s.slice(-10)
+    : s;
+
+}
+
+
+function setStatus(el,msg,ok=false){
+
+  el.textContent = msg;
+
+  el.className =
+    'status ' +
+    (ok ? 'ok' : '');
+
+}
+
+
+function headers(extra={}){
+
+  return Object.assign(
+    {
+      'Content-Type':'application/json'
+    },
+
+    token
+      ? {
+          'Authorization':
+          'Bearer ' + token
         }
+      : {},
 
-        return {
-            ok: response.ok,
-            data
-        };
+    extra
+  );
 
-    } catch (error) {
-
-        return {
-            ok: false,
-            data: {
-                success: false,
-                error: "Нет соединения с сервером."
-            }
-        };
-    }
 }
 
 
-/* ================= ELEMENTS ================= */
+async function api(path,options={}){
 
-const authScreen =
-    document.getElementById("authScreen");
+  const opts =
+    Object.assign({},options);
 
-const appScreen =
-    document.getElementById("appScreen");
+  opts.headers =
+    headers(options.headers || {});
 
-const authMessage =
-    document.getElementById("authMessage");
+  const res =
+    await fetch(path,opts);
 
-const appMessage =
-    document.getElementById("appMessage");
+  const type =
+    res.headers.get('content-type') || '';
 
+  const data =
+    type.includes('application/json')
+      ? await res.json()
+      : await res.text();
 
-/* ================= AUTH TABS ================= */
+  if(
+    !res.ok ||
+    (data && data.success === false)
+  ){
 
-function showLogin() {
+    const message =
+      data &&
+      typeof data === 'object'
+        ? (
+            data.error ||
+            data.message ||
+            'Ошибка запроса'
+          )
+        : 'HTTP ' + res.status;
 
-    document
-        .getElementById("loginForm")
-        .classList.remove("hidden");
+    const err =
+      new Error(message);
 
-    document
-        .getElementById("registerForm")
-        .classList.add("hidden");
+    err.data = data;
+    err.status = res.status;
 
-    document
-        .getElementById("loginTab")
-        .classList.add("active");
+    throw err;
 
-    document
-        .getElementById("registerTab")
-        .classList.remove("active");
+  }
 
-    authMessage.textContent = "";
+  return data;
+
 }
 
 
-function showRegister() {
+/* AUTH */
 
-    document
-        .getElementById("loginForm")
-        .classList.add("hidden");
+function showAuth(mode){
 
-    document
-        .getElementById("registerForm")
-        .classList.remove("hidden");
+  const login =
+    mode === 'login';
 
-    document
-        .getElementById("loginTab")
-        .classList.remove("active");
+  $('loginForm')
+    .classList
+    .toggle('hidden',!login);
 
-    document
-        .getElementById("registerTab")
-        .classList.add("active");
+  $('registerForm')
+    .classList
+    .toggle('hidden',login);
 
-    authMessage.textContent = "";
+  $('loginTab')
+    .classList
+    .toggle('active',login);
+
+  $('registerTab')
+    .classList
+    .toggle('active',!login);
+
+  setStatus(
+    $('authStatus'),
+    'Готово.'
+  );
+
 }
 
 
-/* ================= LOGIN ================= */
+async function login(){
 
-async function login() {
+  const username =
+    $('loginUsername')
+    .value
+    .trim();
 
-    const username =
-        document
-            .getElementById("loginUsername")
-            .value
-            .trim();
+  const password =
+    $('loginPassword')
+    .value;
 
-    const password =
-        document
-            .getElementById("loginPassword")
-            .value;
+  if(!username || !password){
 
-    if (!username || !password) {
-
-        authMessage.textContent =
-            "Введите имя и пароль.";
-
-        return;
-    }
-
-    authMessage.textContent =
-        "Вход...";
-
-    const result =
-        await api(
-            "/api/auth/login",
-            {
-                method: "POST",
-
-                body: JSON.stringify({
-                    username,
-                    password
-                })
-            }
-        );
-
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-
-        authMessage.textContent =
-            result.data.error ||
-            "Не удалось войти.";
-
-        return;
-    }
-
-    token =
-        result.data.token;
-
-    localStorage.setItem(
-        "slx_token",
-        token
+    setStatus(
+      $('authStatus'),
+      'Введи имя пользователя и пароль.'
     );
 
-    await loadApp();
-}
+    return;
+  }
 
+  $('loginBtn').disabled = true;
 
-/* ================= REGISTER ================= */
+  try{
 
-async function register() {
+    const data =
+      await api(
+        '/api/auth/login',
+        {
+          method:'POST',
+          body:JSON.stringify({
+            username,
+            password
+          })
+        }
+      );
 
-    const username =
-        document
-            .getElementById("registerUsername")
-            .value
-            .trim();
+    if(data.token)
+      token = data.token;
 
-    const password =
-        document
-            .getElementById("registerPassword")
-            .value;
-
-    const password2 =
-        document
-            .getElementById("registerPassword2")
-            .value;
-
-    if (
-        !username ||
-        !password ||
-        !password2
-    ) {
-
-        authMessage.textContent =
-            "Заполни все поля.";
-
-        return;
-    }
-
-    if (password !== password2) {
-
-        authMessage.textContent =
-            "Пароли не совпадают.";
-
-        return;
-    }
-
-    authMessage.textContent =
-        "Создание аккаунта...";
-
-    const result =
-        await api(
-            "/api/auth/register",
-            {
-                method: "POST",
-
-                body: JSON.stringify({
-                    username,
-                    password
-                })
-            }
-        );
-
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-
-        authMessage.textContent =
-            result.data.error ||
-            "Ошибка регистрации.";
-
-        return;
-    }
-
-    token =
-        result.data.token;
+    if(!token)
+      throw new Error(
+        'Сервер не вернул токен сессии.'
+      );
 
     localStorage.setItem(
-        "slx_token",
-        token
+      TOKEN_KEY,
+      token
     );
 
-    await loadApp();
+    await enterApp();
+
+  }catch(e){
+
+    setStatus(
+      $('authStatus'),
+      e.message
+    );
+
+  }finally{
+
+    $('loginBtn').disabled = false;
+
+  }
+
 }
 
 
-/* ================= LOAD APP ================= */
+async function register(){
 
-async function loadApp() {
+  const username =
+    $('registerUsername')
+    .value
+    .trim();
 
-    const result =
-        await api("/api/auth/me");
+  const password =
+    $('registerPassword')
+    .value;
 
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
+  if(username.length < 3){
 
-        logoutLocal();
+    setStatus(
+      $('authStatus'),
+      'Имя пользователя должно быть не короче 3 символов.'
+    );
+
+    return;
+  }
+
+  if(password.length < 6){
+
+    setStatus(
+      $('authStatus'),
+      'Пароль должен быть не короче 6 символов.'
+    );
+
+    return;
+  }
+
+  $('registerBtn').disabled = true;
+
+  try{
+
+    const data =
+      await api(
+        '/api/auth/register',
+        {
+          method:'POST',
+          body:JSON.stringify({
+            username,
+            password
+          })
+        }
+      );
+
+    if(data.token)
+      token = data.token;
+
+    if(!token)
+      throw new Error(
+        'Аккаунт создан. Теперь войди в него.'
+      );
+
+    localStorage.setItem(
+      TOKEN_KEY,
+      token
+    );
+
+    await enterApp();
+
+  }catch(e){
+
+    setStatus(
+      $('authStatus'),
+      e.message
+    );
+
+  }finally{
+
+    $('registerBtn').disabled = false;
+
+  }
+
+}
+
+
+/* APP */
+
+async function enterApp(){
+
+  $('authScreen')
+    .classList
+    .add('hidden');
+
+  $('mainScreen')
+    .classList
+    .remove('hidden');
+
+  $('bottomNav')
+    .classList
+    .remove('hidden');
+
+  await loadAll();
+
+  goPage('home');
+
+}
+
+
+async function bootstrap(){
+
+  if(!token)
+    return;
+
+  try{
+
+    await enterApp();
+
+  }catch(e){
+
+    token = '';
+
+    localStorage.removeItem(
+      TOKEN_KEY
+    );
+
+    $('mainScreen')
+      .classList
+      .add('hidden');
+
+    $('bottomNav')
+      .classList
+      .add('hidden');
+
+    $('authScreen')
+      .classList
+      .remove('hidden');
+
+    setStatus(
+      $('authStatus'),
+      'Сессия истекла. Войди снова.'
+    );
+
+  }
+
+}
+
+
+async function loadAll(){
+
+  setStatus(
+    $('topStatus'),
+    'Загрузка данных…'
+  );
+
+  const me =
+    await api('/api/auth/me');
+
+  currentUser =
+    me.user ||
+    me.account ||
+    me;
+
+  const feeData =
+    await api('/api/status')
+      .catch(()=>null);
+
+  if(
+    feeData &&
+    feeData.transferFee != null
+  )
+    fee = num(
+      feeData.transferFee
+    );
+
+  if(
+    feeData &&
+    feeData.fee != null
+  )
+    fee = num(
+      feeData.fee
+    );
+
+  $('feeLabel').textContent =
+    fmt(fee);
+
+  await loadWallets();
+
+  await refreshActiveWallet();
+
+  await loadNetwork();
+
+  setStatus(
+    $('topStatus'),
+    'Сеть подключена.',
+    true
+  );
+
+}
+
+
+/* WALLET HELPERS */
+
+function normalizeWalletList(data){
+
+  if(Array.isArray(data))
+    return data;
+
+  if(
+    data &&
+    Array.isArray(data.wallets)
+  )
+    return data.wallets;
+
+  if(
+    data &&
+    Array.isArray(data.items)
+  )
+    return data.items;
+
+  return [];
+
+}
+
+
+function walletIdOf(w){
+
+  return w &&
+    (
+      w.id ||
+      w.walletId ||
+      w.addressId ||
+      w.wallet
+    );
+
+}
+
+
+function walletAddressOf(w){
+
+  return w &&
+    (
+      w.address ||
+      w.walletAddress ||
+      w.id
+    );
+
+}
+
+
+/* LOAD ALL WALLETS */
+
+async function loadWallets(){
+
+  const data =
+    await api('/api/wallets');
+
+  wallets =
+    normalizeWalletList(data);
+
+  if(
+    !wallets.length &&
+    data &&
+    data.wallet
+  ){
+
+    wallets = [
+      data.wallet
+    ];
+
+  }
+
+  let saved =
+    localStorage.getItem(
+      ACTIVE_WALLET_KEY
+    );
+
+  let activeId =
+    data &&
+    (
+      data.currentWalletId ||
+      data.walletId ||
+      data.activeWalletId
+    );
+
+  if(!activeId)
+    activeId = saved;
+
+  if(
+    !activeId &&
+    wallets[0]
+  )
+    activeId =
+      walletIdOf(wallets[0]);
+
+  if(activeId){
+
+    localStorage.setItem(
+      ACTIVE_WALLET_KEY,
+      activeId
+    );
+
+  }
+
+  renderWalletList(
+    activeId
+  );
+
+}
+
+
+/* RENDER WALLET LIST */
+
+function renderWalletList(activeId){
+
+  if(!wallets.length){
+
+    $('walletList').innerHTML =
+      '<div class="muted">Кошельков пока нет.</div>';
+
+    return;
+  }
+
+  $('walletList').innerHTML =
+    wallets
+      .map(w=>{
+
+        const id =
+          walletIdOf(w);
+
+        const address =
+          walletAddressOf(w);
+
+        const active =
+          String(id) ===
+          String(activeId);
+
+        return `
+<button
+  class="wallet-item ${active ? 'active' : ''}"
+  data-wallet-id="${esc(id)}">
+
+  <div class="wallet-top">
+
+    <span class="wallet-id">
+      Кошелёк ${esc(shortAddr(id))}
+    </span>
+
+    <span class="wallet-bal">
+      ${esc(fmt(w.balance))} SLX
+    </span>
+
+  </div>
+
+  <div class="addr">
+    ${esc(address || id)}
+  </div>
+
+</button>
+`;
+
+      })
+      .join('');
+
+}
+
+
+/*
+  ВАЖНО:
+  Делегирование клика.
+  Поэтому после обновления списка
+  кнопки кошельков продолжают работать.
+*/
+
+$('walletList')
+  .addEventListener(
+    'click',
+    async event => {
+
+      const btn =
+        event.target.closest(
+          '[data-wallet-id]'
+        );
+
+      if(!btn)
         return;
+
+      event.preventDefault();
+
+      const id =
+        btn.dataset.walletId;
+
+      await selectWallet(id);
+
     }
+  );
 
-    currentUser =
-        result.data.user;
 
-    authScreen.classList.add("hidden");
-    appScreen.classList.remove("hidden");
+/* SELECT WALLET */
 
-    document
-        .getElementById("username")
-        .textContent =
-        currentUser.username;
+async function selectWallet(id){
+
+  if(!id)
+    return;
+
+  setStatus(
+    $('topStatus'),
+    'Переключение кошелька…'
+  );
+
+  try{
+
+    await api(
+      '/api/wallet/select',
+      {
+        method:'POST',
+        body:JSON.stringify({
+          walletId:id
+        })
+      }
+    );
+
+    localStorage.setItem(
+      ACTIVE_WALLET_KEY,
+      id
+    );
 
     await loadWallets();
-    await loadNetwork();
-}
 
+    await refreshActiveWallet();
 
-/* ================= LOAD WALLETS ================= */
-
-async function loadWallets() {
-
-    const result =
-        await api("/api/wallets");
-
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-
-        appMessage.textContent =
-            result.data.error ||
-            "Не удалось загрузить кошельки.";
-
-        return;
-    }
-
-    myWallets =
-        result.data.wallets || [];
-
-    const savedWallet =
-        localStorage.getItem(
-            "slx_active_wallet"
-        );
-
-    let wallet =
-        myWallets.find(
-            w => w.id === savedWallet
-        );
-
-    if (!wallet) {
-
-        wallet =
-            myWallets.find(
-                w =>
-                    w.id ===
-                    currentUser.walletId
-            );
-    }
-
-    if (
-        !wallet &&
-        myWallets.length > 0
-    ) {
-
-        wallet =
-            myWallets[0];
-    }
-
-    if (wallet) {
-
-        await selectWallet(
-            wallet.id,
-            false
-        );
-
-    } else {
-
-        renderWalletList();
-    }
-}
-
-
-/* ================= SELECT WALLET ================= */
-
-async function selectWallet(
-    walletId,
-    save = true
-) {
-
-    const result =
-        await api(
-            "/api/wallet/select",
-            {
-                method: "POST",
-
-                body: JSON.stringify({
-                    id: walletId
-                })
-            }
-        );
-
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-
-        appMessage.textContent =
-            result.data.error ||
-            "Не удалось выбрать кошелёк.";
-
-        return;
-    }
-
-    currentWallet =
-        result.data.wallet;
-
-    if (save) {
-
-        localStorage.setItem(
-            "slx_active_wallet",
-            currentWallet.id
-        );
-    }
-
-    updateWalletUI();
-
-    appMessage.textContent = "";
-
-    await refreshWallets();
-}
-
-
-/* ================= REFRESH WALLETS ================= */
-
-async function refreshWallets() {
-
-    const result =
-        await api("/api/wallets");
-
-    if (
-        result.ok &&
-        result.data.success
-    ) {
-
-        myWallets =
-            result.data.wallets || [];
-    }
-
-    renderWalletList();
-}
-
-
-/* ================= WALLET LIST ================= */
-
-function renderWalletList() {
-
-    const list =
-        document.getElementById(
-            "walletList"
-        );
-
-    list.innerHTML = "";
-
-    if (!myWallets.length) {
-
-        list.innerHTML = `
-            <div class="notice">
-                У аккаунта пока нет кошельков.
-            </div>
-        `;
-
-        return;
-    }
-
-    myWallets.forEach(
-        wallet => {
-
-            const item =
-                document.createElement(
-                    "div"
-                );
-
-            item.className =
-                "wallet-item";
-
-            if (
-                currentWallet &&
-                wallet.id ===
-                currentWallet.id
-            ) {
-
-                item.classList.add(
-                    "active"
-                );
-            }
-
-            item.innerHTML = `
-                <strong>
-                    ${
-                        wallet.id ===
-                        (currentWallet?.id || "")
-                            ? "🟣 "
-                            : "👛 "
-                    }${wallet.id}
-                </strong>
-
-                <div class="wallet-balance">
-                    ${Number(wallet.balance).toFixed(2)} SLX
-                </div>
-
-                <div class="wallet-address">
-                    ${wallet.address}
-                </div>
-            `;
-
-            item.onclick = function() {
-
-                selectWallet(
-                    wallet.id
-                );
-
-            };
-
-            list.appendChild(item);
-        }
+    setStatus(
+      $('topStatus'),
+      'Кошелёк выбран.',
+      true
     );
+
+    await loadHistory();
+
+    await renderWalletQR();
+
+  }catch(e){
+
+    setStatus(
+      $('topStatus'),
+      e.message
+    );
+
+  }
+
 }
 
 
-/* ================= UPDATE WALLET UI ================= */
+/* CREATE WALLET */
 
-function updateWalletUI() {
+async function createNewWallet(){
 
-    if (!currentWallet) {
-        return;
+  const btn =
+    $('newWalletBtn');
+
+  btn.disabled = true;
+
+  btn.textContent =
+    'Создание…';
+
+  try{
+
+    const data =
+      await api(
+        '/api/wallet/create',
+        {
+          method:'POST',
+          body:JSON.stringify({})
+        }
+      );
+
+    const w =
+      data.wallet || data;
+
+    const id =
+      walletIdOf(w);
+
+    if(id){
+
+      localStorage.setItem(
+        ACTIVE_WALLET_KEY,
+        id
+      );
+
     }
 
-    document
-        .getElementById("balance")
-        .textContent =
-        Number(
-            currentWallet.balance
-        ).toFixed(2);
+    await loadWallets();
 
-    document
-        .getElementById("walletId")
-        .textContent =
-        currentWallet.id;
+    if(id)
+      await selectWallet(id);
+    else
+      await refreshActiveWallet();
 
-    document
-        .getElementById("walletAddress")
-        .textContent =
-        currentWallet.address;
+    setStatus(
+      $('topStatus'),
+      'Новый кошелёк создан.',
+      true
+    );
 
-    renderHistory();
-    renderWalletList();
+  }catch(e){
+
+    setStatus(
+      $('topStatus'),
+      e.message
+    );
+
+  }finally{
+
+    btn.disabled = false;
+
+    btn.textContent =
+      '＋ Новый кошелёк';
+
+  }
+
 }
 
 
-/* ================= NEW WALLET ================= */
+/* ACTIVE WALLET */
 
-async function createNewWallet() {
+async function refreshActiveWallet(){
 
-    const button =
-        document.getElementById(
-            "newWalletButton"
-        );
+  const saved =
+    localStorage.getItem(
+      ACTIVE_WALLET_KEY
+    );
 
-    if (!button) {
-        return;
-    }
+  let candidate =
+    saved;
 
-    button.disabled = true;
+  if(
+    !candidate &&
+    wallets[0]
+  )
+    candidate =
+      walletIdOf(wallets[0]);
 
-    button.textContent =
-        "⏳ Создание...";
+  if(!candidate){
 
-    appMessage.textContent =
-        "";
+    activeWallet = null;
 
-    const result =
-        await api(
-            "/api/wallet/create",
-            {
-                method: "POST"
-            }
-        );
+    renderActive();
 
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
+    return;
+  }
 
-        button.disabled = false;
+  try{
 
-        button.textContent =
-            "＋ Новый кошелёк";
+    const data =
+      await api(
+        '/api/wallet/' +
+        encodeURIComponent(candidate)
+      );
 
-        appMessage.textContent =
-            result.data.error ||
-            "Не удалось создать кошелёк.";
+    activeWallet =
+      data.wallet || data;
 
-        return;
-    }
+  }catch(e){
 
-    const newWallet =
-        result.data.wallet;
+    const found =
+      wallets.find(
+        w =>
+          String(
+            walletIdOf(w)
+          ) ===
+          String(candidate)
+      );
 
-    currentWallet =
-        newWallet;
+    activeWallet =
+      found || null;
 
-    if (result.data.walletIds) {
+  }
 
-        currentUser.walletIds =
-            result.data.walletIds;
-    }
+  if(activeWallet){
 
     localStorage.setItem(
-        "slx_active_wallet",
-        newWallet.id
+      ACTIVE_WALLET_KEY,
+      walletIdOf(activeWallet)
     );
 
-    button.disabled = false;
+  }
 
-    button.textContent =
-        "＋ Новый кошелёк";
+  renderActive();
 
-    appMessage.textContent =
-        "✅ Новый кошелёк создан!";
+  await renderWalletQR();
 
-    await refreshWallets();
+  await loadHistory();
 
-    updateWalletUI();
 }
 
 
-/* ================= HISTORY ================= */
+function renderActive(){
 
-async function loadCurrentWalletDetails() {
+  const id =
+    activeWallet
+      ? walletIdOf(activeWallet)
+      : '—';
 
-    if (!currentWallet) {
-        return;
-    }
+  const address =
+    activeWallet
+      ? walletAddressOf(activeWallet)
+      : '—';
 
-    const result =
-        await api(
-            "/api/wallet/" +
-            encodeURIComponent(
-                currentWallet.id
-            )
-        );
+  const balance =
+    activeWallet
+      ? activeWallet.balance
+      : 0;
 
-    if (
-        result.ok &&
-        result.data.success
-    ) {
+  $('activeAddress')
+    .textContent =
+      address || id;
 
-        currentWallet =
-            result.data.wallet;
+  $('balance')
+    .textContent =
+      fmt(balance);
 
-        updateWalletUI();
-    }
+  $('sendFrom')
+    .textContent =
+      address || id;
+
+  $('walletDataAddress')
+    .textContent =
+      address || id;
+
+  $('walletDataBalance')
+    .textContent =
+      fmt(balance) + ' SLX';
+
+  $('walletDataOwner')
+    .textContent =
+      (
+        activeWallet &&
+        (
+          activeWallet.ownerId ||
+          activeWallet.owner_id ||
+          currentUser?.username
+        )
+      ) || '—';
+
 }
 
 
-function renderHistory() {
+/* COPY */
 
-    const box =
-        document.getElementById(
-            "history"
-        );
+async function copyActiveAddress(){
 
-    const transactions =
-        currentWallet?.transactions ||
-        [];
+  const address =
+    walletAddressOf(
+      activeWallet
+    );
 
-    if (!transactions.length) {
+  if(!address)
+    return;
 
-        box.innerHTML =
-            `<div class="small">
-                Нет операций.
-            </div>`;
+  try{
 
-        return;
-    }
+    await navigator.clipboard
+      .writeText(address);
 
-    box.innerHTML = "";
+    setStatus(
+      $('topStatus'),
+      'Адрес скопирован.',
+      true
+    );
 
-    transactions.forEach(
-        tx => {
+  }catch(e){
 
-            const div =
-                document.createElement(
-                    "div"
-                );
+    setStatus(
+      $('topStatus'),
+      'Скопируй адрес вручную: ' +
+      address
+    );
 
-            div.className =
-                "history-item";
+  }
 
-            let title =
-                "Операция";
+}
 
-            if (tx.type === "send") {
-                title =
-                    "📤 Отправлено";
-            }
 
-            if (tx.type === "receive") {
-                title =
-                    "📥 Получено";
-            }
+/* SEND */
 
-            if (tx.type === "faucet") {
-                title =
-                    "💧 Faucet";
-            }
+async function sendSLX(){
 
-            div.innerHTML = `
-                <strong>
-                    ${title}
-                </strong>
+  if(!activeWallet){
 
-                <div class="small">
-                    ${Number(tx.amount).toFixed(2)} SLX
-                </div>
+    setStatus(
+      $('sendStatus'),
+      'Сначала выбери кошелёк.'
+    );
 
-                <div class="small">
-                    ${new Date(tx.time).toLocaleString()}
-                </div>
+    return;
+  }
 
-                ${
-                    tx.from
-                        ? `<div class="small">
-                            От: ${tx.from}
-                           </div>`
-                        : ""
-                }
+  const to =
+    $('sendTo')
+      .value
+      .trim();
 
-                ${
-                    tx.to
-                        ? `<div class="small">
-                            Кому: ${tx.to}
-                           </div>`
-                        : ""
-                }
-            `;
+  const amount =
+    num(
+      $('sendAmount').value
+    );
 
-            box.appendChild(div);
+  if(!to){
+
+    setStatus(
+      $('sendStatus'),
+      'Введи адрес получателя.'
+    );
+
+    return;
+  }
+
+  if(amount <= 0){
+
+    setStatus(
+      $('sendStatus'),
+      'Количество должно быть больше нуля.'
+    );
+
+    return;
+  }
+
+  if(
+    amount + fee >
+    num(activeWallet.balance)
+  ){
+
+    setStatus(
+      $('sendStatus'),
+      'Недостаточно SLX с учётом комиссии сети.'
+    );
+
+    return;
+  }
+
+  $('sendBtn').disabled = true;
+
+  try{
+
+    const body = {
+      fromWalletId:
+        walletIdOf(activeWallet),
+
+      to,
+
+      amount
+    };
+
+    const data =
+      await api(
+        '/api/send',
+        {
+          method:'POST',
+          body:JSON.stringify(body)
         }
+      );
+
+    $('sendAmount').value = '';
+    $('sendTo').value = '';
+
+    const tx =
+      data.transaction ||
+      data.tx ||
+      data;
+
+    setStatus(
+      $('sendStatus'),
+      'Перевод выполнен' +
+      (
+        tx.id || tx.txid
+          ? ': ' +
+            (tx.id || tx.txid)
+          : '.'
+      ),
+      true
     );
+
+    await loadWallets();
+
+    await refreshActiveWallet();
+
+    await loadNetwork();
+
+  }catch(e){
+
+    setStatus(
+      $('sendStatus'),
+      e.message
+    );
+
+  }finally{
+
+    $('sendBtn').disabled = false;
+
+  }
+
 }
 
 
-/* ================= SEND ================= */
+/* FAUCET */
 
-async function sendSLX() {
+async function useFaucet(){
 
-    if (!currentWallet) {
+  if(!activeWallet){
 
-        appMessage.textContent =
-            "Сначала выбери кошелёк.";
+    setStatus(
+      $('faucetStatus'),
+      'Сначала выбери кошелёк.'
+    );
 
-        return;
-    }
+    return;
+  }
 
-    const recipient =
-        document
-            .getElementById(
-                "recipientInput"
-            )
-            .value
-            .trim();
+  try{
 
-    const amount =
-        Number(
-            document
-                .getElementById(
-                    "amountInput"
-                )
-                .value
-        );
+    await api(
+      '/api/faucet',
+      {
+        method:'POST',
+        body:JSON.stringify({
+          walletId:
+            walletIdOf(activeWallet)
+        })
+      }
+    );
 
-    if (!recipient) {
+    setStatus(
+      $('faucetStatus'),
+      'Получено 10 SLX на активный кошелёк.',
+      true
+    );
 
-        appMessage.textContent =
-            "Введи SLX-ID получателя.";
+    await loadWallets();
 
-        return;
-    }
+    await refreshActiveWallet();
 
-    if (
-        !Number.isFinite(amount) ||
-        amount <= 0
-    ) {
+    await loadNetwork();
 
-        appMessage.textContent =
-            "Введи правильную сумму.";
+  }catch(e){
 
-        return;
-    }
+    setStatus(
+      $('faucetStatus'),
+      e.message
+    );
 
-    appMessage.textContent =
-        "Отправка...";
+  }
 
-    const result =
-        await api(
-            "/api/send",
-            {
-                method: "POST",
-
-                body: JSON.stringify({
-                    sender:
-                        currentWallet.id,
-
-                    recipient,
-
-                    amount
-                })
-            }
-        );
-
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-
-        appMessage.textContent =
-            result.data.error ||
-            "Ошибка перевода.";
-
-        return;
-    }
-
-    appMessage.textContent =
-        "✅ Перевод выполнен.";
-
-    document
-        .getElementById(
-            "recipientInput"
-        )
-        .value = "";
-
-    document
-        .getElementById(
-            "amountInput"
-        )
-        .value = "";
-
-    await loadCurrentWalletDetails();
-    await refreshWallets();
 }
 
 
-/* ================= FAUCET ================= */
+/* QR */
 
-async function faucet() {
+async function renderWalletQR(){
 
-    if (!currentWallet) {
-        return;
-    }
+  const q =
+    $('qrcode');
 
-    const result =
-        await api(
-            "/api/faucet",
-            {
-                method: "POST",
+  q.innerHTML = '';
 
-                body: JSON.stringify({
-                    id:
-                        currentWallet.id
-                })
-            }
-        );
+  const address =
+    walletAddressOf(
+      activeWallet
+    );
 
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
+  $('qrText')
+    .textContent =
+      address || '—';
 
-        appMessage.textContent =
-            result.data.error ||
-            "Ошибка Faucet.";
+  if(!address)
+    return;
 
-        return;
-    }
-
-    appMessage.textContent =
-        "💧 Получено 100 SLX.";
-
-    await loadCurrentWalletDetails();
-    await refreshWallets();
-}
-
-
-/* ================= COPY ID ================= */
-
-async function copyId() {
-
-    if (!currentWallet) {
-        return;
-    }
-
-    try {
-
-        await navigator.clipboard.writeText(
-            currentWallet.id
-        );
-
-        appMessage.textContent =
-            "📋 SLX-ID скопирован.";
-
-    } catch {
-
-        appMessage.textContent =
-            "Не удалось скопировать.";
-    }
-}
-
-
-/* ================= QR ================= */
-
-function showQR() {
-
-    if (!currentWallet) {
-        return;
-    }
-
-    const qr =
-        document.getElementById(
-            "qrcode"
-        );
-
-    qr.innerHTML = "";
+  try{
 
     new QRCode(
-        qr,
-        {
-            text:
-                "SLX:" +
-                currentWallet.id,
-
-            width: 220,
-            height: 220
-        }
+      q,
+      {
+        text:address,
+        width:220,
+        height:220,
+        correctLevel:
+          QRCode.CorrectLevel.M
+      }
     );
 
-    document
-        .getElementById(
-            "qrText"
-        )
-        .textContent =
-        currentWallet.id;
+  }catch(e){
 
-    document
-        .getElementById(
-            "qrModal"
-        )
-        .classList.remove(
-            "hidden"
-        );
+    q.innerHTML =
+      '<div class="muted">Не удалось создать QR на этом устройстве.</div>';
+
+  }
+
 }
 
 
-function closeQR() {
+function showQR(){
 
-    document
-        .getElementById(
-            "qrModal"
-        )
-        .classList.add(
-            "hidden"
-        );
+  goPage('wallet');
+
 }
 
 
-/* ================= SCANNER ================= */
+/* SCANNER */
 
-async function startScanner() {
+async function startScanner(){
 
-    const modal =
-        document.getElementById(
-            "scannerModal"
-        );
+  if(!window.isSecureContext){
 
-    const video =
-        document.getElementById(
-            "scannerVideo"
-        );
-
-    const status =
-        document.getElementById(
-            "scannerStatus"
-        );
-
-    modal.classList.remove(
-        "hidden"
+    setStatus(
+      $('sendStatus'),
+      'Камера требует HTTPS. Открой сайт через Render HTTPS.'
     );
 
-    status.textContent =
-        "Запрашиваем доступ к камере...";
+    return;
+  }
 
-    try {
+  if(scannerRunning)
+    return;
 
-        scannerStream =
-            await navigator.mediaDevices
-                .getUserMedia({
-                    video: {
-                        facingMode: {
-                            ideal: "environment"
-                        }
-                    },
-                    audio: false
-                });
+  try{
 
-        video.srcObject =
-            scannerStream;
-
-        await video.play();
-
-        scannerRunning = true;
-
-        status.textContent =
-            "Наведи камеру на QR-код.";
-
-        scanFrame();
-
-    } catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-            "Не удалось открыть камеру.";
-    }
-}
-
-
-function scanFrame() {
-
-    if (!scannerRunning) {
-        return;
-    }
-
-    const video =
-        document.getElementById(
-            "scannerVideo"
-        );
-
-    const canvas =
-        document.getElementById(
-            "scannerCanvas"
-        );
-
-    if (
-        video.readyState !==
-        video.HAVE_ENOUGH_DATA
-    ) {
-
-        requestAnimationFrame(
-            scanFrame
-        );
-
-        return;
-    }
-
-    const width =
-        video.videoWidth;
-
-    const height =
-        video.videoHeight;
-
-    canvas.width = width;
-    canvas.height = height;
-
-    const context =
-        canvas.getContext(
-            "2d",
-            {
-                willReadFrequently: true
+    scannerStream =
+      await navigator.mediaDevices
+        .getUserMedia({
+          video:{
+            facingMode:{
+              ideal:'environment'
             }
-        );
+          },
+          audio:false
+        });
 
-    context.drawImage(
-        video,
-        0,
-        0,
-        width,
-        height
-    );
+    $('scannerCard')
+      .classList
+      .remove('hidden');
 
-    const imageData =
-        context.getImageData(
-            0,
-            0,
-            width,
-            height
-        );
+    $('scanVideo')
+      .srcObject =
+      scannerStream;
 
-    const code =
-        jsQR(
-            imageData.data,
-            width,
-            height
-        );
-
-    if (code) {
-
-        let value =
-            code.data.trim();
-
-        if (
-            value.startsWith("SLX:")
-        ) {
-
-            value =
-                value.substring(4);
-        }
-
-        document
-            .getElementById(
-                "recipientInput"
-            )
-            .value =
-            value;
-
-        stopScanner();
-
-        appMessage.textContent =
-            "✅ QR распознан.";
-
-        return;
-    }
+    scannerRunning = true;
 
     requestAnimationFrame(
-        scanFrame
+      scanFrame
     );
+
+  }catch(e){
+
+    setStatus(
+      $('sendStatus'),
+      'Не удалось открыть камеру. Разреши доступ к камере в Safari.'
+    );
+
+  }
+
 }
 
 
-function stopScanner() {
+function scanFrame(){
 
-    scannerRunning = false;
+  if(!scannerRunning)
+    return;
 
-    if (scannerStream) {
+  const video =
+    $('scanVideo');
 
-        scannerStream
-            .getTracks()
-            .forEach(
-                track =>
-                    track.stop()
-            );
+  const canvas =
+    $('scanCanvas');
 
-        scannerStream = null;
+  if(video.readyState < 2){
+
+    requestAnimationFrame(
+      scanFrame
+    );
+
+    return;
+  }
+
+  canvas.width =
+    video.videoWidth || 640;
+
+  canvas.height =
+    video.videoHeight || 480;
+
+  const ctx =
+    canvas.getContext(
+      '2d',
+      {
+        willReadFrequently:true
+      }
+    );
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+  const img =
+    ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+  const code =
+    window.jsQR
+      ? jsQR(
+          img.data,
+          img.width,
+          img.height,
+          {
+            inversionAttempts:
+              'dontInvert'
+          }
+        )
+      : null;
+
+  if(code && code.data){
+
+    $('sendTo').value =
+      code.data;
+
+    setStatus(
+      $('sendStatus'),
+      'QR считан. Адрес вставлен в поле получателя.',
+      true
+    );
+
+    stopScanner();
+
+    return;
+  }
+
+  requestAnimationFrame(
+    scanFrame
+  );
+
+}
+
+
+function stopScanner(){
+
+  scannerRunning = false;
+
+  if(scannerStream){
+
+    scannerStream
+      .getTracks()
+      .forEach(
+        t => t.stop()
+      );
+
+    scannerStream = null;
+
+  }
+
+  $('scanVideo')
+    .srcObject = null;
+
+  $('scannerCard')
+    .classList
+    .add('hidden');
+
+}
+
+
+/* HISTORY */
+
+async function loadHistory(){
+
+  if(!activeWallet){
+
+    $('historyList')
+      .textContent =
+      'Кошелёк не выбран.';
+
+    return;
+  }
+
+  try{
+
+    const data =
+      await api(
+        '/api/wallet/' +
+        encodeURIComponent(
+          walletIdOf(activeWallet)
+        )
+      );
+
+    const txs =
+      data.transactions ||
+      data.history ||
+      (
+        data.wallet &&
+        (
+          data.wallet.transactions ||
+          data.wallet.history
+        )
+      ) ||
+      [];
+
+    if(
+      !Array.isArray(txs) ||
+      !txs.length
+    ){
+
+      $('historyList')
+        .textContent =
+        'Транзакций пока нет.';
+
+      return;
     }
 
-    document
-        .getElementById(
-            "scannerVideo"
-        )
-        .srcObject = null;
+    $('historyList')
+      .innerHTML =
+      txs
+        .slice()
+        .reverse()
+        .map(t=>{
 
-    document
-        .getElementById(
-            "scannerModal"
-        )
-        .classList.add(
-            "hidden"
-        );
+          const type =
+            t.type ||
+            t.direction ||
+            'TRANSACTION';
+
+          const amount =
+            num(t.amount);
+
+          const from =
+            t.fromWallet ||
+            t.from_wallet ||
+            t.from ||
+            '';
+
+          const to =
+            t.toWallet ||
+            t.to_wallet ||
+            t.to ||
+            '';
+
+          const created =
+            t.createdAt ||
+            t.created_at ||
+            t.time ||
+            '';
+
+          const id =
+            t.id ||
+            t.txid ||
+            '';
+
+          return `
+<div class="tx">
+
+  <div class="tx-head">
+
+    <b>
+      ${esc(type)}
+    </b>
+
+    <span class="tx-amount">
+      ${
+        amount
+          ? esc(fmt(amount)) +
+            ' SLX'
+          : ''
+      }
+    </span>
+
+  </div>
+
+  ${
+    from
+      ? `
+      <div class="small">
+        От:
+        <span class="mono">
+          ${esc(shortAddr(from))}
+        </span>
+      </div>
+      `
+      : ''
+  }
+
+  ${
+    to
+      ? `
+      <div class="small">
+        Кому:
+        <span class="mono">
+          ${esc(shortAddr(to))}
+        </span>
+      </div>
+      `
+      : ''
+  }
+
+  ${
+    id
+      ? `
+      <div class="small mono">
+        ${esc(id)}
+      </div>
+      `
+      : ''
+  }
+
+  ${
+    created
+      ? `
+      <div class="small">
+        ${
+          esc(
+            new Date(created)
+              .toLocaleString('ru-RU')
+          )
+        }
+      </div>
+      `
+      : ''
+  }
+
+</div>
+`;
+
+        })
+        .join('');
+
+  }catch(e){
+
+    $('historyList')
+      .textContent =
+      'Не удалось загрузить историю: ' +
+      e.message;
+
+  }
+
 }
 
 
-/* ================= NETWORK ================= */
+/* NETWORK */
 
-async function loadNetwork() {
+async function loadNetwork(){
 
-    const result =
-        await api("/api/status");
+  const [
+    status,
+    blocks,
+    economy
+  ] =
+    await Promise.all([
 
-    if (
-        !result.ok ||
-        !result.data.success
-    ) {
-        return;
+      api('/api/status')
+        .catch(
+          e => ({
+            error:e.message
+          })
+        ),
+
+      api('/api/blocks')
+        .catch(
+          e => ({
+            error:e.message
+          })
+        ),
+
+      api('/api/economy')
+        .catch(
+          e => ({
+            error:e.message
+          })
+        )
+
+    ]);
+
+
+  /* STATUS */
+
+  if(status.error){
+
+    $('networkInfo')
+      .textContent =
+      status.error;
+
+  }else{
+
+    const version =
+      status.version ?? '—';
+
+    const users =
+      status.users ??
+      status.userCount ??
+      '—';
+
+    const walletCount =
+      status.wallets ??
+      status.walletCount ??
+      '—';
+
+    const supply =
+      status.supply ??
+      status.circulatingSupply ??
+      '—';
+
+    $('networkInfo')
+      .innerHTML = `
+
+<div class="kv">
+  <span>Версия</span>
+  <b>${esc(version)}</b>
+</div>
+
+<div class="kv">
+  <span>Пользователи</span>
+  <b>${esc(users)}</b>
+</div>
+
+<div class="kv">
+  <span>Кошельки</span>
+  <b>${esc(walletCount)}</b>
+</div>
+
+<div class="kv">
+  <span>Supply</span>
+  <b>${esc(fmt(supply))} SLX</b>
+</div>
+
+<div class="kv">
+  <span>Комиссия</span>
+  <b>
+    ${esc(
+      fmt(
+        status.transferFee ??
+        status.fee ??
+        fee
+      )
+    )} SLX
+  </b>
+</div>
+
+<div class="kv">
+  <span>Faucet</span>
+  <b>
+    ${esc(
+      fmt(
+        status.faucetAmount ??
+        status.faucet ??
+        10
+      )
+    )} SLX
+  </b>
+</div>
+
+`;
+
+  }
+
+
+  /* BLOCKS */
+
+  const list =
+    Array.isArray(blocks)
+      ? blocks
+      : (
+          blocks.blocks ||
+          blocks.items ||
+          []
+        );
+
+  if(blocks.error){
+
+    $('blocksList')
+      .textContent =
+      blocks.error;
+
+  }else if(!list.length){
+
+    $('blocksList')
+      .textContent =
+      'Блоков пока нет.';
+
+  }else{
+
+    $('blocksList')
+      .innerHTML =
+      list
+        .slice()
+        .reverse()
+        .slice(0,12)
+        .map(b=>`
+
+<div class="tx">
+
+  <div class="tx-head">
+
+    <b>
+      #${esc(
+        b.blockIndex ??
+        b.index ??
+        '—'
+      )}
+    </b>
+
+    <span>
+      ${esc(
+        b.transactionCount ??
+        b.transaction_count ??
+        0
+      )} tx
+    </span>
+
+  </div>
+
+  <div class="small mono">
+    ${esc(b.hash || '—')}
+  </div>
+
+  <div class="small">
+    prev:
+    <span class="mono">
+      ${esc(
+        shortAddr(
+          b.previousHash ||
+          b.previous_hash ||
+          '—'
+        )
+      )}
+    </span>
+  </div>
+
+</div>
+
+`)
+        .join('');
+
+  }
+
+
+  /* ECONOMY */
+
+  if(economy.error){
+
+    $('economyInfo')
+      .textContent =
+      economy.error;
+
+  }else{
+
+    const max =
+      economy.maxSupply ??
+      economy.max_supply ??
+      21000000;
+
+    const circulating =
+      economy.circulatingSupply ??
+      economy.supply ??
+      economy.totalSupply ??
+      0;
+
+    $('economyInfo')
+      .innerHTML = `
+
+<div class="kv">
+  <span>Максимальный supply</span>
+  <b>
+    ${esc(fmt(max))} SLX
+  </b>
+</div>
+
+<div class="kv">
+  <span>Текущий supply</span>
+  <b>
+    ${esc(fmt(circulating))} SLX
+  </b>
+</div>
+
+<div class="kv">
+  <span>Комиссия</span>
+  <b>
+    ${esc(
+      fmt(
+        economy.transferFee ??
+        economy.fee ??
+        fee
+      )
+    )} SLX
+  </b>
+</div>
+
+<div class="kv">
+  <span>Faucet</span>
+  <b>
+    ${esc(
+      fmt(
+        economy.faucetAmount ??
+        economy.faucet ??
+        10
+      )
+    )} SLX
+  </b>
+</div>
+
+`;
+
+  }
+
+}
+
+
+/* NAVIGATION */
+
+function goPage(id){
+
+  const pages = [
+    'home',
+    'send',
+    'wallet',
+    'history',
+    'network'
+  ];
+
+  pages.forEach(
+    p => {
+
+      const name =
+        'page' +
+        p.charAt(0).toUpperCase() +
+        p.slice(1);
+
+      $(name)
+        .classList
+        .toggle(
+          'hidden',
+          p !== id
+        );
+
     }
+  );
 
-    document
-        .getElementById(
-            "networkVersion"
+  document
+    .querySelectorAll(
+      '.nav button'
+    )
+    .forEach(
+      b =>
+        b.classList.toggle(
+          'active',
+          b.dataset.page === id
         )
-        .textContent =
-        result.data.version;
+    );
 
-    document
-        .getElementById(
-            "networkAccounts"
-        )
-        .textContent =
-        result.data.accounts;
+  if(id === 'history')
+    loadHistory();
 
-    document
-        .getElementById(
-            "networkWallets"
-        )
-        .textContent =
-        result.data.wallets;
+  if(id === 'wallet')
+    renderWalletQR();
+
+  if(id === 'network')
+    loadNetwork();
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+
 }
 
 
-/* ================= LOGOUT ================= */
+/* LOGOUT */
 
-async function logout() {
+async function logout(){
 
-    try {
+  stopScanner();
 
-        await api(
-            "/api/auth/logout",
-            {
-                method: "POST"
-            }
-        );
+  try{
 
-    } catch {}
+    await api(
+      '/api/auth/logout',
+      {
+        method:'POST',
+        body:JSON.stringify({})
+      }
+    );
 
-    logoutLocal();
+  }catch(e){}
+
+  token = '';
+  currentUser = null;
+  wallets = [];
+  activeWallet = null;
+
+  localStorage.removeItem(
+    TOKEN_KEY
+  );
+
+  localStorage.removeItem(
+    ACTIVE_WALLET_KEY
+  );
+
+  $('mainScreen')
+    .classList
+    .add('hidden');
+
+  $('bottomNav')
+    .classList
+    .add('hidden');
+
+  $('authScreen')
+    .classList
+    .remove('hidden');
+
+  showAuth('login');
+
+  setStatus(
+    $('authStatus'),
+    'Ты вышел из аккаунта.'
+  );
+
 }
 
 
-function logoutLocal() {
-
-    token = "";
-
-    currentUser = null;
-    currentWallet = null;
-    myWallets = [];
-
-    localStorage.removeItem(
-        "slx_token"
-    );
-
-    localStorage.removeItem(
-        "slx_active_wallet"
-    );
-
-    appScreen.classList.add(
-        "hidden"
-    );
-
-    authScreen.classList.remove(
-        "hidden"
-    );
-
-    showLogin();
-}
-
-
-/* ================= START ================= */
-
-if (token) {
-    loadApp();
-}
+bootstrap();
 
 </script>
 
