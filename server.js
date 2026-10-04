@@ -1,221 +1,108 @@
 const http = require("http");
-const fs = require("fs");
-const path = require("path");
 const crypto = require("crypto");
+const { Pool } = require("pg");
 
 const PORT = process.env.PORT || 3000;
+const DATABASE_URL = process.env.DATABASE_URL;
 
-const DATA_FILE = path.join(__dirname, "slx-data.json");
-
-let database = {
-  users: {},
-  wallets: {}
-};
-
-const sessions = new Map();
-
-/* =========================
-   DATABASE
-========================= */
-
-function loadDatabase() {
-  try {
-    if (!fs.existsSync(DATA_FILE)) {
-      saveDatabase();
-      console.log("SLX database created.");
-      return;
-    }
-
-    const raw = fs.readFileSync(DATA_FILE, "utf8");
-    const data = JSON.parse(raw);
-
-    database.users = data.users || {};
-    database.wallets = data.wallets || {};
-
-    // Совместимость со старыми аккаунтами
-    for (const user of Object.values(database.users)) {
-      if (!Array.isArray(user.walletIds)) {
-        user.walletIds = [];
-
-        if (user.walletId) {
-          user.walletIds.push(user.walletId);
-        }
-      }
-    }
-
-    console.log(
-      "Database loaded:",
-      Object.keys(database.users).length,
-      "users,",
-      Object.keys(database.wallets).length,
-      "wallets"
-    );
-
-  } catch (error) {
-    console.error("Database load error:", error);
-  }
+if (!DATABASE_URL) {
+  console.error("DATABASE_URL is not set");
+  process.exit(1);
 }
 
-function saveDatabase() {
-  try {
-    const tempFile = DATA_FILE + ".tmp";
+const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: process.env.NODE_ENV === "production"
+    ? { rejectUnauthorized: false }
+    : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000
+});
 
-    fs.writeFileSync(
-      tempFile,
-      JSON.stringify(database, null, 2),
-      "utf8"
-    );
+// ===============================
+// BASIC HELPERS
+// ===============================
 
-    fs.renameSync(tempFile, DATA_FILE);
-
-  } catch (error) {
-    console.error("Database save error:", error);
-  }
-}
-
-/* =========================
-   IDS
-========================= */
-
-function makeWalletId() {
-  let id;
-
-  do {
-    id =
-      "SLX" +
-      crypto
-        .randomBytes(5)
-        .toString("hex")
-        .toUpperCase();
-  } while (database.wallets[id]);
-
-  return id;
-}
-
-function makeAddress() {
-  return (
-    "SLX-" +
-    crypto
-      .randomBytes(8)
-      .toString("hex")
-      .toUpperCase()
-  );
+function makeId() {
+  return "SLX" + crypto.randomBytes(6).toString("hex").toUpperCase();
 }
 
 function makeUserId() {
-  return (
-    "USR-" +
-    crypto
-      .randomBytes(8)
-      .toString("hex")
-      .toUpperCase()
-  );
+  return "USR" + crypto.randomBytes(8).toString("hex").toUpperCase();
 }
 
-function makeSessionToken() {
+function makeAddress() {
+  return "SLX-" + crypto.randomBytes(8).toString("hex").toUpperCase();
+}
+
+function makeToken() {
   return crypto.randomBytes(32).toString("hex");
 }
-
-/* =========================
-   PASSWORD
-========================= */
 
 function hashPassword(password) {
   return crypto
     .createHash("sha256")
-    .update(password)
+    .update(String(password))
     .digest("hex");
 }
 
-/* =========================
-   WALLET
-========================= */
+function json(res, status, data) {
+  res.writeHead(status, {
+    "Content-Type": "application/json; charset=utf-8",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS"
+  });
 
-function createWallet(ownerId) {
-  const id = makeWalletId();
-
-  const wallet = {
-    id,
-    ownerId,
-    name: "SLX Wallet",
-    address: makeAddress(),
-    balance: 1000,
-    transactions: [],
-    createdAt: new Date().toISOString()
-  };
-
-  database.wallets[id] = wallet;
-
-  return wallet;
+  res.end(JSON.stringify(data));
 }
 
-function getWallet(id) {
-  const key = String(id || "")
-    .trim()
-    .toUpperCase();
+function getBody(req) {
+  return new Promise((resolve, reject) => {
+    let body = "";
 
-  return database.wallets[key] || null;
+    req.on("data", chunk => {
+      body += chunk.toString();
+
+      if (body.length > 1024 * 1024) {
+        reject(new Error("Request body too large"));
+        req.destroy();
+      }
+    });
+
+    req.on("end", () => {
+      if (!body) {
+        resolve({});
+        return;
+      }
+
+      try {
+        resolve(JSON.parse(body));
+      } catch {
+        reject(new Error("Invalid JSON"));
+      }
+    });
+
+    req.on("error", reject);
+  });
 }
-
-function getUserWallets(user) {
-  if (!user || !Array.isArray(user.walletIds)) {
-    return [];
-  }
-
-  return user.walletIds
-    .map(id => getWallet(id))
-    .filter(Boolean);
-}
-
-/* =========================
-   TRANSACTIONS
-========================= */
-
-function addTransaction(wallet, transaction) {
-  wallet.transactions.unshift(transaction);
-
-  if (wallet.transactions.length > 50) {
-    wallet.transactions =
-      wallet.transactions.slice(0, 50);
-  }
-}
-
-/* =========================
-   USERS
-========================= */
-
-function findUserByUsername(username) {
-  const target = String(username || "")
-    .trim()
-    .toLowerCase();
-
-  for (const user of Object.values(database.users)) {
-    if (
-      user.username.toLowerCase() === target
-    ) {
-      return user;
-    }
-  }
-
-  return null;
-}
-
-/* =========================
-   AUTH
-========================= */
 
 function getToken(req) {
-  const header =
-    req.headers.authorization || "";
+  const header = req.headers.authorization || "";
 
   if (!header.startsWith("Bearer ")) {
     return null;
   }
 
-  return header.substring(7).trim();
+  return header.slice(7).trim();
 }
 
-function getUserByToken(req) {
+// Sessions remain in memory.
+// After a server restart, users simply log in again.
+const sessions = new Map();
+
+async function getUserFromRequest(req) {
   const token = getToken(req);
 
   if (!token) {
@@ -228,1182 +115,837 @@ function getUserByToken(req) {
     return null;
   }
 
-  return database.users[userId] || null;
+  const result = await pool.query(
+    `SELECT id, username, created_at
+     FROM users
+     WHERE id = $1`,
+    [userId]
+  );
+
+  return result.rows[0] || null;
 }
 
-/* =========================
-   JSON
-========================= */
+async function requireUser(req, res) {
+  const user = await getUserFromRequest(req);
 
-function sendJSON(res, data, status = 200) {
-  res.writeHead(status, {
-    "Content-Type":
-      "application/json; charset=utf-8",
-
-    "Access-Control-Allow-Origin": "*",
-
-    "Access-Control-Allow-Headers":
-      "Content-Type, Authorization"
-  });
-
-  res.end(JSON.stringify(data));
-}
-
-/* =========================
-   BODY
-========================= */
-
-function getBody(req) {
-  return new Promise((resolve, reject) => {
-    let body = "";
-
-    req.on("data", chunk => {
-      body += chunk;
+  if (!user) {
+    json(res, 401, {
+      success: false,
+      error: "Необходим вход в аккаунт"
     });
 
-    req.on("end", () => {
-      try {
-        resolve(body ? JSON.parse(body) : {});
-      } catch {
-        reject(new Error("Invalid JSON"));
-      }
-    });
+    return null;
+  }
 
-    req.on("error", reject);
-  });
+  return user;
 }
 
-/* =========================
-   HTML
-========================= */
+function walletResponse(row) {
+  return {
+    id: row.id,
+    name: row.name,
+    address: row.address,
+    balance: Number(row.balance),
+    createdAt: row.created_at
+  };
+}
 
-function sendHTML(res) {
-  fs.readFile(
-    path.join(__dirname, "index.html"),
-    "utf8",
-    (error, html) => {
-      if (error) {
-        res.writeHead(500, {
-          "Content-Type":
-            "text/plain; charset=utf-8"
+// ===============================
+// DATABASE
+// ===============================
+
+async function initDatabase() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      username TEXT NOT NULL UNIQUE,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS wallets (
+      id TEXT PRIMARY KEY,
+      owner_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      name TEXT NOT NULL DEFAULT 'Основной кошелек',
+      address TEXT NOT NULL UNIQUE,
+      balance NUMERIC(30, 8) NOT NULL DEFAULT 1000,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS transactions (
+      id TEXT PRIMARY KEY,
+      wallet_id TEXT NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+      type TEXT NOT NULL,
+      amount NUMERIC(30, 8) NOT NULL,
+      from_wallet TEXT,
+      to_wallet TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_wallets_owner
+    ON wallets(owner_id)
+  `);
+
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_transactions_wallet
+    ON transactions(wallet_id, created_at DESC)
+  `);
+
+  console.log("PostgreSQL database ready");
+}
+
+// ===============================
+// SERVER
+// ===============================
+
+const server = http.createServer(async (req, res) => {
+  if (req.method === "OPTIONS") {
+    json(res, 204, {});
+    return;
+  }
+
+  try {
+    const url = new URL(
+      req.url,
+      `http://${req.headers.host || "localhost"}`
+    );
+
+    const pathname = url.pathname;
+
+    // =============================
+    // HOME
+    // =============================
+
+    if (req.method === "GET" && pathname === "/") {
+      const fs = require("fs");
+      const path = require("path");
+
+      const file = path.join(__dirname, "index.html");
+
+      if (!fs.existsSync(file)) {
+        json(res, 404, {
+          success: false,
+          error: "index.html not found"
         });
-
-        res.end("index.html not found");
         return;
       }
 
       res.writeHead(200, {
-        "Content-Type":
-          "text/html; charset=utf-8"
+        "Content-Type": "text/html; charset=utf-8"
       });
 
-      res.end(html);
+      res.end(fs.readFileSync(file));
+      return;
     }
-  );
-}
 
-/* =========================
-   SERVER
-========================= */
+    // =============================
+    // STATUS
+    // =============================
 
-const server = http.createServer(
-  async (req, res) => {
+    if (req.method === "GET" && pathname === "/api/status") {
+      const users = await pool.query(
+        `SELECT COUNT(*)::int AS count FROM users`
+      );
 
-    try {
+      const wallets = await pool.query(
+        `SELECT COUNT(*)::int AS count FROM wallets`
+      );
 
-      /* =========================
-         MAIN PAGE
-      ========================= */
+      json(res, 200, {
+        success: true,
+        network: "SLX Testnet",
+        version: "1.4.0",
+        status: "online",
+        storage: "PostgreSQL",
+        accounts: users.rows[0].count,
+        wallets: wallets.rows[0].count
+      });
 
-      if (
-        req.method === "GET" &&
-        req.url === "/"
-      ) {
-        sendHTML(res);
+      return;
+    }
+
+    // =============================
+    // REGISTER
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/auth/register") {
+      const body = await getBody(req);
+
+      const username = String(body.username || "").trim();
+      const password = String(body.password || "");
+
+      if (username.length < 3) {
+        json(res, 400, {
+          success: false,
+          error: "Имя пользователя должно содержать минимум 3 символа"
+        });
         return;
       }
 
+      if (password.length < 4) {
+        json(res, 400, {
+          success: false,
+          error: "Пароль должен содержать минимум 4 символа"
+        });
+        return;
+      }
 
-      /* =========================
-         REGISTER
-      ========================= */
+      const existing = await pool.query(
+        `SELECT id FROM users WHERE LOWER(username) = LOWER($1)`,
+        [username]
+      );
 
-      if (
-        req.method === "POST" &&
-        req.url === "/api/auth/register"
-      ) {
+      if (existing.rows.length > 0) {
+        json(res, 409, {
+          success: false,
+          error: "Такой пользователь уже существует"
+        });
+        return;
+      }
 
-        const body = await getBody(req);
+      const client = await pool.connect();
 
-        const username =
-          String(body.username || "").trim();
-
-        const password =
-          String(body.password || "");
-
-        if (
-          username.length < 3 ||
-          username.length > 20
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Имя должно содержать от 3 до 20 символов."
-            },
-            400
-          );
-
-          return;
-        }
-
-        if (
-          !/^[a-zA-Z0-9_]+$/.test(username)
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Имя может содержать только буквы, цифры и _."
-            },
-            400
-          );
-
-          return;
-        }
-
-        if (password.length < 6) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Пароль должен содержать минимум 6 символов."
-            },
-            400
-          );
-
-          return;
-        }
-
-        if (
-          findUserByUsername(username)
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Это имя уже зарегистрировано."
-            },
-            409
-          );
-
-          return;
-        }
+      try {
+        await client.query("BEGIN");
 
         const userId = makeUserId();
+        const walletId = makeId();
+        const address = makeAddress();
+        const passwordHash = hashPassword(password);
 
-        const user = {
-          id: userId,
-          username,
-          passwordHash:
-            hashPassword(password),
-
-          walletIds: [],
-
-          createdAt:
-            new Date().toISOString()
-        };
-
-        database.users[userId] = user;
-
-        const wallet =
-          createWallet(userId);
-
-        user.walletIds.push(wallet.id);
-
-        // Первый кошелёк считаем главным
-        user.walletId = wallet.id;
-
-        saveDatabase();
-
-        const token =
-          makeSessionToken();
-
-        sessions.set(
-          token,
-          user.id
+        await client.query(
+          `INSERT INTO users
+           (id, username, password_hash)
+           VALUES ($1, $2, $3)`,
+          [userId, username, passwordHash]
         );
 
-        sendJSON(res, {
-          success: true,
-
-          token,
-
-          user: {
-            id: user.id,
-            username: user.username,
-            walletId: user.walletId,
-            walletIds: user.walletIds
-          },
-
-          wallet: {
-            id: wallet.id,
-            address: wallet.address,
-            balance: wallet.balance
-          }
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         LOGIN
-      ========================= */
-
-      if (
-        req.method === "POST" &&
-        req.url === "/api/auth/login"
-      ) {
-
-        const body = await getBody(req);
-
-        const username =
-          String(body.username || "").trim();
-
-        const password =
-          String(body.password || "");
-
-        const user =
-          findUserByUsername(username);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Неверное имя или пароль."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const passwordHash =
-          hashPassword(password);
-
-        if (
-          user.passwordHash !==
-          passwordHash
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Неверное имя или пароль."
-            },
-            401
-          );
-
-          return;
-        }
-
-        // Совместимость
-        if (!Array.isArray(user.walletIds)) {
-          user.walletIds = [];
-
-          if (user.walletId) {
-            user.walletIds.push(
-              user.walletId
-            );
-          }
-        }
-
-        const token =
-          makeSessionToken();
-
-        sessions.set(
-          token,
-          user.id
+        await client.query(
+          `INSERT INTO wallets
+           (id, owner_id, name, address, balance)
+           VALUES ($1, $2, $3, $4, $5)`,
+          [
+            walletId,
+            userId,
+            "Основной кошелек",
+            address,
+            1000
+          ]
         );
 
-        const wallet =
-          getWallet(user.walletId);
+        const token = makeToken();
 
-        sendJSON(res, {
+        await client.query("COMMIT");
+
+        sessions.set(token, userId);
+
+        json(res, 201, {
           success: true,
-
           token,
-
           user: {
-            id: user.id,
-            username: user.username,
-            walletId: user.walletId,
-            walletIds: user.walletIds
-          },
-
-          wallet: wallet
-            ? {
-                id: wallet.id,
-                address: wallet.address,
-                balance: wallet.balance
-              }
-            : null
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         CURRENT USER
-      ========================= */
-
-      if (
-        req.method === "GET" &&
-        req.url === "/api/auth/me"
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Не авторизован."
-            },
-            401
-          );
-
-          return;
-        }
-
-        if (!Array.isArray(user.walletIds)) {
-          user.walletIds = [];
-
-          if (user.walletId) {
-            user.walletIds.push(
-              user.walletId
-            );
+            id: userId,
+            username,
+            walletId,
+            walletIds: [walletId]
           }
-
-          saveDatabase();
-        }
-
-        const wallet =
-          getWallet(user.walletId);
-
-        sendJSON(res, {
-          success: true,
-
-          user: {
-            id: user.id,
-            username: user.username,
-            walletId: user.walletId,
-            walletIds: user.walletIds
-          },
-
-          wallet: wallet
-            ? {
-                id: wallet.id,
-                address: wallet.address,
-                balance: wallet.balance
-              }
-            : null
         });
 
         return;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
       }
+    }
 
+    // =============================
+    // LOGIN
+    // =============================
 
-      /* =========================
-         LOGOUT
-      ========================= */
+    if (req.method === "POST" && pathname === "/api/auth/login") {
+      const body = await getBody(req);
 
-      if (
-        req.method === "POST" &&
-        req.url === "/api/auth/logout"
-      ) {
+      const username = String(body.username || "").trim();
+      const password = String(body.password || "");
 
-        const token =
-          getToken(req);
+      const result = await pool.query(
+        `SELECT id, username, password_hash
+         FROM users
+         WHERE LOWER(username) = LOWER($1)`,
+        [username]
+      );
 
-        if (token) {
-          sessions.delete(token);
-        }
-
-        sendJSON(res, {
-          success: true
+      if (result.rows.length === 0) {
+        json(res, 401, {
+          success: false,
+          error: "Неверное имя пользователя или пароль"
         });
-
         return;
       }
 
+      const user = result.rows[0];
+      const passwordHash = hashPassword(password);
 
-      /* =========================
-         CREATE NEW WALLET
-      ========================= */
+      if (passwordHash !== user.password_hash) {
+        json(res, 401, {
+          success: false,
+          error: "Неверное имя пользователя или пароль"
+        });
+        return;
+      }
 
-      if (
-        req.method === "POST" &&
-        req.url === "/api/wallet/create"
-      ) {
+      const walletsResult = await pool.query(
+        `SELECT id
+         FROM wallets
+         WHERE owner_id = $1
+         ORDER BY created_at ASC`,
+        [user.id]
+      );
 
-        const user =
-          getUserByToken(req);
+      const walletIds = walletsResult.rows.map(row => row.id);
+      const walletId = walletIds[0] || null;
 
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
+      const token = makeToken();
 
-          return;
+      sessions.set(token, user.id);
+
+      json(res, 200, {
+        success: true,
+        token,
+        user: {
+          id: user.id,
+          username: user.username,
+          walletId,
+          walletIds
         }
+      });
 
-        if (!Array.isArray(user.walletIds)) {
-          user.walletIds = [];
+      return;
+    }
+
+    // =============================
+    // CURRENT USER
+    // =============================
+
+    if (req.method === "GET" && pathname === "/api/auth/me") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const walletsResult = await pool.query(
+        `SELECT id
+         FROM wallets
+         WHERE owner_id = $1
+         ORDER BY created_at ASC`,
+        [user.id]
+      );
+
+      const walletIds = walletsResult.rows.map(row => row.id);
+
+      json(res, 200, {
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          walletId: walletIds[0] || null,
+          walletIds
         }
+      });
 
-        const wallet =
-          createWallet(user.id);
+      return;
+    }
 
-        user.walletIds.push(
-          wallet.id
+    // =============================
+    // LOGOUT
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/auth/logout") {
+      const token = getToken(req);
+
+      if (token) {
+        sessions.delete(token);
+      }
+
+      json(res, 200, {
+        success: true
+      });
+
+      return;
+    }
+
+    // =============================
+    // CREATE WALLET
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/wallet/create") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const body = await getBody(req);
+
+      const name =
+        String(body.name || "").trim() ||
+        "Кошелек " + Date.now();
+
+      const walletId = makeId();
+      const address = makeAddress();
+
+      const result = await pool.query(
+        `INSERT INTO wallets
+         (id, owner_id, name, address, balance)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id, name, address, balance, created_at`,
+        [
+          walletId,
+          user.id,
+          name,
+          address,
+          1000
+        ]
+      );
+
+      json(res, 201, {
+        success: true,
+        wallet: walletResponse(result.rows[0])
+      });
+
+      return;
+    }
+
+    // =============================
+    // LIST MY WALLETS
+    // =============================
+
+    if (req.method === "GET" && pathname === "/api/wallets") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const result = await pool.query(
+        `SELECT id, name, address, balance, created_at
+         FROM wallets
+         WHERE owner_id = $1
+         ORDER BY created_at ASC`,
+        [user.id]
+      );
+
+      json(res, 200, {
+        success: true,
+        wallets: result.rows.map(walletResponse)
+      });
+
+      return;
+    }
+
+    // =============================
+    // SELECT WALLET
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/wallet/select") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const body = await getBody(req);
+      const walletId = String(body.walletId || "");
+
+      const result = await pool.query(
+        `SELECT id, name, address, balance, created_at
+         FROM wallets
+         WHERE id = $1 AND owner_id = $2`,
+        [walletId, user.id]
+      );
+
+      if (result.rows.length === 0) {
+        json(res, 404, {
+          success: false,
+          error: "Кошелек не найден"
+        });
+        return;
+      }
+
+      json(res, 200, {
+        success: true,
+        wallet: walletResponse(result.rows[0])
+      });
+
+      return;
+    }
+
+    // =============================
+    // GET WALLET
+    // =============================
+
+    if (req.method === "GET" && pathname.startsWith("/api/wallet/")) {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const walletId = pathname.split("/").pop();
+
+      const walletResult = await pool.query(
+        `SELECT id, name, address, balance, created_at
+         FROM wallets
+         WHERE id = $1 AND owner_id = $2`,
+        [walletId, user.id]
+      );
+
+      if (walletResult.rows.length === 0) {
+        json(res, 404, {
+          success: false,
+          error: "Кошелек не найден"
+        });
+        return;
+      }
+
+      const transactionsResult = await pool.query(
+        `SELECT
+           id,
+           type,
+           amount,
+           from_wallet,
+           to_wallet,
+           created_at
+         FROM transactions
+         WHERE wallet_id = $1
+         ORDER BY created_at DESC
+         LIMIT 100`,
+        [walletId]
+      );
+
+      json(res, 200, {
+        success: true,
+        wallet: walletResponse(walletResult.rows[0]),
+        transactions: transactionsResult.rows.map(tx => ({
+          id: tx.id,
+          type: tx.type,
+          amount: Number(tx.amount),
+          from: tx.from_wallet,
+          to: tx.to_wallet,
+          time: tx.created_at
+        }))
+      });
+
+      return;
+    }
+
+    // =============================
+    // FIND WALLET
+    // =============================
+
+    if (req.method === "GET" && pathname.startsWith("/api/find/")) {
+      const id = pathname.split("/").pop();
+
+      const result = await pool.query(
+        `SELECT id, name, address, balance, created_at
+         FROM wallets
+         WHERE id = $1 OR address = $1`,
+        [id]
+      );
+
+      if (result.rows.length === 0) {
+        json(res, 404, {
+          success: false,
+          error: "Кошелек не найден"
+        });
+        return;
+      }
+
+      json(res, 200, {
+        success: true,
+        wallet: walletResponse(result.rows[0])
+      });
+
+      return;
+    }
+
+    // =============================
+    // FAUCET
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/faucet") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const body = await getBody(req);
+      const walletId = String(body.walletId || "");
+
+      const client = await pool.connect();
+
+      try {
+        await client.query("BEGIN");
+
+        const walletResult = await client.query(
+          `SELECT id, balance
+           FROM wallets
+           WHERE id = $1 AND owner_id = $2
+           FOR UPDATE`,
+          [walletId, user.id]
         );
 
-        saveDatabase();
-
-        sendJSON(res, {
-          success: true,
-
-          wallet: {
-            id: wallet.id,
-            address: wallet.address,
-            balance: wallet.balance,
-            transactions:
-              wallet.transactions
-          },
-
-          walletIds:
-            user.walletIds
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         MY WALLETS
-      ========================= */
-
-      if (
-        req.method === "GET" &&
-        req.url === "/api/wallets"
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const wallets =
-          getUserWallets(user);
-
-        sendJSON(res, {
-          success: true,
-
-          wallets:
-            wallets.map(wallet => ({
-              id: wallet.id,
-              name: wallet.name,
-              address: wallet.address,
-              balance: wallet.balance,
-              createdAt:
-                wallet.createdAt
-            }))
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         SELECT WALLET
-      ========================= */
-
-      if (
-        req.method === "POST" &&
-        req.url === "/api/wallet/select"
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const body =
-          await getBody(req);
-
-        const wallet =
-          getWallet(body.id);
-
-        if (!wallet) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Кошелёк не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        if (
-          wallet.ownerId !==
-          user.id
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Этот кошелёк не принадлежит вашему аккаунту."
-            },
-            403
-          );
-
-          return;
-        }
-
-        user.walletId =
-          wallet.id;
-
-        saveDatabase();
-
-        sendJSON(res, {
-          success: true,
-
-          wallet: {
-            id: wallet.id,
-            name: wallet.name,
-            address: wallet.address,
-            balance: wallet.balance,
-            transactions:
-              wallet.transactions
-          }
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         GET WALLET
-      ========================= */
-
-      if (
-        req.method === "GET" &&
-        req.url.startsWith(
-          "/api/wallet/"
-        )
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const id =
-          decodeURIComponent(
-            req.url.replace(
-              "/api/wallet/",
-              ""
-            )
-          );
-
-        const wallet =
-          getWallet(id);
-
-        if (!wallet) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "SLX-ID не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        if (
-          wallet.ownerId !==
-          user.id
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Этот кошелёк вам не принадлежит."
-            },
-            403
-          );
-
-          return;
-        }
-
-        sendJSON(res, {
-          success: true,
-
-          wallet: {
-            id: wallet.id,
-            name: wallet.name,
-            address: wallet.address,
-            balance: wallet.balance,
-            transactions:
-              wallet.transactions
-          }
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         FIND WALLET
-      ========================= */
-
-      if (
-        req.method === "GET" &&
-        req.url.startsWith(
-          "/api/find/"
-        )
-      ) {
-
-        const id =
-          decodeURIComponent(
-            req.url.replace(
-              "/api/find/",
-              ""
-            )
-          );
-
-        const wallet =
-          getWallet(id);
-
-        if (!wallet) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Получатель не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        sendJSON(res, {
-          success: true,
-
-          recipient: {
-            id: wallet.id,
-            address: wallet.address
-          }
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         FAUCET
-      ========================= */
-
-      if (
-        req.method === "POST" &&
-        req.url === "/api/faucet"
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const body =
-          await getBody(req);
-
-        const wallet =
-          getWallet(body.id);
-
-        if (!wallet) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Кошелёк не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        if (
-          wallet.ownerId !==
-          user.id
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Этот кошелёк вам не принадлежит."
-            },
-            403
-          );
+        if (walletResult.rows.length === 0) {
+          await client.query("ROLLBACK");
+
+          json(res, 404, {
+            success: false,
+            error: "Кошелек не найден"
+          });
 
           return;
         }
 
         const amount = 100;
+        const txId = makeId();
 
-        wallet.balance += amount;
+        await client.query(
+          `UPDATE wallets
+           SET balance = balance + $1
+           WHERE id = $2`,
+          [amount, walletId]
+        );
 
-        const transaction = {
-          id:
-            "TX-" +
-            Date.now(),
-
-          type:
+        await client.query(
+          `INSERT INTO transactions
+           (id, wallet_id, type, amount, from_wallet, to_wallet)
+           VALUES ($1, $2, $3, $4, $5, $6)`,
+          [
+            txId,
+            walletId,
             "faucet",
+            amount,
+            "SLX-FAUCET",
+            walletId
+          ]
+        );
 
+        const updated = await client.query(
+          `SELECT id, name, address, balance, created_at
+           FROM wallets
+           WHERE id = $1`,
+          [walletId]
+        );
+
+        await client.query("COMMIT");
+
+        json(res, 200, {
+          success: true,
           amount,
-
-          from:
-            "FAUCET",
-
-          to:
-            wallet.id,
-
-          time:
-            new Date().toISOString()
-        };
-
-        addTransaction(
-          wallet,
-          transaction
-        );
-
-        saveDatabase();
-
-        sendJSON(res, {
-          success: true,
-          transaction,
-          balance:
-            wallet.balance
+          wallet: walletResponse(updated.rows[0])
         });
 
         return;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
       }
-
-
-      /* =========================
-         SEND SLX
-      ========================= */
-
-      if (
-        req.method === "POST" &&
-        req.url === "/api/send"
-      ) {
-
-        const user =
-          getUserByToken(req);
-
-        if (!user) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Необходимо войти в аккаунт."
-            },
-            401
-          );
-
-          return;
-        }
-
-        const body =
-          await getBody(req);
-
-        const sender =
-          getWallet(body.sender);
-
-        const recipient =
-          getWallet(body.recipient);
-
-        const amount =
-          Number(body.amount);
-
-        if (!sender) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Ваш кошелёк не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        if (
-          sender.ownerId !==
-          user.id
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Этот кошелёк не принадлежит вашему аккаунту."
-            },
-            403
-          );
-
-          return;
-        }
-
-        if (!recipient) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Получатель не найден."
-            },
-            404
-          );
-
-          return;
-        }
-
-        if (
-          sender.id ===
-          recipient.id
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Нельзя отправить самому себе."
-            },
-            400
-          );
-
-          return;
-        }
-
-        if (
-          !Number.isFinite(amount) ||
-          amount <= 0
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Неверная сумма."
-            },
-            400
-          );
-
-          return;
-        }
-
-        if (
-          amount >
-          sender.balance
-        ) {
-          sendJSON(
-            res,
-            {
-              success: false,
-              error:
-                "Недостаточно SLX."
-            },
-            400
-          );
-
-          return;
-        }
-
-        sender.balance -= amount;
-        recipient.balance += amount;
-
-        const transactionId =
-          "TX-" +
-          Date.now() +
-          "-" +
-          crypto
-            .randomBytes(3)
-            .toString("hex");
-
-        const time =
-          new Date().toISOString();
-
-        addTransaction(
-          sender,
-          {
-            id:
-              transactionId,
-
-            type:
-              "send",
-
-            amount,
-
-            from:
-              sender.id,
-
-            to:
-              recipient.id,
-
-            time
-          }
-        );
-
-        addTransaction(
-          recipient,
-          {
-            id:
-              transactionId,
-
-            type:
-              "receive",
-
-            amount,
-
-            from:
-              sender.id,
-
-            to:
-              recipient.id,
-
-            time
-          }
-        );
-
-        saveDatabase();
-
-        sendJSON(res, {
-          success: true,
-
-          transaction: {
-            id:
-              transactionId,
-
-            amount,
-
-            from:
-              sender.id,
-
-            to:
-              recipient.id,
-
-            time
-          },
-
-          senderBalance:
-            sender.balance,
-
-          recipientBalance:
-            recipient.balance
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         NETWORK STATUS
-      ========================= */
-
-      if (
-        req.method === "GET" &&
-        req.url === "/api/status"
-      ) {
-
-        const wallets =
-          Object.values(
-            database.wallets
-          );
-
-        sendJSON(res, {
-          success: true,
-
-          network:
-            "SLX Testnet",
-
-          version:
-            "1.3",
-
-          status:
-            "online",
-
-          accounts:
-            Object.keys(
-              database.users
-            ).length,
-
-          wallets:
-            wallets.length
-        });
-
-        return;
-      }
-
-
-      /* =========================
-         NOT FOUND
-      ========================= */
-
-      sendJSON(
-        res,
-        {
-          success: false,
-          error: "Not found"
-        },
-        404
-      );
-
-    } catch (error) {
-
-      console.error(
-        "SERVER ERROR:",
-        error
-      );
-
-      sendJSON(
-        res,
-        {
-          success: false,
-          error:
-            "Внутренняя ошибка сервера."
-        },
-        500
-      );
     }
+
+    // =============================
+    // SEND SLX
+    // =============================
+
+    if (req.method === "POST" && pathname === "/api/send") {
+      const user = await requireUser(req, res);
+
+      if (!user) return;
+
+      const body = await getBody(req);
+
+      const senderId = String(body.senderId || "");
+      const recipientId = String(body.recipientId || "");
+      const amount = Number(body.amount);
+
+      if (!senderId || !recipientId) {
+        json(res, 400, {
+          success: false,
+          error: "Не указан отправитель или получатель"
+        });
+        return;
+      }
+
+      if (senderId === recipientId) {
+        json(res, 400, {
+          success: false,
+          error: "Нельзя отправить самому себе"
+        });
+        return;
+      }
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        json(res, 400, {
+          success: false,
+          error: "Неверная сумма"
+        });
+        return;
+      }
+
+      const client = await pool.connect();
+
+      try {
+        await client.query("BEGIN");
+
+        // Sender must belong to current user.
+        const senderResult = await client.query(
+          `SELECT id, balance
+           FROM wallets
+           WHERE id = $1 AND owner_id = $2
+           FOR UPDATE`,
+          [senderId, user.id]
+        );
+
+        if (senderResult.rows.length === 0) {
+          await client.query("ROLLBACK");
+
+          json(res, 403, {
+            success: false,
+            error: "Этот кошелек вам не принадлежит"
+          });
+
+          return;
+        }
+
+        // Lock recipient wallet.
+        const recipientResult = await client.query(
+          `SELECT id, balance
+           FROM wallets
+           WHERE id = $1
+           FOR UPDATE`,
+          [recipientId]
+        );
+
+        if (recipientResult.rows.length === 0) {
+          await client.query("ROLLBACK");
+
+          json(res, 404, {
+            success: false,
+            error: "Кошелек получателя не найден"
+          });
+
+          return;
+        }
+
+        const senderBalance = Number(senderResult.rows[0].balance);
+
+        if (senderBalance < amount) {
+          await client.query("ROLLBACK");
+
+          json(res, 400, {
+            success: false,
+            error: "Недостаточно SLX"
+          });
+
+          return;
+        }
+
+        const txId = makeId();
+
+        await client.query(
+          `UPDATE wallets
+           SET balance = balance - $1
+           WHERE id = $2`,
+          [amount, senderId]
+        );
+
+        await client.query(
+          `UPDATE wallets
+           SET balance = balance + $1
+           WHERE id = $2`,
+          [amount, recipientId]
+        );
+
+        await client.query(
+          `INSERT INTO transactions
+           (id, wallet_id, type, amount, from_wallet, to_wallet)
+           VALUES
+           ($1, $2, 'send', $3, $4, $5),
+           ($1 || '-R', $5, 'receive', $3, $4, $5)`,
+          [
+            txId,
+            senderId,
+            amount,
+            senderId,
+            recipientId
+          ]
+        );
+
+        const updatedSender = await client.query(
+          `SELECT id, name, address, balance, created_at
+           FROM wallets
+           WHERE id = $1`,
+          [senderId]
+        );
+
+        await client.query("COMMIT");
+
+        json(res, 200, {
+          success: true,
+          transaction: {
+            id: txId,
+            amount,
+            from: senderId,
+            to: recipientId
+          },
+          wallet: walletResponse(updatedSender.rows[0])
+        });
+
+        return;
+      } catch (error) {
+        await client.query("ROLLBACK");
+        throw error;
+      } finally {
+        client.release();
+      }
+    }
+
+    // =============================
+    // 404
+    // =============================
+
+    json(res, 404, {
+      success: false,
+      error: "Not found"
+    });
+
+  } catch (error) {
+    console.error("SERVER ERROR:", error);
+
+    json(res, 500, {
+      success: false,
+      error: "Внутренняя ошибка сервера"
+    });
   }
-);
+});
 
+// ===============================
+// START
+// ===============================
 
-/* =========================
-   START
-========================= */
+async function start() {
+  try {
+    await initDatabase();
 
-loadDatabase();
-
-server.listen(
-  PORT,
-  "0.0.0.0",
-  () => {
-
-    console.log(
-      "=============================="
-    );
-
-    console.log(
-      "SLX Network v1.3"
-    );
-
-    console.log(
-      "Persistent Accounts + Multi-Wallet"
-    );
-
-    console.log(
-      "Server is LIVE"
-    );
-
-    console.log(
-      "=============================="
-    );
+    server.listen(PORT, () => {
+      console.log("================================");
+      console.log("SLX Network v1.4.0");
+      console.log("Storage: PostgreSQL");
+      console.log(`Port: ${PORT}`);
+      console.log("================================");
+    });
+  } catch (error) {
+    console.error("DATABASE STARTUP ERROR:", error);
+    process.exit(1);
   }
-);
+}
+
+start();
