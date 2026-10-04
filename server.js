@@ -6,6 +6,12 @@ const crypto = require("crypto");
 const PORT = process.env.PORT || 3000;
 
 const wallets = new Map();
+const users = new Map();
+const sessions = new Map();
+
+/* =========================
+   HELPERS
+========================= */
 
 function makeId() {
   return "SLX" + crypto.randomBytes(5).toString("hex").toUpperCase();
@@ -13,6 +19,17 @@ function makeId() {
 
 function makeAddress() {
   return "SLX-" + crypto.randomBytes(8).toString("hex").toUpperCase();
+}
+
+function makeSessionToken() {
+  return crypto.randomBytes(32).toString("hex");
+}
+
+function hashPassword(password) {
+  return crypto
+    .createHash("sha256")
+    .update(password)
+    .digest("hex");
 }
 
 function createWallet() {
@@ -36,7 +53,9 @@ function createWallet() {
 }
 
 function getWallet(id) {
-  return wallets.get(String(id || "").trim().toUpperCase());
+  return wallets.get(
+    String(id || "").trim().toUpperCase()
+  );
 }
 
 function addTransaction(wallet, transaction) {
@@ -77,12 +96,37 @@ function getBody(req) {
   });
 }
 
+function getToken(req) {
+  const header = req.headers.authorization || "";
+
+  if (!header.startsWith("Bearer ")) {
+    return null;
+  }
+
+  return header.substring(7).trim();
+}
+
+function getUserByToken(req) {
+  const token = getToken(req);
+
+  if (!token) {
+    return null;
+  }
+
+  const userId = sessions.get(token);
+
+  if (!userId) {
+    return null;
+  }
+
+  return users.get(userId) || null;
+}
+
 function sendHTML(res) {
   fs.readFile(
     path.join(__dirname, "index.html"),
     "utf8",
     (error, html) => {
-
       if (error) {
         res.writeHead(500, {
           "Content-Type":
@@ -103,9 +147,16 @@ function sendHTML(res) {
   );
 }
 
+/* =========================
+   SERVER
+========================= */
+
 const server = http.createServer(async (req, res) => {
 
-  // MAIN PAGE
+  /* =========================
+     MAIN PAGE
+  ========================= */
+
   if (
     req.method === "GET" &&
     req.url === "/"
@@ -115,7 +166,348 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // NETWORK STATUS
+  /* =========================
+     REGISTER
+  ========================= */
+
+  if (
+    req.method === "POST" &&
+    req.url === "/api/auth/register"
+  ) {
+
+    try {
+      const body = await getBody(req);
+
+      const username =
+        String(body.username || "")
+          .trim();
+
+      const password =
+        String(body.password || "");
+
+      if (
+        username.length < 3 ||
+        username.length > 20
+      ) {
+        sendJSON(
+          res,
+          {
+            success: false,
+            error:
+              "Имя должно содержать от 3 до 20 символов."
+          },
+          400
+        );
+
+        return;
+      }
+
+      if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+        sendJSON(
+          res,
+          {
+            success: false,
+            error:
+              "Имя может содержать только буквы, цифры и _."
+          },
+          400
+        );
+
+        return;
+      }
+
+      if (password.length < 6) {
+        sendJSON(
+          res,
+          {
+            success: false,
+            error:
+              "Пароль должен содержать минимум 6 символов."
+          },
+          400
+        );
+
+        return;
+      }
+
+      const usernameKey =
+        username.toLowerCase();
+
+      for (const user of users.values()) {
+        if (
+          user.username.toLowerCase() ===
+          usernameKey
+        ) {
+          sendJSON(
+            res,
+            {
+              success: false,
+              error:
+                "Это имя уже зарегистрировано."
+            },
+            409
+          );
+
+          return;
+        }
+      }
+
+      const wallet =
+        createWallet();
+
+      const userId =
+        "USR-" +
+        crypto
+          .randomBytes(8)
+          .toString("hex")
+          .toUpperCase();
+
+      const user = {
+        id: userId,
+        username,
+        passwordHash:
+          hashPassword(password),
+        walletId: wallet.id,
+        createdAt:
+          new Date().toISOString()
+      };
+
+      users.set(
+        userId,
+        user
+      );
+
+      const token =
+        makeSessionToken();
+
+      sessions.set(
+        token,
+        userId
+      );
+
+      sendJSON(res, {
+        success: true,
+        token,
+
+        user: {
+          id: user.id,
+          username: user.username,
+          walletId: user.walletId
+        },
+
+        wallet: {
+          id: wallet.id,
+          address: wallet.address,
+          balance: wallet.balance
+        }
+      });
+
+    } catch {
+      sendJSON(
+        res,
+        {
+          success: false,
+          error:
+            "Ошибка регистрации."
+        },
+        400
+      );
+    }
+
+    return;
+  }
+
+
+  /* =========================
+     LOGIN
+  ========================= */
+
+  if (
+    req.method === "POST" &&
+    req.url === "/api/auth/login"
+  ) {
+
+    try {
+      const body =
+        await getBody(req);
+
+      const username =
+        String(body.username || "")
+          .trim();
+
+      const password =
+        String(body.password || "");
+
+      const passwordHash =
+        hashPassword(password);
+
+      let foundUser = null;
+
+      for (const user of users.values()) {
+        if (
+          user.username.toLowerCase() ===
+          username.toLowerCase()
+        ) {
+          foundUser = user;
+          break;
+        }
+      }
+
+      if (
+        !foundUser ||
+        foundUser.passwordHash !==
+          passwordHash
+      ) {
+        sendJSON(
+          res,
+          {
+            success: false,
+            error:
+              "Неверное имя или пароль."
+          },
+          401
+        );
+
+        return;
+      }
+
+      const token =
+        makeSessionToken();
+
+      sessions.set(
+        token,
+        foundUser.id
+      );
+
+      const wallet =
+        getWallet(
+          foundUser.walletId
+        );
+
+      sendJSON(res, {
+        success: true,
+        token,
+
+        user: {
+          id: foundUser.id,
+          username:
+            foundUser.username,
+          walletId:
+            foundUser.walletId
+        },
+
+        wallet: wallet
+          ? {
+              id: wallet.id,
+              address:
+                wallet.address,
+              balance:
+                wallet.balance
+            }
+          : null
+      });
+
+    } catch {
+      sendJSON(
+        res,
+        {
+          success: false,
+          error:
+            "Ошибка входа."
+        },
+        400
+      );
+    }
+
+    return;
+  }
+
+
+  /* =========================
+     CURRENT USER
+  ========================= */
+
+  if (
+    req.method === "GET" &&
+    req.url === "/api/auth/me"
+  ) {
+
+    const user =
+      getUserByToken(req);
+
+    if (!user) {
+      sendJSON(
+        res,
+        {
+          success: false,
+          error:
+            "Не авторизован."
+        },
+        401
+      );
+
+      return;
+    }
+
+    const wallet =
+      getWallet(
+        user.walletId
+      );
+
+    sendJSON(res, {
+      success: true,
+
+      user: {
+        id: user.id,
+        username:
+          user.username,
+        walletId:
+          user.walletId
+      },
+
+      wallet: wallet
+        ? {
+            id: wallet.id,
+            address:
+              wallet.address,
+            balance:
+              wallet.balance
+          }
+        : null
+    });
+
+    return;
+  }
+
+
+  /* =========================
+     LOGOUT
+  ========================= */
+
+  if (
+    req.method === "POST" &&
+    req.url === "/api/auth/logout"
+  ) {
+
+    const token =
+      getToken(req);
+
+    if (token) {
+      sessions.delete(token);
+    }
+
+    sendJSON(res, {
+      success: true
+    });
+
+    return;
+  }
+
+
+  /* =========================
+     NETWORK STATUS
+  ========================= */
+
   if (
     req.method === "GET" &&
     req.url === "/api/status"
@@ -124,36 +516,46 @@ const server = http.createServer(async (req, res) => {
     sendJSON(res, {
       success: true,
       network: "SLX Testnet",
-      version: "1.0",
+      version: "1.1",
       status: "online",
-      wallets: Array.from(
-        wallets.values()
-      ).map(wallet => ({
-        id: wallet.id,
-        address: wallet.address,
-        balance: wallet.balance
-      }))
+
+      wallets:
+        Array.from(
+          wallets.values()
+        ).map(wallet => ({
+          id: wallet.id,
+          address:
+            wallet.address,
+          balance:
+            wallet.balance
+        }))
     });
 
     return;
   }
 
 
-  // CREATE WALLET
+  /* =========================
+     CREATE WALLET
+  ========================= */
+
   if (
     req.method === "POST" &&
     req.url === "/api/wallet/create"
   ) {
 
-    const wallet = createWallet();
+    const wallet =
+      createWallet();
 
     sendJSON(res, {
       success: true,
 
       wallet: {
         id: wallet.id,
-        address: wallet.address,
-        balance: wallet.balance,
+        address:
+          wallet.address,
+        balance:
+          wallet.balance,
         transactions:
           wallet.transactions
       }
@@ -163,23 +565,29 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // GET WALLET
+  /* =========================
+     GET WALLET
+  ========================= */
+
   if (
     req.method === "GET" &&
-    req.url.startsWith("/api/wallet/")
+    req.url.startsWith(
+      "/api/wallet/"
+    )
   ) {
 
-    const id = decodeURIComponent(
-      req.url.replace(
-        "/api/wallet/",
-        ""
-      )
-    );
+    const id =
+      decodeURIComponent(
+        req.url.replace(
+          "/api/wallet/",
+          ""
+        )
+      );
 
-    const wallet = getWallet(id);
+    const wallet =
+      getWallet(id);
 
     if (!wallet) {
-
       sendJSON(
         res,
         {
@@ -198,8 +606,10 @@ const server = http.createServer(async (req, res) => {
 
       wallet: {
         id: wallet.id,
-        address: wallet.address,
-        balance: wallet.balance,
+        address:
+          wallet.address,
+        balance:
+          wallet.balance,
         transactions:
           wallet.transactions
       }
@@ -209,23 +619,29 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // FIND WALLET
+  /* =========================
+     FIND WALLET
+  ========================= */
+
   if (
     req.method === "GET" &&
-    req.url.startsWith("/api/find/")
+    req.url.startsWith(
+      "/api/find/"
+    )
   ) {
 
-    const id = decodeURIComponent(
-      req.url.replace(
-        "/api/find/",
-        ""
-      )
-    );
+    const id =
+      decodeURIComponent(
+        req.url.replace(
+          "/api/find/",
+          ""
+        )
+      );
 
-    const wallet = getWallet(id);
+    const wallet =
+      getWallet(id);
 
     if (!wallet) {
-
       sendJSON(
         res,
         {
@@ -244,7 +660,8 @@ const server = http.createServer(async (req, res) => {
 
       recipient: {
         id: wallet.id,
-        address: wallet.address
+        address:
+          wallet.address
       }
     });
 
@@ -252,7 +669,10 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // FAUCET
+  /* =========================
+     FAUCET
+  ========================= */
+
   if (
     req.method === "POST" &&
     req.url === "/api/faucet"
@@ -267,7 +687,6 @@ const server = http.createServer(async (req, res) => {
         getWallet(body.id);
 
       if (!wallet) {
-
         sendJSON(
           res,
           {
@@ -291,11 +710,9 @@ const server = http.createServer(async (req, res) => {
           Date.now(),
 
         type: "faucet",
-
         amount,
 
         from: "FAUCET",
-
         to: wallet.id,
 
         time:
@@ -331,7 +748,10 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // SEND SLX
+  /* =========================
+     SEND SLX
+  ========================= */
+
   if (
     req.method === "POST" &&
     req.url === "/api/send"
@@ -351,9 +771,7 @@ const server = http.createServer(async (req, res) => {
       const amount =
         Number(body.amount);
 
-
       if (!sender) {
-
         sendJSON(
           res,
           {
@@ -367,9 +785,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-
       if (!recipient) {
-
         sendJSON(
           res,
           {
@@ -383,12 +799,10 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-
       if (
         sender.id ===
         recipient.id
       ) {
-
         sendJSON(
           res,
           {
@@ -402,12 +816,10 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-
       if (
         !Number.isFinite(amount) ||
         amount <= 0
       ) {
-
         sendJSON(
           res,
           {
@@ -421,12 +833,10 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-
       if (
         amount >
         sender.balance
       ) {
-
         sendJSON(
           res,
           {
@@ -440,11 +850,8 @@ const server = http.createServer(async (req, res) => {
         return;
       }
 
-
       sender.balance -= amount;
-
       recipient.balance += amount;
-
 
       const transactionId =
         "TX-" +
@@ -454,45 +861,50 @@ const server = http.createServer(async (req, res) => {
           .randomBytes(3)
           .toString("hex");
 
-
       const time =
         new Date().toISOString();
-
 
       addTransaction(
         sender,
         {
-          id: transactionId,
+          id:
+            transactionId,
           type: "send",
           amount,
-          from: sender.id,
-          to: recipient.id,
+          from:
+            sender.id,
+          to:
+            recipient.id,
           time
         }
       );
-
 
       addTransaction(
         recipient,
         {
-          id: transactionId,
+          id:
+            transactionId,
           type: "receive",
           amount,
-          from: sender.id,
-          to: recipient.id,
+          from:
+            sender.id,
+          to:
+            recipient.id,
           time
         }
       );
-
 
       sendJSON(res, {
         success: true,
 
         transaction: {
-          id: transactionId,
+          id:
+            transactionId,
           amount,
-          from: sender.id,
-          to: recipient.id,
+          from:
+            sender.id,
+          to:
+            recipient.id,
           time
         },
 
@@ -520,7 +932,10 @@ const server = http.createServer(async (req, res) => {
   }
 
 
-  // NOT FOUND
+  /* =========================
+     NOT FOUND
+  ========================= */
+
   sendJSON(
     res,
     {
@@ -532,6 +947,10 @@ const server = http.createServer(async (req, res) => {
 });
 
 
+/* =========================
+   START
+========================= */
+
 server.listen(
   PORT,
   "0.0.0.0",
@@ -542,11 +961,11 @@ server.listen(
     );
 
     console.log(
-      "SLX Network v1.0"
+      "SLX Network v1.1"
     );
 
     console.log(
-      "QR + SLX-ID Testnet"
+      "Account + Wallet Testnet"
     );
 
     console.log(
