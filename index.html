@@ -11,6 +11,9 @@
 
   <title>SLX Network v1.0</title>
 
+  <!-- QR SCANNER -->
+  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+
   <style>
 
     * {
@@ -266,9 +269,11 @@
 
     .scanner {
       width: 100%;
+      min-height: 280px;
       border-radius: 18px;
       margin-top: 15px;
       background: black;
+      object-fit: cover;
     }
 
     footer {
@@ -598,6 +603,8 @@
       id="scannerVideo"
       class="scanner"
       playsinline
+      autoplay
+      muted
     ></video>
 
     <div
@@ -1019,7 +1026,7 @@ function showMyQR() {
 
 
 /* =========================
-   QR SCANNER
+   QR SCANNER — FIXED
 ========================= */
 
 async function openScanner() {
@@ -1045,23 +1052,37 @@ async function openScanner() {
   );
 
 
+  message.className =
+    "error";
+
   message.textContent =
     "Запрашиваем камеру...";
 
 
-  if (
-    !("BarcodeDetector" in window)
-  ) {
-
-    message.textContent =
-      "Автоматический QR-сканер не поддерживается этим браузером. Введите SLX-ID вручную.";
-
-    return;
-
-  }
-
-
   try {
+
+    if (
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ) {
+
+      throw new Error(
+        "Камера не поддерживается этим браузером."
+      );
+
+    }
+
+
+    if (
+      typeof jsQR !== "function"
+    ) {
+
+      throw new Error(
+        "QR-модуль не загрузился. Проверьте интернет-соединение."
+      );
+
+    }
+
 
     scannerStream =
       await navigator.mediaDevices.getUserMedia(
@@ -1069,8 +1090,18 @@ async function openScanner() {
           video: {
             facingMode: {
               ideal: "environment"
+            },
+
+            width: {
+              ideal: 1280
+            },
+
+            height: {
+              ideal: 720
             }
-          }
+          },
+
+          audio: false
         }
       );
 
@@ -1079,71 +1110,184 @@ async function openScanner() {
       scannerStream;
 
 
+    video.setAttribute(
+      "playsinline",
+      ""
+    );
+
+    video.setAttribute(
+      "muted",
+      ""
+    );
+
+
     await video.play();
-
-
-    const detector =
-      new BarcodeDetector(
-        {
-          formats: [
-            "qr_code"
-          ]
-        }
-      );
 
 
     message.className =
       "success";
 
-
     message.textContent =
       "Наведите камеру на QR-код";
 
 
+    const canvas =
+      document.createElement(
+        "canvas"
+      );
+
+
+    const context =
+      canvas.getContext(
+        "2d",
+        {
+          willReadFrequently: true
+        }
+      );
+
+
+    function scanFrame() {
+
+      if (
+        !scannerStream
+      ) {
+
+        return;
+
+      }
+
+
+      if (
+        video.readyState < 2
+      ) {
+
+        scannerTimer =
+          requestAnimationFrame(
+            scanFrame
+          );
+
+        return;
+
+      }
+
+
+      const width =
+        video.videoWidth;
+
+      const height =
+        video.videoHeight;
+
+
+      if (
+        !width ||
+        !height
+      ) {
+
+        scannerTimer =
+          requestAnimationFrame(
+            scanFrame
+          );
+
+        return;
+
+      }
+
+
+      canvas.width =
+        width;
+
+      canvas.height =
+        height;
+
+
+      context.drawImage(
+        video,
+        0,
+        0,
+        width,
+        height
+      );
+
+
+      const imageData =
+        context.getImageData(
+          0,
+          0,
+          width,
+          height
+        );
+
+
+      const code =
+        jsQR(
+          imageData.data,
+          imageData.width,
+          imageData.height,
+          {
+            inversionAttempts:
+              "attemptBoth"
+          }
+        );
+
+
+      if (
+        code &&
+        code.data
+      ) {
+
+        handleQR(
+          code.data
+        );
+
+        return;
+
+      }
+
+
+      scannerTimer =
+        requestAnimationFrame(
+          scanFrame
+        );
+
+    }
+
+
     scannerTimer =
-      setInterval(
-        async () => {
-
-          try {
-
-            const codes =
-              await detector.detect(
-                video
-              );
-
-
-            if (
-              !codes.length
-            ) {
-              return;
-            }
-
-
-            const value =
-              codes[0].rawValue;
-
-
-            handleQR(value);
-
-          }
-
-          catch {
-
-          }
-
-        },
-        500
+      requestAnimationFrame(
+        scanFrame
       );
 
   }
 
-  catch {
+  catch (error) {
+
+    console.error(
+      "QR scanner error:",
+      error
+    );
+
+
+    if (scannerStream) {
+
+      scannerStream
+        .getTracks()
+        .forEach(
+          track => track.stop()
+        );
+
+      scannerStream = null;
+
+    }
+
 
     message.className =
       "error";
 
+
     message.textContent =
-      "Камера недоступна. Разрешите доступ к камере или введите SLX-ID вручную.";
+      "Не удалось открыть камеру. " +
+      "Разрешите доступ к камере " +
+      "в настройках браузера.";
 
   }
 
@@ -1154,19 +1298,33 @@ async function openScanner() {
    QR RESULT
 ========================= */
 
-function handleQR(value) {
+function handleQR(
+  value
+) {
 
   let id =
-    String(value || "")
-      .trim();
+    String(
+      value || ""
+    ).trim();
 
 
   if (
-    id.startsWith("SLX:")
+    id.startsWith(
+      "SLX:"
+    )
   ) {
 
     id =
-      id.substring(4);
+      id.substring(
+        4
+      );
+
+  }
+
+
+  if (!id) {
+
+    return;
 
   }
 
@@ -1200,18 +1358,23 @@ function handleQR(value) {
 
 function stopScanner() {
 
-  if (scannerTimer) {
+  if (
+    scannerTimer
+  ) {
 
-    clearInterval(
+    cancelAnimationFrame(
       scannerTimer
     );
 
-    scannerTimer = null;
+    scannerTimer =
+      null;
 
   }
 
 
-  if (scannerStream) {
+  if (
+    scannerStream
+  ) {
 
     scannerStream
       .getTracks()
@@ -1219,15 +1382,26 @@ function stopScanner() {
         track => track.stop()
       );
 
-    scannerStream = null;
+    scannerStream =
+      null;
 
   }
 
 
-  document.getElementById(
-    "scannerVideo"
-  ).srcObject =
-    null;
+  const video =
+    document.getElementById(
+      "scannerVideo"
+    );
+
+
+  if (video) {
+
+    video.pause();
+
+    video.srcObject =
+      null;
+
+  }
 
 
   closeModal(
@@ -1504,7 +1678,9 @@ function renderHistory(
    MODAL
 ========================= */
 
-function closeModal(id) {
+function closeModal(
+  id
+) {
 
   document
     .getElementById(id)
