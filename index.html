@@ -4,71 +4,484 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b12">
-<title>SLX Network v1.6</title>
+<title>SLX Network v1.7</title>
+
 <style>
 *{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#07090f;color:#fff;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+
+html,body{
+margin:0;
+padding:0;
+background:#07090f;
+color:#fff;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+
 body{min-height:100vh}
-.app{max-width:640px;margin:auto;padding:18px 15px 100px}
+
+.app{
+max-width:640px;
+margin:auto;
+padding:18px 15px 100px
+}
+
 .hidden{display:none!important}
-.badge{display:inline-block;padding:6px 10px;border:1px solid #303748;border-radius:999px;font-size:12px;color:#9ee7ff}
-h1{font-size:31px;margin:14px 0 5px}
-h2{font-size:20px;margin:0 0 12px}
-.muted{color:#919aac;line-height:1.45}
-.card{background:#101521;border:1px solid #202838;border-radius:18px;padding:17px;margin-top:15px}
-.balance{font-size:34px;font-weight:800;margin:7px 0 2px;word-break:break-word}
+
+.badge{
+display:inline-block;
+padding:6px 10px;
+border:1px solid #303748;
+border-radius:999px;
+font-size:12px;
+color:#9ee7ff
+}
+
+h1{
+font-size:31px;
+margin:14px 0 5px
+}
+
+h2{
+font-size:20px;
+margin:0 0 12px
+}
+
+.muted{
+color:#919aac;
+line-height:1.45
+}
+
+.card{
+background:#101521;
+border:1px solid #202838;
+border-radius:18px;
+padding:17px;
+margin-top:15px
+}
+
+.balance{
+font-size:34px;
+font-weight:800;
+margin:7px 0 2px;
+word-break:break-word
+}
+
 .slx{color:#7de3ff}
-.small{font-size:12px;color:#778197}
+
+.small{
+font-size:12px;
+color:#778197
+}
+
 input,button{font:inherit}
-input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid #30394b;background:#090d15;color:#fff;font-size:16px;margin-top:9px;outline:none}
-input:focus{border-color:#61d7ff}
-button{width:100%;border:0;border-radius:13px;padding:13px 14px;margin-top:9px;font-size:15px;font-weight:750;background:#fff;color:#080a10;cursor:pointer}
-button.secondary{background:#1a2130;color:#fff;border:1px solid #30394b}
-button.danger{background:#2a1216;color:#fff;border:1px solid #63303a}
-button:disabled{opacity:.55;cursor:default}
-.row{display:flex;gap:9px;align-items:center}
+
+input{
+width:100%;
+padding:13px 14px;
+border-radius:12px;
+border:1px solid #30394b;
+background:#090d15;
+color:#fff;
+font-size:16px;
+margin-top:9px;
+outline:none
+}
+
+input:focus{
+border-color:#61d7ff
+}
+
+button{
+width:100%;
+border:0;
+border-radius:13px;
+padding:13px 14px;
+margin-top:9px;
+font-size:15px;
+font-weight:750;
+background:#fff;
+color:#080a10;
+cursor:pointer
+}
+
+button.secondary{
+background:#1a2130;
+color:#fff;
+border:1px solid #30394b
+}
+
+button.danger{
+background:#2a1216;
+color:#fff;
+border:1px solid #63303a
+}
+
+button:disabled{
+opacity:.55;
+cursor:default
+}
+
+.row{
+display:flex;
+gap:9px;
+align-items:center
+}
+
 .row>*{flex:1}
-.status{padding:10px 12px;border-radius:10px;background:#0b111b;margin-top:10px;color:#9ee7ff;font-size:13px;word-break:break-word}
+
+.status{
+padding:10px 12px;
+border-radius:10px;
+background:#0b111b;
+margin-top:10px;
+color:#9ee7ff;
+font-size:13px;
+word-break:break-word
+}
+
 .ok{color:#9ef0b4}
 .err{color:#ff9a9a}
-.wallet-list{display:grid;gap:9px;margin-top:10px}
-.wallet-item{width:100%;text-align:left;background:#0c111a;border:1px solid #283244;color:#fff;border-radius:13px;padding:12px;cursor:pointer;margin:0}
-.wallet-item.active{border-color:#66dcff;box-shadow:0 0 0 1px #66dcff inset}
-.wallet-top{display:flex;justify-content:space-between;gap:10px;align-items:center}
-.wallet-id{font-weight:750;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.wallet-bal{font-weight:800;white-space:nowrap;color:#b9f3ff}
-.addr{font-size:12px;color:#8994a7;margin-top:5px;word-break:break-all}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.kv{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #1d2533;font-size:14px}
+
+.wallet-list{
+display:grid;
+gap:9px;
+margin-top:10px
+}
+
+.wallet-item{
+width:100%;
+text-align:left;
+background:#0c111a;
+border:1px solid #283244;
+color:#fff;
+border-radius:13px;
+padding:12px;
+cursor:pointer;
+margin:0
+}
+
+.wallet-item.active{
+border-color:#66dcff;
+box-shadow:0 0 0 1px #66dcff inset
+}
+
+.wallet-top{
+display:flex;
+justify-content:space-between;
+gap:10px;
+align-items:center
+}
+
+.wallet-id{
+font-weight:750;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap
+}
+
+.wallet-bal{
+font-weight:800;
+white-space:nowrap;
+color:#b9f3ff
+}
+
+.addr{
+font-size:12px;
+color:#8994a7;
+margin-top:5px;
+word-break:break-all
+}
+
+.grid2{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:9px
+}
+
+.kv{
+display:flex;
+justify-content:space-between;
+gap:10px;
+padding:9px 0;
+border-bottom:1px solid #1d2533;
+font-size:14px
+}
+
 .kv:last-child{border-bottom:0}
-.qr-wrap{display:flex;justify-content:center;padding:6px 0 2px}
-#qrcode img,#qrcode canvas{max-width:100%;height:auto}
-.scan-box{display:flex;justify-content:center;overflow:hidden;border-radius:14px;background:#05070b;margin-top:10px}
-#scanVideo{width:100%;max-height:360px;object-fit:cover;display:block}
+
+.qr-wrap{
+display:flex;
+justify-content:center;
+padding:6px 0 2px
+}
+
+#qrcode img,
+#qrcode canvas{
+max-width:100%;
+height:auto
+}
+
+.scan-box{
+display:flex;
+justify-content:center;
+overflow:hidden;
+border-radius:14px;
+background:#05070b;
+margin-top:10px
+}
+
+#scanVideo{
+width:100%;
+max-height:360px;
+object-fit:cover;
+display:block
+}
+
 #scanCanvas{display:none}
-.tx{padding:12px 0;border-bottom:1px solid #1d2533}
+
+.tx{
+padding:12px 0;
+border-bottom:1px solid #1d2533
+}
+
 .tx:last-child{border-bottom:0}
-.tx-head{display:flex;justify-content:space-between;gap:10px}
+
+.tx-head{
+display:flex;
+justify-content:space-between;
+gap:10px
+}
+
 .tx-amount{font-weight:800}
-.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;word-break:break-all}
-.nav{position:fixed;left:0;right:0;bottom:0;background:rgba(7,9,15,.94);backdrop-filter:blur(14px);border-top:1px solid #1d2533;padding:8px max(10px,env(safe-area-inset-left)) calc(8px + env(safe-area-inset-bottom));z-index:20}
-.nav-inner{max-width:640px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
-.nav button{margin:0;padding:10px 5px;background:#111722;color:#9ca7ba;border:1px solid #202a3a;font-size:12px}
-.nav button.active{color:#fff;border-color:#66dcff}
-.auth{max-width:480px;margin:0 auto;padding-top:10vh}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:7px}
-.tabs button{margin:0;background:#111722;color:#9ca7ba;border:1px solid #202a3a}
-.tabs button.active{background:#fff;color:#080a10}
-.footer-note{margin-top:18px;text-align:center;color:#687286;font-size:12px;line-height:1.4}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:#182130;border:1px solid #66dcff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;color:#9ee7ff;margin-bottom:12px}
-.profile-name{font-size:24px;font-weight:800}
-.profile-id{margin-top:5px;color:#8c98aa;font-size:13px;word-break:break-all}
+
+.mono{
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+font-size:12px;
+word-break:break-all
+}
+
+.nav{
+position:fixed;
+left:0;
+right:0;
+bottom:0;
+background:rgba(7,9,15,.94);
+backdrop-filter:blur(14px);
+border-top:1px solid #1d2533;
+padding:8px max(10px,env(safe-area-inset-left))
+calc(8px + env(safe-area-inset-bottom));
+z-index:20
+}
+
+.nav-inner{
+max-width:640px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(5,1fr);
+gap:7px
+}
+
+.nav button{
+margin:0;
+padding:10px 5px;
+background:#111722;
+color:#9ca7ba;
+border:1px solid #202a3a;
+font-size:12px
+}
+
+.nav button.active{
+color:#fff;
+border-color:#66dcff
+}
+
+.auth{
+max-width:480px;
+margin:0 auto;
+padding-top:10vh
+}
+
+.tabs{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:7px
+}
+
+.tabs button{
+margin:0;
+background:#111722;
+color:#9ca7ba;
+border:1px solid #202a3a
+}
+
+.tabs button.active{
+background:#fff;
+color:#080a10
+}
+
+.footer-note{
+margin-top:18px;
+text-align:center;
+color:#687286;
+font-size:12px;
+line-height:1.4
+}
+
+.profile-avatar{
+width:72px;
+height:72px;
+border-radius:50%;
+background:#182130;
+border:1px solid #66dcff;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:30px;
+font-weight:800;
+color:#9ee7ff;
+margin-bottom:12px
+}
+
+.profile-name{
+font-size:24px;
+font-weight:800
+}
+
+.profile-id{
+margin-top:5px;
+color:#8c98aa;
+font-size:13px;
+word-break:break-all
+}
+
+.password-wrap{
+position:relative
+}
+
+.password-wrap input{
+padding-right:52px
+}
+
+.password-toggle{
+position:absolute;
+right:8px;
+top:8px;
+width:auto;
+margin:0;
+padding:8px 10px;
+background:#151b27;
+color:#c7d0df;
+border:1px solid #30394b;
+font-size:12px
+}
+
+.strength{
+margin-top:9px;
+height:6px;
+background:#1a2130;
+border-radius:999px;
+overflow:hidden
+}
+
+.strength-bar{
+height:100%;
+width:0;
+transition:width .2s ease
+}
+
+.strength-text{
+margin-top:6px;
+font-size:12px;
+color:#778197
+}
+
+.confirm-box{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.72);
+display:flex;
+align-items:flex-end;
+justify-content:center;
+padding:15px;
+z-index:100
+}
+
+.confirm-panel{
+width:100%;
+max-width:520px;
+background:#101521;
+border:1px solid #30394b;
+border-radius:20px;
+padding:18px;
+box-shadow:0 20px 60px rgba(0,0,0,.5)
+}
+
+.confirm-title{
+font-size:20px;
+font-weight:800;
+margin-bottom:14px
+}
+
+.confirm-item{
+display:flex;
+justify-content:space-between;
+gap:15px;
+padding:10px 0;
+border-bottom:1px solid #1d2533;
+font-size:14px
+}
+
+.confirm-item:last-child{
+border-bottom:0
+}
+
+.confirm-value{
+text-align:right;
+word-break:break-all
+}
+
+.receipt{
+margin-top:12px;
+padding:14px;
+border:1px solid #274535;
+background:#0b1710;
+border-radius:14px
+}
+
+.receipt-title{
+font-weight:800;
+color:#9ef0b4;
+margin-bottom:8px
+}
+
+.security-dot{
+display:inline-block;
+width:8px;
+height:8px;
+border-radius:50%;
+margin-right:7px;
+background:#9ef0b4
+}
+
+.warning-dot{
+background:#ffd27d
+}
+
 @media (max-width:420px){
 .balance{font-size:30px}
-.grid2{grid-template-columns:1fr}
-.nav button{font-size:11px;padding-left:2px;padding-right:2px}
+
+.grid2{
+grid-template-columns:1fr
+}
+
+.nav button{
+font-size:11px;
+padding-left:2px;
+padding-right:2px
+}
 }
 </style>
+
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </head>
@@ -76,153 +489,591 @@ button:disabled{opacity:.55;cursor:default}
 <body>
 
 <div id="authScreen" class="app auth">
-<span class="badge">SLX NETWORK • TESTNET v1.6</span>
+
+<span class="badge">SLX NETWORK • TESTNET v1.7</span>
+
 <h1>SLX Account</h1>
-<div class="muted">Аккаунт, несколько кошельков, переводы и тестовый блокчейн.</div>
+
+<div class="muted">
+Аккаунт, несколько кошельков, переводы, история и тестовый блокчейн.
+</div>
 
 <div class="card">
+
 <div class="tabs">
-<button id="loginTab" class="active" onclick="showAuth('login')">Войти</button>
-<button id="registerTab" onclick="showAuth('register')">Регистрация</button>
+<button id="loginTab" class="active" onclick="showAuth('login')">
+Войти
+</button>
+
+<button id="registerTab" onclick="showAuth('register')">
+Регистрация
+</button>
 </div>
 
 <div id="loginForm">
-<input id="loginUsername" autocomplete="username" placeholder="Имя пользователя">
-<input id="loginPassword" autocomplete="current-password" type="password" placeholder="Пароль">
-<button id="loginBtn" onclick="login()">Войти</button>
+
+<input
+id="loginUsername"
+autocomplete="username"
+placeholder="Имя пользователя"
+>
+
+<div class="password-wrap">
+
+<input
+id="loginPassword"
+autocomplete="current-password"
+type="password"
+placeholder="Пароль"
+>
+
+<button
+type="button"
+class="password-toggle"
+onclick="togglePassword('loginPassword',this)"
+>
+Показать
+</button>
+
+</div>
+
+<button id="loginBtn" onclick="login()">
+Войти
+</button>
+
 </div>
 
 <div id="registerForm" class="hidden">
-<input id="registerUsername" autocomplete="username" placeholder="Имя пользователя">
-<input id="registerPassword" autocomplete="new-password" type="password" placeholder="Пароль">
-<button id="registerBtn" onclick="register()">Создать аккаунт</button>
+
+<input
+id="registerUsername"
+autocomplete="username"
+placeholder="Имя пользователя"
+>
+
+<div class="password-wrap">
+
+<input
+id="registerPassword"
+autocomplete="new-password"
+type="password"
+placeholder="Пароль"
+oninput="updatePasswordStrength()"
+>
+
+<button
+type="button"
+class="password-toggle"
+onclick="togglePassword('registerPassword',this)"
+>
+Показать
+</button>
+
 </div>
 
-<div id="authStatus" class="status">Готово.</div>
+<div class="strength">
+<div id="strengthBar" class="strength-bar"></div>
 </div>
 
-<div class="footer-note">SLX v1.6 — тестовая сеть. SLX здесь не является реальными деньгами.</div>
+<div id="strengthText" class="strength-text">
+Введите пароль.
 </div>
+
+<button id="registerBtn" onclick="register()">
+Создать аккаунт
+</button>
+
+</div>
+
+<div id="authStatus" class="status">
+Готово.
+</div>
+
+</div>
+
+<div class="footer-note">
+SLX v1.7 — тестовая сеть. SLX здесь не является реальными деньгами.
+</div>
+
+</div>
+
 
 <div id="mainScreen" class="app hidden">
-<span class="badge">SLX NETWORK • TESTNET v1.6</span>
+
+<span class="badge">SLX NETWORK • TESTNET v1.7</span>
+
 <h1>Кошелёк SLX</h1>
-<div id="topStatus" class="status">Подключение…</div>
+
+<div id="topStatus" class="status">
+Подключение…
+</div>
+
 
 <section id="pageHome">
-<div class="card">
-<div class="small">Активный кошелёк</div>
-<div id="activeAddress" class="mono" style="margin-top:7px">—</div>
-<div class="balance"><span id="balance">0.000000</span> <span class="slx">SLX</span></div>
-<div class="small">Тестовый баланс</div>
-</div>
 
 <div class="card">
+
+<div class="small">
+Активный кошелёк
+</div>
+
+<div id="activeAddress" class="mono" style="margin-top:7px">
+—
+</div>
+
+<div class="balance">
+<span id="balance">0.000000</span>
+<span class="slx">SLX</span>
+</div>
+
+<div class="small">
+Тестовый баланс
+</div>
+
+</div>
+
+
+<div class="card">
+
 <h2>Мои кошельки</h2>
+
 <div id="walletList" class="wallet-list"></div>
-<button id="newWalletBtn" class="secondary" onclick="createNewWallet()">＋ Новый кошелёк</button>
+
+<button
+id="newWalletBtn"
+class="secondary"
+onclick="createNewWallet()"
+>
+＋ Новый кошелёк
+</button>
+
 </div>
 
+
 <div class="card">
+
 <h2>Быстрые действия</h2>
+
 <div class="grid2">
-<button class="secondary" onclick="copyActiveAddress()">Скопировать адрес</button>
-<button class="secondary" onclick="goPage('send')">Отправить SLX</button>
-<button class="secondary" onclick="showQR()">Показать QR</button>
-<button class="secondary" onclick="goPage('network')">Сеть</button>
+
+<button
+class="secondary"
+onclick="copyActiveAddress()"
+>
+Скопировать адрес
+</button>
+
+<button
+class="secondary"
+onclick="goPage('send')"
+>
+Отправить SLX
+</button>
+
+<button
+class="secondary"
+onclick="showQR()"
+>
+Показать QR
+</button>
+
+<button
+class="secondary"
+onclick="goPage('network')"
+>
+Сеть
+</button>
+
 </div>
+
 </div>
+
 </section>
+
 
 <section id="pageSend" class="hidden">
+
 <div class="card">
+
 <h2>Отправить SLX</h2>
-<div class="small">Отправитель</div>
-<div id="sendFrom" class="mono" style="margin-top:5px">—</div>
-<input id="sendTo" placeholder="Адрес кошелька получателя">
-<input id="sendAmount" type="number" min="0.00000001" step="0.00000001" placeholder="Количество SLX">
-<div class="small" style="margin-top:8px">Комиссия сети: <span id="feeLabel">0.1</span> SLX</div>
-<button id="sendBtn" onclick="sendSLX()">Отправить</button>
-<button class="secondary" onclick="startScanner()">📷 Сканировать QR</button>
-<div id="sendStatus" class="status">Укажи адрес и количество.</div>
+
+<div class="small">
+Отправитель
+</div>
+
+<div id="sendFrom" class="mono" style="margin-top:5px">
+—
+</div>
+
+<input
+id="sendTo"
+placeholder="Адрес кошелька получателя"
+>
+
+<input
+id="sendAmount"
+type="number"
+min="0.00000001"
+step="0.00000001"
+placeholder="Количество SLX"
+>
+
+<div class="small" style="margin-top:8px">
+Комиссия сети:
+<span id="feeLabel">0.1</span> SLX
+</div>
+
+<div id="sendPreview" class="status">
+Введи сумму для предварительного расчёта.
+</div>
+
+<button id="sendBtn" onclick="prepareSend()">
+Продолжить
+</button>
+
+<button
+class="secondary"
+onclick="startScanner()"
+>
+📷 Сканировать QR
+</button>
+
+<div id="sendStatus" class="status">
+Укажи адрес и количество.
+</div>
+
+
+<div id="lastReceipt" class="receipt hidden">
+
+<div class="receipt-title">
+✓ Последняя транзакция
+</div>
+
+<div class="small">
+TX ID
+</div>
+
+<div
+id="receiptTxId"
+class="mono"
+style="margin-top:5px"
+>
+—
+</div>
+
+<button
+class="secondary"
+onclick="copyReceiptTx()"
+>
+Скопировать TX ID
+</button>
+
+</div>
+
 
 <div id="scannerCard" class="hidden" style="margin-top:12px">
-<div class="small">Наведите камеру на QR-код адреса.</div>
-<div class="scan-box"><video id="scanVideo" playsinline autoplay muted></video></div>
-<canvas id="scanCanvas"></canvas>
-<button class="danger" onclick="stopScanner()">Остановить сканер</button>
-</div>
+
+<div class="small">
+Наведите камеру на QR-код адреса.
 </div>
 
-<div class="card">
-<h2>Faucet</h2>
-<div class="muted">Получить тестовые SLX на активный кошелёк.</div>
-<button class="secondary" onclick="useFaucet()">Получить 10 SLX</button>
-<div id="faucetStatus" class="status">Готово.</div>
+<div class="scan-box">
+
+<video
+id="scanVideo"
+playsinline
+autoplay
+muted
+></video>
+
 </div>
+
+<canvas id="scanCanvas"></canvas>
+
+<button
+class="danger"
+onclick="stopScanner()"
+>
+Остановить сканер
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Faucet</h2>
+
+<div class="muted">
+Получить тестовые SLX на активный кошелёк.
+</div>
+
+<button
+class="secondary"
+onclick="useFaucet()"
+>
+Получить 10 SLX
+</button>
+
+<div id="faucetStatus" class="status">
+Готово.
+</div>
+
+</div>
+
 </section>
+
 
 <section id="pageWallet" class="hidden">
-<div class="card">
-<h2>QR моего кошелька</h2>
-<div id="qrcode" class="qr-wrap"></div>
-<div id="qrText" class="mono" style="text-align:center">—</div>
-<button class="secondary" onclick="copyActiveAddress()">Скопировать адрес</button>
-</div>
 
 <div class="card">
-<h2>Данные кошелька</h2>
-<div class="kv"><span>Адрес</span><span id="walletDataAddress" class="mono">—</span></div>
-<div class="kv"><span>Баланс</span><span id="walletDataBalance">0</span></div>
-<div class="kv"><span>Владелец</span><span id="walletDataOwner">—</span></div>
+
+<h2>QR моего кошелька</h2>
+
+<div id="qrcode" class="qr-wrap"></div>
+
+<div
+id="qrText"
+class="mono"
+style="text-align:center"
+>
+—
 </div>
+
+<button
+class="secondary"
+onclick="copyActiveAddress()"
+>
+Скопировать адрес
+</button>
+
+</div>
+
+
+<div class="card">
+
+<h2>Данные кошелька</h2>
+
+<div class="kv">
+<span>Адрес</span>
+<span id="walletDataAddress" class="mono">
+—
+</span>
+</div>
+
+<div class="kv">
+<span>Баланс</span>
+<span id="walletDataBalance">
+0
+</span>
+</div>
+
+<div class="kv">
+<span>Владелец</span>
+<span id="walletDataOwner">
+—
+</span>
+</div>
+
+</div>
+
 </section>
+
 
 <section id="pageHistory" class="hidden">
+
 <div class="card">
+
 <h2>История</h2>
-<div id="historyList" class="muted">Загрузка…</div>
+
+<div id="historyList" class="muted">
+Загрузка…
 </div>
+
+</div>
+
 </section>
+
 
 <section id="pageNetwork" class="hidden">
 
+
 <div class="card">
+
 <h2>Профиль</h2>
-<div id="profileInfo">Загрузка…</div>
+
+<div id="profileInfo">
+Загрузка…
 </div>
 
+</div>
+
+
 <div class="card">
+
 <h2>Сеть</h2>
-<div id="networkInfo">Загрузка…</div>
+
+<div id="networkInfo">
+Загрузка…
 </div>
 
+</div>
+
+
 <div class="card">
+
 <h2>Последние блоки</h2>
-<div id="blocksList" class="muted">Загрузка…</div>
+
+<div id="blocksList" class="muted">
+Загрузка…
 </div>
 
+</div>
+
+
 <div class="card">
+
 <h2>Экономика SLX</h2>
-<div id="economyInfo">Загрузка…</div>
+
+<div id="economyInfo">
+Загрузка…
 </div>
 
+</div>
+
+
 <div class="card">
-<button class="danger" onclick="logout()">Выйти из аккаунта</button>
+
+<h2>Безопасность</h2>
+
+<div id="securityInfo">
+Проверка…
+</div>
+
+</div>
+
+
+<div class="card">
+
+<button
+class="danger"
+onclick="logout()"
+>
+Выйти из аккаунта
+</button>
+
 </div>
 
 </section>
+
 </div>
 
+
 <div id="bottomNav" class="nav hidden">
+
 <div class="nav-inner">
-<button data-page="home" class="active" onclick="goPage('home')">🏠<br>Главная</button>
-<button data-page="wallet" onclick="goPage('wallet')">👛<br>Кошелёк</button>
-<button data-page="send" onclick="goPage('send')">📤<br>Отправить</button>
-<button data-page="history" onclick="goPage('history')">📜<br>История</button>
-<button data-page="network" onclick="goPage('network')">🌐<br>Сеть</button>
+
+<button
+data-page="home"
+class="active"
+onclick="goPage('home')"
+>
+🏠<br>Главная
+</button>
+
+<button
+data-page="wallet"
+onclick="goPage('wallet')"
+>
+👛<br>Кошелёк
+</button>
+
+<button
+data-page="send"
+onclick="goPage('send')"
+>
+📤<br>Отправить
+</button>
+
+<button
+data-page="history"
+onclick="goPage('history')"
+>
+📜<br>История
+</button>
+
+<button
+data-page="network"
+onclick="goPage('network')"
+>
+🌐<br>Сеть
+</button>
+
 </div>
+
 </div>
+
+
+<div id="sendConfirmModal" class="confirm-box hidden">
+
+<div class="confirm-panel">
+
+<div class="confirm-title">
+Подтверждение перевода
+</div>
+
+<div class="confirm-item">
+<span>Отправитель</span>
+<span id="confirmFrom" class="confirm-value mono">
+—
+</span>
+</div>
+
+<div class="confirm-item">
+<span>Получатель</span>
+<span id="confirmTo" class="confirm-value mono">
+—
+</span>
+</div>
+
+<div class="confirm-item">
+<span>Количество</span>
+<span id="confirmAmount" class="confirm-value">
+0 SLX
+</span>
+</div>
+
+<div class="confirm-item">
+<span>Комиссия</span>
+<span id="confirmFee" class="confirm-value">
+0 SLX
+</span>
+</div>
+
+<div class="confirm-item">
+<b>Итого</b>
+<b id="confirmTotal" class="confirm-value">
+0 SLX
+</b>
+</div>
+
+<button id="confirmSendBtn" onclick="confirmSend()">
+Подтвердить перевод
+</button>
+
+<button
+class="secondary"
+onclick="closeSendConfirm()"
+>
+Отмена
+</button>
+
+</div>
+
+</div>
+
 
 <script>
 const TOKEN_KEY='slx_token';
@@ -232,11 +1083,18 @@ let token=localStorage.getItem(TOKEN_KEY)||'';
 let currentUser=null;
 let wallets=[];
 let activeWallet=null;
+
 let scannerStream=null;
 let scannerRunning=false;
 let fee=0.1;
 
-function $(id){return document.getElementById(id)}
+let pendingSend=null;
+let sendLocked=false;
+
+function $(id){
+return document.getElementById(id);
+}
+
 
 function esc(value){
 return String(value??'').replace(/[&<>'"]/g,c=>({
@@ -248,10 +1106,12 @@ return String(value??'').replace(/[&<>'"]/g,c=>({
 }[c]));
 }
 
+
 function num(v){
 const n=Number(v);
 return Number.isFinite(n)?n:0;
 }
+
 
 function fmt(v){
 return num(v).toLocaleString('ru-RU',{
@@ -260,15 +1120,20 @@ maximumFractionDigits:8
 });
 }
 
+
 function shortAddr(v){
 const s=String(v??'');
-return s.length>28?s.slice(0,14)+'…'+s.slice(-10):s;
+return s.length>28
+?s.slice(0,14)+'…'+s.slice(-10)
+:s;
 }
+
 
 function setStatus(el,msg,ok=false){
 el.textContent=msg;
 el.className='status '+(ok?'ok':'');
 }
+
 
 function headers(extra={}){
 return Object.assign(
@@ -278,142 +1143,305 @@ extra
 );
 }
 
+
 async function api(path,options={}){
 const opts=Object.assign({},options);
+
 opts.headers=headers(options.headers||{});
 
 const res=await fetch(path,opts);
+
 const type=res.headers.get('content-type')||'';
-const data=type.includes('application/json')?await res.json():await res.text();
+
+const data=
+type.includes('application/json')
+?await res.json()
+:await res.text();
 
 if(!res.ok||(data&&data.success===false)){
-const message=data&&typeof data==='object'
+
+const message=
+data&&typeof data==='object'
 ?(data.error||data.message||'Ошибка запроса')
 :('HTTP '+res.status);
 
 const err=new Error(message);
+
 err.data=data;
 err.status=res.status;
+
 throw err;
 }
 
 return data;
 }
 
+
 function showAuth(mode){
-const login=mode==='login';
 
-$('loginForm').classList.toggle('hidden',!login);
-$('registerForm').classList.toggle('hidden',login);
-$('loginTab').classList.toggle('active',login);
-$('registerTab').classList.toggle('active',!login);
+const isLogin=mode==='login';
 
-setStatus($('authStatus'),'Готово.');
+$('loginForm')
+.classList.toggle('hidden',!isLogin);
+
+$('registerForm')
+.classList.toggle('hidden',isLogin);
+
+$('loginTab')
+.classList.toggle('active',isLogin);
+
+$('registerTab')
+.classList.toggle('active',!isLogin);
+
+setStatus(
+$('authStatus'),
+'Готово.'
+);
 }
 
+
+function togglePassword(id,button){
+
+const input=$(id);
+
+if(input.type==='password'){
+
+input.type='text';
+button.textContent='Скрыть';
+
+}else{
+
+input.type='password';
+button.textContent='Показать';
+
+}
+}
+
+
+function updatePasswordStrength(){
+
+const password=$('registerPassword').value;
+
+let score=0;
+
+if(password.length>=6)score++;
+if(password.length>=10)score++;
+if(/[A-ZА-Я]/.test(password))score++;
+if(/[0-9]/.test(password))score++;
+if(/[^A-Za-zА-Яа-я0-9]/.test(password))score++;
+
+const width=Math.min(score*20,100);
+
+$('strengthBar').style.width=width+'%';
+
+const text=[
+'Введите пароль.',
+'Очень слабый пароль.',
+'Слабый пароль.',
+'Средний пароль.',
+'Хороший пароль.',
+'Сильный пароль.'
+][score]||'Сильный пароль.';
+
+$('strengthText').textContent=text;
+}
+
+
 async function login(){
+
 const username=$('loginUsername').value.trim();
 const password=$('loginPassword').value;
 
 if(!username||!password){
-setStatus($('authStatus'),'Введи имя пользователя и пароль.');
+
+setStatus(
+$('authStatus'),
+'Введи имя пользователя и пароль.'
+);
+
 return;
 }
 
 $('loginBtn').disabled=true;
 
 try{
+
 const data=await api('/api/auth/login',{
 method:'POST',
-body:JSON.stringify({username,password})
+body:JSON.stringify({
+username,
+password
+})
 });
 
-if(data.token)token=data.token;
+if(data.token)
+token=data.token;
 
-if(!token)throw new Error('Сервер не вернул токен сессии.');
+if(!token)
+throw new Error(
+'Сервер не вернул токен сессии.'
+);
 
-localStorage.setItem(TOKEN_KEY,token);
+localStorage.setItem(
+TOKEN_KEY,
+token
+);
+
 await enterApp();
 
 }catch(e){
-setStatus($('authStatus'),e.message);
+
+setStatus(
+$('authStatus'),
+e.message
+);
+
+}finally{
+
+$('loginBtn').disabled=false;
+
+}
 }
 
-finally{
-$('loginBtn').disabled=false;
-}
-}
 
 async function register(){
-const username=$('registerUsername').value.trim();
-const password=$('registerPassword').value;
+
+const username=
+$('registerUsername').value.trim();
+
+const password=
+$('registerPassword').value;
 
 if(username.length<3){
-setStatus($('authStatus'),'Имя пользователя должно быть не короче 3 символов.');
+
+setStatus(
+$('authStatus'),
+'Имя пользователя должно быть не короче 3 символов.'
+);
+
 return;
 }
 
 if(password.length<6){
-setStatus($('authStatus'),'Пароль должен быть не короче 6 символов.');
+
+setStatus(
+$('authStatus'),
+'Пароль должен быть не короче 6 символов.'
+);
+
 return;
 }
 
 $('registerBtn').disabled=true;
 
 try{
+
 const data=await api('/api/auth/register',{
 method:'POST',
-body:JSON.stringify({username,password})
+body:JSON.stringify({
+username,
+password
+})
 });
 
-if(data.token)token=data.token;
+if(data.token)
+token=data.token;
 
-if(!token)throw new Error('Аккаунт создан. Теперь войди в него.');
+if(!token)
+throw new Error(
+'Аккаунт создан. Теперь войди в него.'
+);
 
-localStorage.setItem(TOKEN_KEY,token);
+localStorage.setItem(
+TOKEN_KEY,
+token
+);
+
 await enterApp();
 
 }catch(e){
-setStatus($('authStatus'),e.message);
+
+setStatus(
+$('authStatus'),
+e.message
+);
+
+}finally{
+
+$('registerBtn').disabled=false;
+
+}
 }
 
-finally{
-$('registerBtn').disabled=false;
-}
-}
 
 async function enterApp(){
-$('authScreen').classList.add('hidden');
-$('mainScreen').classList.remove('hidden');
-$('bottomNav').classList.remove('hidden');
+
+$('authScreen')
+.classList.add('hidden');
+
+$('mainScreen')
+.classList.remove('hidden');
+
+$('bottomNav')
+.classList.remove('hidden');
 
 await loadAll();
+
 goPage('home');
 }
 
+
 async function bootstrap(){
-if(!token)return;
+
+if(!token)
+return;
 
 try{
+
 await enterApp();
+
 }catch(e){
+
 token='';
+
 localStorage.removeItem(TOKEN_KEY);
-$('mainScreen').classList.add('hidden');
-$('bottomNav').classList.add('hidden');
-$('authScreen').classList.remove('hidden');
-setStatus($('authStatus'),'Сессия истекла. Войди снова.');
+
+$('mainScreen')
+.classList.add('hidden');
+
+$('bottomNav')
+.classList.add('hidden');
+
+$('authScreen')
+.classList.remove('hidden');
+
+setStatus(
+$('authStatus'),
+'Сессия истекла. Войди снова.'
+);
+
 }
 }
+
 
 async function loadAll(){
-setStatus($('topStatus'),'Загрузка данных…');
 
-const me=await api('/api/auth/me');
+setStatus(
+$('topStatus'),
+'Загрузка данных…'
+);
 
-currentUser=me.user||me.account||me;
+const me=
+await api('/api/auth/me');
 
-const feeData=await api('/api/status').catch(()=>null);
+currentUser=
+me.user||
+me.account||
+me;
+
+const feeData=
+await api('/api/status')
+.catch(()=>null);
 
 if(feeData&&feeData.transferFee!=null)
 fee=num(feeData.transferFee);
@@ -421,129 +1449,242 @@ fee=num(feeData.transferFee);
 if(feeData&&feeData.fee!=null)
 fee=num(feeData.fee);
 
-$('feeLabel').textContent=fmt(fee);
+$('feeLabel').textContent=
+fmt(fee);
 
 await loadWallets();
 await refreshActiveWallet();
 await loadProfile();
 await loadNetwork();
 
-setStatus($('topStatus'),'Сеть подключена.',true);
+setStatus(
+$('topStatus'),
+'Сеть подключена.',
+true
+);
+
+renderSecurity();
 }
 
+
 function normalizeWalletList(data){
-if(Array.isArray(data))return data;
-if(data&&Array.isArray(data.wallets))return data.wallets;
-if(data&&Array.isArray(data.items))return data.items;
+
+if(Array.isArray(data))
+return data;
+
+if(data&&Array.isArray(data.wallets))
+return data.wallets;
+
+if(data&&Array.isArray(data.items))
+return data.items;
+
 return[];
 }
 
+
 function walletIdOf(w){
-return w&&(w.id||w.walletId||w.addressId||w.wallet);
+
+return w&&(
+w.id||
+w.walletId||
+w.addressId||
+w.wallet
+);
 }
+
 
 function walletAddressOf(w){
-return w&&(w.address||w.walletAddress||w.id);
+
+return w&&(
+w.address||
+w.walletAddress||
+w.id
+);
 }
 
-async function loadWallets(){
-const data=await api('/api/wallets');
 
-wallets=normalizeWalletList(data);
+async function loadWallets(){
+
+const data=
+await api('/api/wallets');
+
+wallets=
+normalizeWalletList(data);
 
 if(!wallets.length&&data&&data.wallet)
 wallets=[data.wallet];
 
-let saved=localStorage.getItem(ACTIVE_WALLET_KEY);
+let saved=
+localStorage.getItem(
+ACTIVE_WALLET_KEY
+);
 
-let activeId=data&&(data.currentWalletId||data.walletId||data.activeWalletId);
+let activeId=
+data&&(
+data.currentWalletId||
+data.walletId||
+data.activeWalletId
+);
 
-if(!activeId)activeId=saved;
-if(!activeId&&wallets[0])activeId=walletIdOf(wallets[0]);
+if(!activeId)
+activeId=saved;
+
+if(!activeId&&wallets[0])
+activeId=walletIdOf(wallets[0]);
 
 if(activeId)
-localStorage.setItem(ACTIVE_WALLET_KEY,activeId);
+localStorage.setItem(
+ACTIVE_WALLET_KEY,
+activeId
+);
 
 renderWalletList(activeId);
 }
 
+
 function renderWalletList(activeId){
+
 if(!wallets.length){
-$('walletList').innerHTML='<div class="muted">Кошельков пока нет.</div>';
+
+$('walletList').innerHTML=
+'<div class="muted">Кошельков пока нет.</div>';
+
 return;
 }
 
-$('walletList').innerHTML=wallets.map(w=>{
+$('walletList').innerHTML=
+wallets.map(w=>{
+
 const id=walletIdOf(w);
 const address=walletAddressOf(w);
-const active=String(id)===String(activeId);
+
+const active=
+String(id)===String(activeId);
 
 return `
-<button class="wallet-item ${active?'active':''}" data-wallet-id="${esc(id)}">
+<button
+class="wallet-item ${active?'active':''}"
+data-wallet-id="${esc(id)}"
+>
 <div class="wallet-top">
-<span class="wallet-id">Кошелёк ${esc(shortAddr(id))}</span>
-<span class="wallet-bal">${esc(fmt(w.balance))} SLX</span>
+
+<span class="wallet-id">
+Кошелёк ${esc(shortAddr(id))}
+</span>
+
+<span class="wallet-bal">
+${esc(fmt(w.balance))} SLX
+</span>
+
 </div>
-<div class="addr">${esc(address||id)}</div>
-</button>`;
+
+<div class="addr">
+${esc(address||id)}
+</div>
+
+</button>
+`;
+
 }).join('');
 }
 
-$('walletList').addEventListener('click',async event=>{
-const btn=event.target.closest('[data-wallet-id]');
 
-if(!btn)return;
+$('walletList').addEventListener(
+'click',
+async event=>{
+
+const btn=
+event.target.closest('[data-wallet-id]');
+
+if(!btn)
+return;
 
 event.preventDefault();
 
-await selectWallet(btn.dataset.walletId);
-});
+await selectWallet(
+btn.dataset.walletId
+);
+
+}
+);
+
 
 async function selectWallet(id){
-if(!id)return;
 
-setStatus($('topStatus'),'Переключение кошелька…');
+if(!id)
+return;
+
+setStatus(
+$('topStatus'),
+'Переключение кошелька…'
+);
 
 try{
 
 await api('/api/wallet/select',{
 method:'POST',
-body:JSON.stringify({walletId:id})
+body:JSON.stringify({
+walletId:id
+})
 });
 
-localStorage.setItem(ACTIVE_WALLET_KEY,id);
+localStorage.setItem(
+ACTIVE_WALLET_KEY,
+id
+);
 
 await loadWallets();
 await refreshActiveWallet();
 
-setStatus($('topStatus'),'Кошелёк выбран.',true);
+setStatus(
+$('topStatus'),
+'Кошелёк выбран.',
+true
+);
 
 await loadHistory();
 await renderWalletQR();
 
 }catch(e){
-setStatus($('topStatus'),e.message);
+
+setStatus(
+$('topStatus'),
+e.message
+);
+
 }
 }
+
 
 async function createNewWallet(){
-const btn=$('newWalletBtn');
+
+const btn=
+$('newWalletBtn');
 
 btn.disabled=true;
+
 btn.textContent='Создание…';
 
 try{
 
-const data=await api('/api/wallet/create',{
+const data=
+await api('/api/wallet/create',{
 method:'POST',
 body:JSON.stringify({})
 });
 
-const w=data.wallet||data;
-const id=walletIdOf(w);
+const w=
+data.wallet||
+data;
+
+const id=
+walletIdOf(w);
 
 if(id)
-localStorage.setItem(ACTIVE_WALLET_KEY,id);
+localStorage.setItem(
+ACTIVE_WALLET_KEY,
+id
+);
 
 await loadWallets();
 
@@ -552,701 +1693,75 @@ await selectWallet(id);
 else
 await refreshActiveWallet();
 
-setStatus($('topStatus'),'Новый кошелёк создан.',true);
-
-}catch(e){
-setStatus($('topStatus'),e.message);
-}
-
-finally{
-btn.disabled=false;
-btn.textContent='＋ Новый кошелёк';
-}
-}
-
-async function refreshActiveWallet(){
-const saved=localStorage.getItem(ACTIVE_WALLET_KEY);
-
-let candidate=saved;
-
-if(!candidate&&wallets[0])
-candidate=walletIdOf(wallets[0]);
-
-if(!candidate){
-activeWallet=null;
-renderActive();
-return;
-}
-
-try{
-
-const data=await api('/api/wallet/'+encodeURIComponent(candidate));
-
-activeWallet=data.wallet||data;
-
-}catch(e){
-
-const found=wallets.find(
-w=>String(walletIdOf(w))===String(candidate)
+setStatus(
+$('topStatus'),
+'Новый кошелёк создан.',
+true
 );
-
-activeWallet=found||null;
-}
-
-if(activeWallet)
-localStorage.setItem(
-ACTIVE_WALLET_KEY,
-walletIdOf(activeWallet)
-);
-
-renderActive();
-await renderWalletQR();
-await loadHistory();
-}
-
-function renderActive(){
-const id=activeWallet?walletIdOf(activeWallet):'—';
-const address=activeWallet?walletAddressOf(activeWallet):'—';
-const balance=activeWallet?activeWallet.balance:0;
-
-$('activeAddress').textContent=address||id;
-$('balance').textContent=fmt(balance);
-$('sendFrom').textContent=address||id;
-$('walletDataAddress').textContent=address||id;
-$('walletDataBalance').textContent=fmt(balance)+' SLX';
-
-$('walletDataOwner').textContent=
-(activeWallet&&(
-activeWallet.ownerId||
-activeWallet.owner_id||
-currentUser?.username||
-''
-))||'—';
-}
-
-async function copyActiveAddress(){
-const address=walletAddressOf(activeWallet);
-
-if(!address)return;
-
-try{
-
-await navigator.clipboard.writeText(address);
-
-setStatus($('topStatus'),'Адрес скопирован.',true);
 
 }catch(e){
 
 setStatus(
 $('topStatus'),
-'Скопируй адрес вручную: '+address
-);
-}
-}
-
-async function sendSLX(){
-if(!activeWallet){
-setStatus($('sendStatus'),'Сначала выбери кошелёк.');
-return;
-}
-
-const to=$('sendTo').value.trim();
-const amount=num($('sendAmount').value);
-
-if(!to){
-setStatus($('sendStatus'),'Введи адрес получателя.');
-return;
-}
-
-if(amount<=0){
-setStatus($('sendStatus'),'Количество должно быть больше нуля.');
-return;
-}
-
-if(amount+fee>num(activeWallet.balance)){
-setStatus($('sendStatus'),'Недостаточно SLX с учётом комиссии сети.');
-return;
-}
-
-$('sendBtn').disabled=true;
-
-try{
-
-const body={
-fromWalletId:walletIdOf(activeWallet),
-to,
-amount
-};
-
-const data=await api('/api/send',{
-method:'POST',
-body:JSON.stringify(body)
-});
-
-$('sendAmount').value='';
-$('sendTo').value='';
-
-const tx=data.transaction||data.tx||data;
-
-setStatus(
-$('sendStatus'),
-'Перевод выполнен'+
-(tx.id||tx.txid?': '+(tx.id||tx.txid):'.'),
-true
+e.message
 );
 
-await loadWallets();
-await refreshActiveWallet();
-await loadNetwork();
+}finally{
 
-}catch(e){
-setStatus($('sendStatus'),e.message);
-}
+btn.disabled=false;
+btn.textContent='＋ Новый кошелёк';
 
-finally{
-$('sendBtn').disabled=false;
 }
 }
 
-async function useFaucet(){
-if(!activeWallet){
-setStatus($('faucetStatus'),'Сначала выбери кошелёк.');
-return;
-}
 
-try{
+async function refreshActiveWallet(){
 
-await api('/api/faucet',{
-method:'POST',
-body:JSON.stringify({
-walletId:walletIdOf(activeWallet)
-})
-});
-
-setStatus(
-$('faucetStatus'),
-'Получено 10 SLX на активный кошелёк.',
-true
+const saved=
+localStorage.getItem(
+ACTIVE_WALLET_KEY
 );
 
-await loadWallets();
-await refreshActiveWallet();
-await loadNetwork();
+let candidate=saved;
 
-}catch(e){
-setStatus($('faucetStatus'),e.message);
-}
-}
+if(!candidate&&wallets[0])
+candidate=
+walletIdOf(wallets[0]);
 
-async function renderWalletQR(){
-const q=$('qrcode');
+if(!candidate){
 
-q.innerHTML='';
-
-const address=walletAddressOf(activeWallet);
-
-$('qrText').textContent=address||'—';
-
-if(!address)return;
-
-try{
-
-new QRCode(q,{
-text:address,
-width:220,
-height:220,
-correctLevel:QRCode.CorrectLevel.M
-});
-
-}catch(e){
-
-q.innerHTML=
-'<div class="muted">Не удалось создать QR на этом устройстве.</div>';
-}
-}
-
-function showQR(){
-goPage('wallet');
-}
-
-async function startScanner(){
-if(!window.isSecureContext){
-setStatus(
-$('sendStatus'),
-'Камера требует HTTPS. Открой сайт через Render HTTPS.'
-);
-return;
-}
-
-if(scannerRunning)return;
-
-try{
-
-scannerStream=
-await navigator.mediaDevices.getUserMedia({
-video:{facingMode:{ideal:'environment'}},
-audio:false
-});
-
-$('scannerCard').classList.remove('hidden');
-
-$('scanVideo').srcObject=scannerStream;
-
-scannerRunning=true;
-
-requestAnimationFrame(scanFrame);
-
-}catch(e){
-
-setStatus(
-$('sendStatus'),
-'Не удалось открыть камеру. Разреши доступ к камере в Safari.'
-);
-}
-}
-
-function scanFrame(){
-if(!scannerRunning)return;
-
-const video=$('scanVideo');
-const canvas=$('scanCanvas');
-
-if(video.readyState<2){
-requestAnimationFrame(scanFrame);
-return;
-}
-
-canvas.width=video.videoWidth||640;
-canvas.height=video.videoHeight||480;
-
-const ctx=canvas.getContext('2d',{
-willReadFrequently:true
-});
-
-ctx.drawImage(
-video,
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-const img=ctx.getImageData(
-0,
-0,
-canvas.width,
-canvas.height
-);
-
-const code=window.jsQR?
-jsQR(
-img.data,
-img.width,
-img.height,
-{inversionAttempts:'dontInvert'}
-):null;
-
-if(code&&code.data){
-
-$('sendTo').value=code.data;
-
-setStatus(
-$('sendStatus'),
-'QR считан. Адрес вставлен в поле получателя.',
-true
-);
-
-stopScanner();
-
-return;
-}
-
-requestAnimationFrame(scanFrame);
-}
-
-function stopScanner(){
-scannerRunning=false;
-
-if(scannerStream){
-scannerStream.getTracks().forEach(t=>t.stop());
-scannerStream=null;
-}
-
-$('scanVideo').srcObject=null;
-$('scannerCard').classList.add('hidden');
-}
-
-async function loadHistory(){
-if(!activeWallet){
-$('historyList').textContent='Кошелёк не выбран.';
-return;
-}
-
-try{
-
-const data=await api(
-'/api/wallet/'+encodeURIComponent(
-walletIdOf(activeWallet)
-)
-);
-
-const txs=
-data.transactions||
-data.history||
-(data.wallet&&(
-data.wallet.transactions||
-data.wallet.history
-))||[];
-
-if(!Array.isArray(txs)||!txs.length){
-
-$('historyList').textContent='Транзакций пока нет.';
-return;
-}
-
-$('historyList').innerHTML=
-txs.slice().reverse().map(t=>{
-
-const type=t.type||t.direction||'TRANSACTION';
-const amount=num(t.amount);
-const from=t.fromWallet||t.from_wallet||t.from||'';
-const to=t.toWallet||t.to_wallet||t.to||'';
-const created=t.createdAt||t.created_at||t.time||'';
-const id=t.id||t.txid||'';
-
-return `
-<div class="tx">
-<div class="tx-head">
-<b>${esc(type)}</b>
-<span class="tx-amount">
-${amount?esc(fmt(amount))+' SLX':''}
-</span>
-</div>
-
-${from?
-`<div class="small">
-От: <span class="mono">${esc(shortAddr(from))}</span>
-</div>`:''}
-
-${to?
-`<div class="small">
-Кому: <span class="mono">${esc(shortAddr(to))}</span>
-</div>`:''}
-
-${id?
-`<div class="small mono">${esc(id)}</div>`:''}
-
-${created?
-`<div class="small">
-${esc(new Date(created).toLocaleString('ru-RU'))}
-</div>`:''}
-
-</div>`;
-}).join('');
-
-}catch(e){
-
-$('historyList').textContent=
-'Не удалось загрузить историю: '+e.message;
-}
-}
-
-async function loadProfile(){
-const box=$('profileInfo');
-
-try{
-
-const me=await api('/api/auth/me');
-
-currentUser=me.user||me.account||me;
-
-const username=
-currentUser?.username||
-currentUser?.name||
-currentUser?.login||
-'Пользователь';
-
-const userId=
-currentUser?.id||
-currentUser?.userId||
-'—';
-
-const walletCount=wallets.length;
-
-const firstLetter=
-String(username).charAt(0).toUpperCase();
-
-box.innerHTML=`
-<div class="profile-avatar">${esc(firstLetter)}</div>
-
-<div class="profile-name">
-${esc(username)}
-</div>
-
-<div class="profile-id">
-ID: <span class="mono">${esc(userId)}</span>
-</div>
-
-<div style="margin-top:15px">
-<div class="kv">
-<span>Кошельков</span>
-<b>${esc(walletCount)}</b>
-</div>
-
-<div class="kv">
-<span>Активный кошелёк</span>
-<b>${esc(shortAddr(walletAddressOf(activeWallet)||'—'))}</b>
-</div>
-
-<div class="kv">
-<span>Баланс</span>
-<b>${esc(fmt(activeWallet?.balance||0))} SLX</b>
-</div>
-</div>
-`;
-
-}catch(e){
-
-box.innerHTML=
-'<div class="muted">Не удалось загрузить профиль: '+
-esc(e.message)+
-'</div>';
-}
-}
-
-async function loadNetwork(){
-
-const [status,blocks,economy]=await Promise.all([
-
-api('/api/status')
-.catch(e=>({error:e.message})),
-
-api('/api/blocks')
-.catch(e=>({error:e.message})),
-
-api('/api/economy')
-.catch(e=>({error:e.message}))
-
-]);
-
-if(status.error){
-
-$('networkInfo').textContent=status.error;
-
-}else{
-
-const version=status.version??'—';
-const users=status.users??status.userCount??'—';
-const walletCount=status.wallets??status.walletCount??'—';
-const supply=status.supply??status.circulatingSupply??'—';
-
-$('networkInfo').innerHTML=`
-
-<div class="kv">
-<span>Версия</span>
-<b>${esc(version)}</b>
-</div>
-
-<div class="kv">
-<span>Пользователи</span>
-<b>${esc(users)}</b>
-</div>
-
-<div class="kv">
-<span>Кошельки</span>
-<b>${esc(walletCount)}</b>
-</div>
-
-<div class="kv">
-<span>Supply</span>
-<b>${esc(fmt(supply))} SLX</b>
-</div>
-
-<div class="kv">
-<span>Комиссия</span>
-<b>${esc(fmt(status.transferFee??status.fee??fee))} SLX</b>
-</div>
-
-<div class="kv">
-<span>Faucet</span>
-<b>${esc(fmt(status.faucetAmount??status.faucet??10))} SLX</b>
-</div>
-`;
-}
-
-const list=
-Array.isArray(blocks)?
-blocks:
-(blocks.blocks||blocks.items||[]);
-
-if(blocks.error){
-
-$('blocksList').textContent=blocks.error;
-
-}else if(!list.length){
-
-$('blocksList').textContent='Блоков пока нет.';
-
-}else{
-
-$('blocksList').innerHTML=
-list.slice()
-.reverse()
-.slice(0,12)
-.map(b=>`
-
-<div class="tx">
-
-<div class="tx-head">
-<b>#${esc(b.blockIndex??b.index??'—')}</b>
-<span>${esc(b.transactionCount??b.transaction_count??0)} tx</span>
-</div>
-
-<div class="small mono">
-${esc(b.hash||'—')}
-</div>
-
-<div class="small">
-prev:
-<span class="mono">
-${esc(shortAddr(
-b.previousHash||
-b.previous_hash||
-'—'
-))}
-</span>
-</div>
-
-</div>
-
-`).join('');
-}
-
-if(economy.error){
-
-$('economyInfo').textContent=economy.error;
-
-}else{
-
-const max=
-economy.maxSupply||
-economy.max_supply||
-21000000;
-
-const circulating=
-economy.circulatingSupply||
-economy.supply||
-economy.totalSupply||
-0;
-
-$('economyInfo').innerHTML=`
-
-<div class="kv">
-<span>Максимальный supply</span>
-<b>${esc(fmt(max))} SLX</b>
-</div>
-
-<div class="kv">
-<span>Текущий supply</span>
-<b>${esc(fmt(circulating))} SLX</b>
-</div>
-
-<div class="kv">
-<span>Комиссия</span>
-<b>${esc(fmt(
-economy.transferFee||
-economy.fee||
-fee
-))} SLX</b>
-</div>
-
-<div class="kv">
-<span>Faucet</span>
-<b>${esc(fmt(
-economy.faucetAmount||
-economy.faucet||
-10
-))} SLX</b>
-</div>
-`;
-}
-}
-
-function goPage(id){
-
-const pages=[
-'home',
-'send',
-'wallet',
-'history',
-'network'
-];
-
-pages.forEach(p=>{
-$('page'+p.charAt(0).toUpperCase()+p.slice(1))
-.classList.toggle('hidden',p!==id);
-});
-
-document.querySelectorAll('.nav button')
-.forEach(b=>{
-b.classList.toggle(
-'active',
-b.dataset.page===id
-);
-});
-
-if(id==='history')
-loadHistory();
-
-if(id==='wallet')
-renderWalletQR();
-
-if(id==='network'){
-loadProfile();
-loadNetwork();
-}
-
-window.scrollTo({
-top:0,
-behavior:'smooth'
-});
-}
-
-async function logout(){
-
-stopScanner();
-
-try{
-
-await api('/api/auth/logout',{
-method:'POST',
-body:JSON.stringify({})
-});
-
-}catch(e){}
-
-token='';
-currentUser=null;
-wallets=[];
 activeWallet=null;
 
-localStorage.removeItem(TOKEN_KEY);
-localStorage.removeItem(ACTIVE_WALLET_KEY);
+renderActive();
 
-$('mainScreen').classList.add('hidden');
-$('bottomNav').classList.add('hidden');
-$('authScreen').classList.remove('hidden');
-
-showAuth('login');
-
-setStatus(
-$('authStatus'),
-'Ты вышел из аккаунта.'
-);
+return;
 }
 
-bootstrap();
-</script>
+try{
 
-</body>
-</html>
+const data=
+await api(
+'/api/wallet/'+encodeURIComponent(candidate)
+);
+
+activeWallet=
+data.wallet||
+data;
+
+}catch(e){
+
+const found=
+wallets.find(
+w=>
+String(walletIdOf(w))===
+String(candidate)
+);
+
+activeWallet=
+found||
+null;
+}
+
+if(activeWallet){
+
+localStorage.setItem(
