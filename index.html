@@ -7,180 +7,405 @@
 <title>SLX Network v1.9.0</title>
 
 <style>
-*{box-sizing:border-box}
-html,body{margin:0;padding:0;background:#070a10;color:#f4f6fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-body{min-height:100vh}
-button,input{font:inherit}
-button{cursor:pointer}
-.app{max-width:680px;margin:auto;padding:28px 18px 100px}
-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:28px}
-.logo{font-size:44px;font-weight:800;letter-spacing:-2px}
-.sub{font-size:20px;color:#8f9bad;margin-top:8px}
-.badge{padding:12px 18px;border:1px solid #17643c;border-radius:30px;color:#35d47a;background:#091c13;font-weight:700}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
-.card{background:#0d121c;border:1px solid #202a3b;border-radius:30px;padding:26px;margin-bottom:18px;box-shadow:0 15px 40px #0004}
-.tabs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
-.tab{height:96px;border-radius:25px;border:1px solid #29354a;background:#101722;color:#9ca7b8;font-size:27px;font-weight:800}
-.tab.active{background:#5365ff;color:white;border-color:#5365ff}
+html,body{
+  margin:0;
+  padding:0;
+  background:#070a10;
+  color:#f4f6fb;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+}
 
-h1{font-size:38px;margin:10px 0 12px}
-h2{font-size:25px;margin:0 0 16px}
-p{color:#8f9bad;font-size:18px;line-height:1.45}
+body{
+  min-height:100vh;
+}
+
+button,input{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  width:100%;
+  max-width:680px;
+  margin:auto;
+  padding:22px 18px 110px;
+}
+
+header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  margin-bottom:28px;
+}
+
+.logo{
+  font-size:43px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-2px;
+}
+
+.version{
+  margin-top:12px;
+  color:#8d9aae;
+  font-size:18px;
+  font-weight:700;
+}
+
+.badge{
+  border:2px solid #145d3d;
+  background:#0b2118;
+  color:#39d889;
+  border-radius:30px;
+  padding:12px 18px;
+  font-weight:800;
+  margin-top:35px;
+}
+
+.card{
+  background:#0d121c;
+  border:2px solid #202a3b;
+  border-radius:30px;
+  padding:24px;
+  margin-bottom:18px;
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin-bottom:24px;
+}
+
+.tab{
+  border:2px solid #253147;
+  background:#111824;
+  color:#9ba8bb;
+  border-radius:24px;
+  padding:20px 10px;
+  font-size:25px;
+  font-weight:900;
+}
+
+.tab.active{
+  background:#5265ff;
+  border-color:#5265ff;
+  color:white;
+}
+
+h1,h2,h3{
+  margin:0 0 14px;
+}
+
+h1{
+  font-size:38px;
+  letter-spacing:-1px;
+}
+
+h2{
+  font-size:28px;
+}
+
+p{
+  color:#929eb1;
+  font-size:17px;
+  line-height:1.45;
+  font-weight:650;
+}
+
+label{
+  display:block;
+  color:#8f9bad;
+  margin:16px 0 8px;
+  font-weight:800;
+}
 
 input{
- width:100%;
- height:74px;
- border-radius:23px;
- border:1px solid #29354a;
- background:#080c13;
- color:white;
- padding:0 28px;
- margin:8px 0;
- outline:none;
- font-size:21px;
+  width:100%;
+  border:2px solid #263248;
+  background:#080d14;
+  color:white;
+  border-radius:20px;
+  padding:19px;
+  outline:none;
+  font-size:19px;
 }
-input:focus{border-color:#5365ff}
-input::placeholder{color:#667185}
 
-.primary,.secondary,.danger{
- width:100%;
- min-height:68px;
- border:0;
- border-radius:22px;
- font-size:22px;
- font-weight:800;
- margin-top:12px;
+input:focus{
+  border-color:#5265ff;
 }
-.primary{background:#5365ff;color:white}
-.secondary{background:#151c28;color:white;border:1px solid #2a3548}
-.danger{background:#3a141a;color:#ff7f8d;border:1px solid #74303a}
 
-.alert{
- padding:18px 22px;
- border-radius:20px;
- margin-bottom:18px;
- font-size:19px;
- font-weight:700;
- background:#32151b;
- border:1px solid #7b303b;
- color:#ff9aa5;
+.primary{
+  width:100%;
+  border:0;
+  background:#5265ff;
+  color:white;
+  border-radius:20px;
+  padding:19px;
+  margin-top:18px;
+  font-size:21px;
+  font-weight:900;
 }
+
+.primary:active{
+  transform:scale(.98);
+}
+
+.secondary{
+  width:100%;
+  border:2px solid #28354a;
+  background:#111824;
+  color:#dce2ed;
+  border-radius:18px;
+  padding:15px;
+  margin-top:10px;
+  font-weight:800;
+}
+
+.danger{
+  border-color:#71323d;
+  color:#ff8d9b;
+}
+
+.error{
+  background:#32151b;
+  border:2px solid #813441;
+  color:#ff9aaa;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:18px;
+  font-weight:800;
+}
+
 .success{
- background:#0d2b1c;
- border-color:#216c47;
- color:#63e49b;
+  background:#10291e;
+  border:2px solid #216344;
+  color:#69e7a3;
+  border-radius:18px;
+  padding:16px;
+  margin-bottom:18px;
+  font-weight:800;
 }
 
-.hidden{display:none!important}
+.hidden{
+  display:none!important;
+}
 
 .balance{
- text-align:center;
- font-size:52px;
- font-weight:800;
- margin:10px 0;
+  font-size:48px;
+  font-weight:900;
+  letter-spacing:-2px;
+  margin:10px 0;
 }
-.unit{font-size:20px;color:#8290a5}
+
+.unit{
+  color:#69778d;
+  font-size:20px;
+}
+
 .address{
- background:#080c13;
- border:1px solid #222d3e;
- padding:15px;
- border-radius:16px;
- word-break:break-all;
- color:#aab4c4;
- font-size:14px;
+  background:#080d14;
+  border:1px solid #253148;
+  border-radius:16px;
+  padding:13px;
+  word-break:break-all;
+  color:#7ee7ae;
+  font-family:monospace;
+  font-size:13px;
 }
 
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.stat{background:#0a0f17;border:1px solid #202a3a;border-radius:20px;padding:18px}
-.stat b{display:block;font-size:25px;margin-top:5px}
-.stat span{color:#7f8b9e}
-
-.wallet{
- border:1px solid #263249;
- background:#0a0f17;
- border-radius:20px;
- padding:18px;
- margin:10px 0;
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
 }
-.wallet.active{border-color:#5365ff}
-.wallet-title{font-size:20px;font-weight:800}
-.wallet-balance{font-size:30px;font-weight:800;margin:8px 0}
-.wallet-address{font-size:12px;color:#7f8b9e;word-break:break-all}
+
+.stat{
+  background:#080d14;
+  border:1px solid #253148;
+  border-radius:18px;
+  padding:17px;
+}
+
+.stat-title{
+  color:#7f8da2;
+  font-size:13px;
+  font-weight:800;
+}
+
+.stat-value{
+  margin-top:6px;
+  font-size:22px;
+  font-weight:900;
+}
 
 .tx{
- padding:15px 0;
- border-bottom:1px solid #202838;
+  background:#080d14;
+  border:1px solid #253148;
+  border-radius:18px;
+  padding:15px;
+  margin-top:10px;
 }
-.tx:last-child{border-bottom:0}
-.tx-top{display:flex;justify-content:space-between;gap:10px}
-.send{color:#ff7888}
-.receive,.faucet{color:#54df94}
-.muted{color:#78859a;font-size:14px;margin-top:5px}
+
+.tx-top{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.tx-type{
+  font-weight:900;
+}
+
+.tx-amount{
+  font-weight:900;
+}
+
+.green{
+  color:#50df92;
+}
+
+.red{
+  color:#ff7788;
+}
+
+.muted{
+  color:#748197;
+  font-size:13px;
+  margin-top:6px;
+  word-break:break-all;
+}
+
+.wallet{
+  background:#080d14;
+  border:2px solid #253148;
+  border-radius:20px;
+  padding:17px;
+  margin-top:10px;
+}
+
+.wallet.active{
+  border-color:#5265ff;
+}
+
+.wallet-name{
+  font-size:18px;
+  font-weight:900;
+}
+
+.wallet-balance{
+  font-size:25px;
+  font-weight:900;
+  margin-top:6px;
+}
+
+.bottom{
+  position:fixed;
+  left:50%;
+  bottom:12px;
+  transform:translateX(-50%);
+  width:min(650px,calc(100% - 24px));
+  background:#10151e;
+  border:2px solid #222c3c;
+  border-radius:24px;
+  padding:8px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:5px;
+  z-index:20;
+  backdrop-filter:blur(15px);
+}
 
 .nav{
- position:fixed;
- bottom:0;
- left:0;
- right:0;
- background:#0b0f17ee;
- backdrop-filter:blur(18px);
- border-top:1px solid #20293a;
- padding:10px 10px calc(10px + env(safe-area-inset-bottom));
- display:grid;
- grid-template-columns:repeat(5,1fr);
- z-index:10;
+  border:0;
+  background:transparent;
+  color:#718097;
+  padding:10px 4px;
+  border-radius:16px;
+  font-size:12px;
+  font-weight:900;
 }
-.nav button{
- background:none;
- border:0;
- color:#778398;
- font-size:12px;
- font-weight:700;
+
+.nav.active{
+  background:#202b46;
+  color:white;
 }
-.nav button.active{color:#fff}
-.nav-icon{display:block;font-size:23px;margin-bottom:3px}
+
+.nav-icon{
+  display:block;
+  font-size:20px;
+  margin-bottom:2px;
+}
+
+.recovery{
+  background:#17120a;
+  border:2px solid #765b22;
+  color:#ffd878;
+  border-radius:18px;
+  padding:17px;
+  margin-top:15px;
+}
+
+.code{
+  margin-top:10px;
+  padding:14px;
+  background:#080d14;
+  border-radius:12px;
+  font-family:monospace;
+  font-size:19px;
+  word-break:break-all;
+  color:#ffe48b;
+}
 
 .modal{
- position:fixed;
- inset:0;
- background:#0009;
- display:flex;
- align-items:center;
- justify-content:center;
- padding:20px;
- z-index:20;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:50;
 }
+
 .modal-box{
- width:min(500px,100%);
- background:#0e141e;
- border:1px solid #29354a;
- border-radius:28px;
- padding:25px;
-}
-.recovery{
- background:#07140d;
- border:1px solid #276844;
- border-radius:18px;
- padding:20px;
- font-size:25px;
- font-weight:800;
- letter-spacing:2px;
- text-align:center;
- word-break:break-word;
- color:#65e59b;
+  width:100%;
+  max-width:520px;
+  background:#0d121c;
+  border:2px solid #263147;
+  border-radius:28px;
+  padding:24px;
 }
 
-.small{font-size:14px;color:#707d91}
-.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
-button:disabled{opacity:.5;cursor:not-allowed}
+@media(max-width:430px){
+  .logo{
+    font-size:39px;
+  }
 
-@media(max-width:500px){
- .logo{font-size:39px}
- .sub{font-size:17px}
- .badge{padding:10px 13px;font-size:13px}
- h1{font-size:34px}
- .balance{font-size:44px}
- .card{padding:20px;border-radius:25px}
+  .badge{
+    font-size:14px;
+    padding:10px 13px;
+  }
+
+  .card{
+    padding:18px;
+  }
+
+  h1{
+    font-size:34px;
+  }
+
+  .balance{
+    font-size:42px;
+  }
 }
 </style>
 </head>
@@ -192,301 +417,503 @@ button:disabled{opacity:.5;cursor:not-allowed}
 <header>
   <div>
     <div class="logo">SLX Network</div>
-    <div class="sub">v1.9.0 · Simple Testnet</div>
+    <div class="version">v1.9.0 · Simple Testnet</div>
   </div>
+
   <div class="badge">TESTNET</div>
 </header>
-
-<div id="alert" class="alert hidden"></div>
 
 <!-- AUTH -->
 <section id="auth">
 
-<div class="card">
+  <div class="card">
 
-<div class="tabs">
-<button id="loginTab" class="tab active" onclick="showAuth('login')">Вход</button>
-<button id="registerTab" class="tab" onclick="showAuth('register')">Регистрация</button>
-</div>
+    <div class="tabs">
+      <button id="loginTab" class="tab active" onclick="showAuth('login')">
+        Вход
+      </button>
 
-<!-- LOGIN -->
-<div id="loginForm">
-<h1>Вход</h1>
-<p>Войдите в свой SLX аккаунт.</p>
+      <button id="registerTab" class="tab" onclick="showAuth('register')">
+        Регистрация
+      </button>
+    </div>
 
-<input id="loginUser" placeholder="Имя пользователя" autocomplete="username">
-<input id="loginPass" type="password" placeholder="Пароль" autocomplete="current-password">
+    <div id="authMessage"></div>
 
-<button class="primary" onclick="login()">Войти в SLX Network</button>
+    <!-- LOGIN -->
 
-<button class="secondary" onclick="showRecovery()">
-Восстановить пароль
-</button>
-</div>
+    <div id="loginBox">
 
-<!-- REGISTER -->
-<div id="registerForm" class="hidden">
-<h1>Создание кошелька</h1>
-<p>Создаётся обычный SLX Testnet Wallet.</p>
+      <h1>Вход</h1>
 
-<input id="regUser" placeholder="Имя пользователя" autocomplete="username">
-<input id="regPass" type="password" placeholder="Пароль" autocomplete="new-password">
-<input id="regPass2" type="password" placeholder="Повторите пароль" autocomplete="new-password">
+      <p>
+        Войдите в свой SLX Testnet аккаунт.
+      </p>
 
-<button class="primary" onclick="register()">Создать SLX Wallet</button>
-</div>
+      <label>Имя пользователя</label>
+      <input id="loginUsername"
+             autocomplete="username"
+             placeholder="Например Seidar">
 
-</div>
+      <label>Пароль</label>
+      <input id="loginPassword"
+             type="password"
+             autocomplete="current-password"
+             placeholder="Пароль">
+
+      <button class="primary" onclick="login()">
+        Войти в SLX Wallet
+      </button>
+
+      <button class="secondary" onclick="openRecovery()">
+        Восстановить пароль
+      </button>
+
+    </div>
+
+    <!-- REGISTER -->
+
+    <div id="registerBox" class="hidden">
+
+      <h1>Создание кошелька</h1>
+
+      <p>
+        Создаётся обычный SLX Testnet Wallet.
+      </p>
+
+      <label>Имя пользователя</label>
+      <input id="registerUsername"
+             autocomplete="username"
+             placeholder="Seidar">
+
+      <label>Пароль</label>
+      <input id="registerPassword"
+             type="password"
+             autocomplete="new-password"
+             placeholder="Минимум 6 символов">
+
+      <label>Повторите пароль</label>
+      <input id="registerPassword2"
+             type="password"
+             autocomplete="new-password"
+             placeholder="Повторите пароль">
+
+      <button class="primary" onclick="register()">
+        Создать SLX Wallet
+      </button>
+
+    </div>
+
+  </div>
+
 </section>
 
-<!-- MAIN -->
-<section id="main" class="hidden">
+<!-- APP -->
 
-<!-- HOME -->
-<div id="page-home">
+<section id="mainApp" class="hidden">
 
-<div class="card">
-<div class="small">Активный баланс</div>
-<div id="balance" class="balance">0</div>
-<div class="unit">SLX</div>
+  <!-- HOME -->
 
-<div style="height:15px"></div>
+  <div id="page-home">
 
-<div id="address" class="address">—</div>
+    <div class="card">
 
-<button class="primary" onclick="openPage('wallet')">
-Мой кошелёк
-</button>
-</div>
+      <p>Активный кошелёк</p>
 
-<div class="grid">
-<div class="stat">
-<span>Сеть</span>
-<b id="networkStatus">—</b>
-</div>
+      <div id="homeBalance" class="balance">
+        0
+      </div>
 
-<div class="stat">
-<span>Блок</span>
-<b id="blockHeight">—</b>
-</div>
+      <div class="unit">SLX</div>
 
-<div class="stat">
-<span>Кошельков</span>
-<b id="walletCount">—</b>
-</div>
+      <br>
 
-<div class="stat">
-<span>Supply</span>
-<b id="circulating">—</b>
-</div>
-</div>
+      <div id="homeAddress" class="address">
+        —
+      </div>
 
-<div class="card">
-<h2>Faucet</h2>
-<p>Получить тестовые SLX.</p>
-<button id="faucetBtn" class="primary" onclick="faucet()">Получить +10 SLX</button>
-</div>
+      <button class="primary" onclick="showPage('wallet')">
+        Управление кошельком
+      </button>
 
-</div>
+    </div>
 
-<!-- WALLET -->
-<div id="page-wallet" class="hidden">
+    <div class="card">
 
-<div class="card">
-<h1>Кошелёк</h1>
+      <h2>Faucet</h2>
 
-<div id="walletList"></div>
+      <p>
+        Получите тестовые SLX.
+        Один запрос в 24 часа.
+      </p>
 
-<button class="secondary" onclick="createWallet()">
-+ Создать кошелёк
-</button>
-</div>
+      <button class="primary" onclick="claimFaucet()">
+        Получить +10 SLX
+      </button>
 
-<div class="card">
-<h2>Отправить SLX</h2>
+    </div>
 
-<input id="sendTo" placeholder="SLXC...">
+    <div class="card">
 
-<input id="sendAmount" type="number" step="0.00000001" min="0" placeholder="Сумма">
+      <h2>Сеть</h2>
 
-<p>Комиссия сети: <b>0.1 SLX</b></p>
+      <div class="grid">
 
-<button class="primary" onclick="sendSLX()">Отправить</button>
-</div>
+        <div class="stat">
+          <div class="stat-title">Статус</div>
+          <div id="homeStatus" class="stat-value green">
+            ONLINE
+          </div>
+        </div>
 
-</div>
+        <div class="stat">
+          <div class="stat-title">Block Height</div>
+          <div id="homeHeight" class="stat-value">
+            —
+          </div>
+        </div>
 
-<!-- HISTORY -->
-<div id="page-history" class="hidden">
+        <div class="stat">
+          <div class="stat-title">Wallets</div>
+          <div id="homeWallets" class="stat-value">
+            —
+          </div>
+        </div>
 
-<div class="card">
-<h1>История</h1>
-<div id="history">Загрузка...</div>
-</div>
+        <div class="stat">
+          <div class="stat-title">Network</div>
+          <div class="stat-value">
+            TESTNET
+          </div>
+        </div>
 
-</div>
+      </div>
 
-<!-- NETWORK -->
-<div id="page-network" class="hidden">
+    </div>
 
-<div class="card">
-<h1>Сеть</h1>
+  </div>
 
-<div class="grid">
-<div class="stat">
-<span>Версия</span>
-<b id="netVersion">—</b>
-</div>
+  <!-- WALLET -->
 
-<div class="stat">
-<span>Network ID</span>
-<b id="netId">—</b>
-</div>
+  <div id="page-wallet" class="hidden">
 
-<div class="stat">
-<span>Блоки</span>
-<b id="netBlocks">—</b>
-</div>
+    <div class="card">
 
-<div class="stat">
-<span>Wallets</span>
-<b id="netWallets">—</b>
-</div>
-</div>
+      <h1>Кошелёк</h1>
 
-<button class="primary" onclick="verifyChain()">
-Проверить Blockchain
-</button>
+      <div id="walletBalance" class="balance">
+        0
+      </div>
 
-<div style="height:15px"></div>
+      <div class="unit">SLX</div>
 
-<div id="chainResult" class="small"></div>
+      <br>
 
-</div>
+      <div id="walletAddress" class="address">
+        —
+      </div>
 
-<div class="card">
-<h2>Последние блоки</h2>
-<div id="blocks">Загрузка...</div>
-</div>
+    </div>
 
-</div>
+    <div class="card">
 
-<!-- SETTINGS -->
-<div id="page-settings" class="hidden">
+      <h2>Отправить SLX</h2>
 
-<div class="card">
-<h1>Настройки</h1>
+      <label>Адрес получателя</label>
 
-<p>Пользователь:</p>
-<div id="profileName" class="address">—</div>
+      <input id="sendTo"
+             placeholder="SLXC...">
 
-<h2 style="margin-top:25px">Изменить пароль</h2>
+      <label>Сумма</label>
 
-<input id="oldPass" type="password" placeholder="Текущий пароль">
-<input id="newPass" type="password" placeholder="Новый пароль">
+      <input id="sendAmount"
+             type="number"
+             step="0.00000001"
+             min="0"
+             placeholder="Например 10">
 
-<button class="primary" onclick="changePassword()">
-Изменить пароль
-</button>
+      <p>
+        Комиссия сети: <b>0.1 SLX</b>
+      </p>
 
-<button class="danger" onclick="logout()">
-Выйти из аккаунта
-</button>
-</div>
+      <button class="primary" onclick="sendSLX()">
+        Отправить SLX
+      </button>
 
-</div>
+    </div>
+
+    <div class="card">
+
+      <h2>Мои кошельки</h2>
+
+      <div id="walletList"></div>
+
+      <button class="primary" onclick="createWallet()">
+        + Создать новый кошелёк
+      </button>
+
+    </div>
+
+  </div>
+
+  <!-- HISTORY -->
+
+  <div id="page-history" class="hidden">
+
+    <div class="card">
+
+      <h1>История</h1>
+
+      <div id="historyList">
+        Загрузка...
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- NETWORK -->
+
+  <div id="page-network" class="hidden">
+
+    <div class="card">
+
+      <h1>SLX Network</h1>
+
+      <div class="grid">
+
+        <div class="stat">
+          <div class="stat-title">Version</div>
+          <div id="networkVersion" class="stat-value">
+            1.9.0
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Status</div>
+          <div id="networkStatus" class="stat-value green">
+            ONLINE
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Blocks</div>
+          <div id="networkBlocks" class="stat-value">
+            —
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Wallets</div>
+          <div id="networkWallets" class="stat-value">
+            —
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Экономика</h2>
+
+      <div class="grid">
+
+        <div class="stat">
+          <div class="stat-title">Max Supply</div>
+          <div id="maxSupply" class="stat-value">
+            21,000,000
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Circulating</div>
+          <div id="circulating" class="stat-value">
+            —
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Faucet</div>
+          <div class="stat-value">
+            10 SLX
+          </div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Fee</div>
+          <div class="stat-value">
+            0.1 SLX
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Blockchain</h2>
+
+      <p>
+        Проверка целостности цепочки блоков.
+      </p>
+
+      <button class="primary" onclick="verifyChain()">
+        Проверить Blockchain
+      </button>
+
+      <div id="verifyResult"></div>
+
+    </div>
+
+  </div>
+
+  <!-- SETTINGS -->
+
+  <div id="page-settings" class="hidden">
+
+    <div class="card">
+
+      <h1>Настройки</h1>
+
+      <h2 id="settingsUsername">
+        —
+      </h2>
+
+      <p>
+        Ваш SLX Testnet аккаунт.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Изменить пароль</h2>
+
+      <label>Старый пароль</label>
+      <input id="oldPassword"
+             type="password">
+
+      <label>Новый пароль</label>
+      <input id="newPassword"
+             type="password">
+
+      <button class="primary" onclick="changePassword()">
+        Изменить пароль
+      </button>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Выход</h2>
+
+      <button class="secondary danger" onclick="logout()">
+        Выйти из аккаунта
+      </button>
+
+    </div>
+
+  </div>
 
 </section>
 
 </div>
 
 <!-- BOTTOM NAV -->
-<nav id="nav" class="nav hidden">
 
-<button id="nav-home" onclick="openPage('home')">
-<span class="nav-icon">⌂</span>
-Главная
-</button>
+<nav id="bottomNav" class="bottom hidden">
 
-<button id="nav-wallet" onclick="openPage('wallet')">
-<span class="nav-icon">▣</span>
-Кошелёк
-</button>
+  <button class="nav active" onclick="showPage('home')">
+    <span class="nav-icon">⌂</span>
+    Главная
+  </button>
 
-<button id="nav-history" onclick="openPage('history')">
-<span class="nav-icon">↔</span>
-История
-</button>
+  <button class="nav" onclick="showPage('wallet')">
+    <span class="nav-icon">◈</span>
+    Wallet
+  </button>
 
-<button id="nav-network" onclick="openPage('network')">
-<span class="nav-icon">◈</span>
-Сеть
-</button>
+  <button class="nav" onclick="showPage('history')">
+    <span class="nav-icon">↔</span>
+    История
+  </button>
 
-<button id="nav-settings" onclick="openPage('settings')">
-<span class="nav-icon">⚙</span>
-Настройки
-</button>
+  <button class="nav" onclick="showPage('network')">
+    <span class="nav-icon">◉</span>
+    Сеть
+  </button>
+
+  <button class="nav" onclick="showPage('settings')">
+    <span class="nav-icon">⚙</span>
+    Настройки
+  </button>
 
 </nav>
 
 <!-- RECOVERY MODAL -->
+
 <div id="recoveryModal" class="modal hidden">
 
-<div class="modal-box">
+  <div class="modal-box">
 
-<h2>Восстановление</h2>
+    <h2>Восстановление</h2>
 
-<input id="recUser" placeholder="Имя пользователя">
+    <p>
+      Используйте Recovery Code, который получили
+      при регистрации.
+    </p>
 
-<input id="recCode" placeholder="Recovery Code">
+    <label>Имя пользователя</label>
 
-<input id="recNewPass" type="password" placeholder="Новый пароль">
+    <input id="recoveryUsername">
 
-<button class="primary" onclick="recoveryReset()">
-Восстановить пароль
-</button>
+    <label>Recovery Code</label>
 
-<button class="secondary" onclick="hideRecovery()">
-Закрыть
-</button>
+    <input id="recoveryCode">
 
-</div>
-</div>
+    <label>Новый пароль</label>
 
-<!-- RECOVERY CODE MODAL -->
-<div id="codeModal" class="modal hidden">
+    <input id="recoveryPassword"
+           type="password">
 
-<div class="modal-box">
+    <button class="primary" onclick="recoveryReset()">
+      Восстановить пароль
+    </button>
 
-<h2>Кошелёк создан 🎉</h2>
+    <button class="secondary" onclick="closeRecovery()">
+      Отмена
+    </button>
 
-<p>
-Это твой Recovery Code. Сохрани его в безопасном месте.
-</p>
+    <div id="recoveryMessage"></div>
 
-<div id="recoveryCode" class="recovery">—</div>
+  </div>
 
-<button class="primary" onclick="closeCodeModal()">
-Я сохранил код
-</button>
-
-</div>
 </div>
 
 <script>
+
 const API = "";
 
-let token = localStorage.getItem("slx_token") || "";
+let token = localStorage.getItem("slx_token");
 let activeWalletId =
   Number(localStorage.getItem("slx_active_wallet") || 0);
 
-let meData = null;
+let currentUser = null;
+let currentWallet = null;
+let walletData = [];
 
-async function api(path, options = {}) {
+
+// ============================================================
+// API
+// ============================================================
+
+async function api(url, options = {}) {
 
   const headers = {
-    "Content-Type": "application/json",
+    "Content-Type":"application/json",
     ...(options.headers || {})
   };
 
@@ -494,7 +921,7 @@ async function api(path, options = {}) {
     headers.Authorization = "Bearer " + token;
   }
 
-  const response = await fetch(API + path, {
+  const response = await fetch(API + url, {
     ...options,
     headers
   });
@@ -504,113 +931,133 @@ async function api(path, options = {}) {
   try {
     data = await response.json();
   } catch {
-    throw new Error("Сервер вернул некорректный ответ.");
+    data = {
+      ok:false,
+      message:"Сервер вернул некорректный ответ."
+    };
+  }
+
+  if (response.status === 401) {
+    logout(false);
   }
 
   if (!response.ok || data.ok === false) {
-    throw new Error(data.message || "Ошибка сервера.");
+    throw new Error(
+      data.message || "Ошибка запроса."
+    );
   }
 
   return data;
 }
 
-function showAlert(message, success = false) {
 
-  const box = document.getElementById("alert");
+// ============================================================
+// AUTH TABS
+// ============================================================
 
-  box.textContent = message;
-  box.classList.remove("hidden");
-  box.classList.toggle("success", success);
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
-}
-
-function hideAlert() {
-  document.getElementById("alert").classList.add("hidden");
-}
-
-function showAuth(type) {
-
-  hideAlert();
+function showAuth(type){
 
   const login =
-    type === "login";
+    document.getElementById("loginBox");
 
-  document
-    .getElementById("loginForm")
-    .classList.toggle("hidden", !login);
+  const register =
+    document.getElementById("registerBox");
 
-  document
-    .getElementById("registerForm")
-    .classList.toggle("hidden", login);
+  const loginTab =
+    document.getElementById("loginTab");
 
-  document
-    .getElementById("loginTab")
-    .classList.toggle("active", login);
+  const registerTab =
+    document.getElementById("registerTab");
 
-  document
-    .getElementById("registerTab")
-    .classList.toggle("active", !login);
+  clearMessage();
+
+  if(type === "login"){
+
+    login.classList.remove("hidden");
+    register.classList.add("hidden");
+
+    loginTab.classList.add("active");
+    registerTab.classList.remove("active");
+
+  }else{
+
+    login.classList.add("hidden");
+    register.classList.remove("hidden");
+
+    loginTab.classList.remove("active");
+    registerTab.classList.add("active");
+  }
 }
 
-function showRecovery() {
-  document
-    .getElementById("recoveryModal")
-    .classList.remove("hidden");
+
+// ============================================================
+// MESSAGE
+// ============================================================
+
+function clearMessage(){
+  document.getElementById("authMessage").innerHTML="";
 }
 
-function hideRecovery() {
-  document
-    .getElementById("recoveryModal")
-    .classList.add("hidden");
+function showError(message){
+
+  document.getElementById("authMessage").innerHTML =
+    `<div class="error">${escapeHTML(message)}</div>`;
 }
 
-function closeCodeModal() {
-  document
-    .getElementById("codeModal")
-    .classList.add("hidden");
+function showSuccess(message){
+
+  document.getElementById("authMessage").innerHTML =
+    `<div class="success">${escapeHTML(message)}</div>`;
 }
 
-async function register() {
 
-  hideAlert();
+// ============================================================
+// REGISTER
+// ============================================================
+
+async function register(){
+
+  clearMessage();
 
   const username =
-    document.getElementById("regUser").value.trim();
+    document.getElementById("registerUsername").value.trim();
 
   const password =
-    document.getElementById("regPass").value;
+    document.getElementById("registerPassword").value;
 
   const password2 =
-    document.getElementById("regPass2").value;
+    document.getElementById("registerPassword2").value;
 
-  if (!username || !password) {
-    showAlert("Заполни имя пользователя и пароль.");
-    return;
+  if(!/^[a-zA-Z0-9_]{3,32}$/.test(username)){
+    return showError(
+      "Имя: 3–32 символа, только буквы, цифры и _."
+    );
   }
 
-  if (password !== password2) {
-    showAlert("Пароли не совпадают.");
-    return;
+  if(password.length < 6){
+    return showError(
+      "Пароль должен содержать минимум 6 символов."
+    );
   }
 
-  if (password.length < 6) {
-    showAlert("Пароль должен содержать минимум 6 символов.");
-    return;
+  if(password !== password2){
+    return showError(
+      "Пароли не совпадают."
+    );
   }
 
-  try {
+  try{
 
-    const data = await api("/api/auth/register", {
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
+    const data = await api(
+      "/api/auth/register",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          username,
+          password
+        })
+      }
+    );
 
     token = data.token;
 
@@ -619,51 +1066,80 @@ async function register() {
       token
     );
 
-    if (data.wallet?.id) {
-      activeWalletId = Number(data.wallet.id);
+    currentUser = data.user;
+
+    if(data.wallet){
+
+      activeWalletId =
+        Number(data.wallet.id);
 
       localStorage.setItem(
         "slx_active_wallet",
-        String(activeWalletId)
+        activeWalletId
       );
     }
 
-    document.getElementById("recoveryCode").textContent =
-      data.recoveryCode || "—";
-
-    document
-      .getElementById("codeModal")
-      .classList.remove("hidden");
-
-    await loadApp();
-
-  } catch (err) {
-
-    showAlert(
-      err.message || "Ошибка регистрации."
+    showSuccess(
+      "Кошелёк создан."
     );
+
+    if(data.recoveryCode){
+
+      document.getElementById("authMessage").innerHTML +=
+        `
+        <div class="recovery">
+          <b>⚠️ Сохраните Recovery Code</b>
+          <div class="code">${escapeHTML(data.recoveryCode)}</div>
+          <p>
+            Он понадобится для восстановления доступа.
+          </p>
+        </div>
+        `;
+    }
+
+    setTimeout(() => {
+      openApp();
+    },1200);
+
+  }catch(err){
+
+    showError(err.message);
   }
 }
 
-async function login() {
 
-  hideAlert();
+// ============================================================
+// LOGIN
+// ============================================================
+
+async function login(){
+
+  clearMessage();
 
   const username =
-    document.getElementById("loginUser").value.trim();
+    document.getElementById("loginUsername").value.trim();
 
   const password =
-    document.getElementById("loginPass").value;
+    document.getElementById("loginPassword").value;
 
-  try {
+  if(!username || !password){
+    return showError(
+      "Введите имя пользователя и пароль."
+    );
+  }
 
-    const data = await api("/api/auth/login", {
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
+  try{
+
+    const data = await api(
+      "/api/auth/login",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          username,
+          password
+        })
+      }
+    );
 
     token = data.token;
 
@@ -672,500 +1148,703 @@ async function login() {
       token
     );
 
-    await loadApp();
+    currentUser = data.user;
 
-  } catch (err) {
+    await loadMe();
 
-    showAlert(
-      err.message || "Ошибка входа."
+    openApp();
+
+  }catch(err){
+
+    showError(err.message);
+  }
+}
+
+
+// ============================================================
+// LOAD ME
+// ============================================================
+
+async function loadMe(){
+
+  const data =
+    await api("/api/auth/me");
+
+  currentUser = data.user;
+
+  walletData =
+    data.wallets || [];
+
+  if(!activeWalletId && walletData.length){
+
+    activeWalletId =
+      Number(walletData[0].id);
+
+    localStorage.setItem(
+      "slx_active_wallet",
+      activeWalletId
+    );
+  }
+
+  currentWallet =
+    walletData.find(
+      w => Number(w.id) === activeWalletId
+    );
+
+  if(!currentWallet && walletData.length){
+
+    currentWallet = walletData[0];
+
+    activeWalletId =
+      Number(currentWallet.id);
+
+    localStorage.setItem(
+      "slx_active_wallet",
+      activeWalletId
     );
   }
 }
 
-async function loadApp() {
 
-  try {
+// ============================================================
+// OPEN APP
+// ============================================================
 
-    const data =
-      await api("/api/auth/me");
+async function openApp(){
 
-    meData = data;
+  document
+    .getElementById("auth")
+    .classList.add("hidden");
 
-    if (
-      !activeWalletId &&
-      data.wallets &&
-      data.wallets.length
-    ) {
-      activeWalletId =
-        Number(data.wallets[0].id);
+  document
+    .getElementById("mainApp")
+    .classList.remove("hidden");
 
-      localStorage.setItem(
-        "slx_active_wallet",
-        String(activeWalletId)
-      );
-    }
+  document
+    .getElementById("bottomNav")
+    .classList.remove("hidden");
 
-    document
-      .getElementById("auth")
-      .classList.add("hidden");
+  try{
 
-    document
-      .getElementById("main")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("nav")
-      .classList.remove("hidden");
-
-    document.getElementById("profileName").textContent =
-      data.user.username;
-
+    await loadMe();
     await refreshAll();
 
-    openPage("home");
+  }catch(err){
 
-  } catch (err) {
+    console.error(err);
 
-    token = "";
-
-    localStorage.removeItem("slx_token");
-
-    document
-      .getElementById("auth")
-      .classList.remove("hidden");
-
-    document
-      .getElementById("main")
-      .classList.add("hidden");
-
-    document
-      .getElementById("nav")
-      .classList.add("hidden");
+    showPage("home");
   }
 }
 
-async function refreshAll() {
 
-  await Promise.allSettled([
-    loadWallets(),
-    loadStatus(),
-    loadEconomy()
-  ]);
+// ============================================================
+// PAGE
+// ============================================================
 
-  if (activeWalletId) {
-    await loadWalletDetails();
+function showPage(page){
+
+  const pages =
+    [
+      "home",
+      "wallet",
+      "history",
+      "network",
+      "settings"
+    ];
+
+  pages.forEach(name => {
+
+    const el =
+      document.getElementById(
+        "page-" + name
+      );
+
+    if(el){
+      el.classList.toggle(
+        "hidden",
+        name !== page
+      );
+    }
+  });
+
+  document
+    .querySelectorAll(".nav")
+    .forEach((button,index) => {
+
+      button.classList.toggle(
+        "active",
+        pages[index] === page
+      );
+    });
+
+  if(page === "history"){
+    loadHistory();
+  }
+
+  if(page === "network"){
+    loadNetwork();
+  }
+
+  if(page === "wallet"){
+    renderWallets();
   }
 }
 
-async function loadWallets() {
 
-  const data =
-    await api("/api/wallets");
+// ============================================================
+// REFRESH
+// ============================================================
 
-  const list =
+async function refreshAll(){
+
+  await loadMe();
+
+  renderWallet();
+
+  renderWallets();
+
+  await loadNetwork();
+
+  await loadHistory();
+}
+
+
+// ============================================================
+// RENDER WALLET
+// ============================================================
+
+function renderWallet(){
+
+  if(!currentWallet){
+
+    document.getElementById("homeBalance").textContent="0";
+    document.getElementById("walletBalance").textContent="0";
+
+    document.getElementById("homeAddress").textContent="—";
+    document.getElementById("walletAddress").textContent="—";
+
+    return;
+  }
+
+  const balance =
+    Number(currentWallet.balance || 0);
+
+  document.getElementById(
+    "homeBalance"
+  ).textContent =
+    formatNumber(balance);
+
+  document.getElementById(
+    "walletBalance"
+  ).textContent =
+    formatNumber(balance);
+
+  document.getElementById(
+    "homeAddress"
+  ).textContent =
+    currentWallet.address;
+
+  document.getElementById(
+    "walletAddress"
+  ).textContent =
+    currentWallet.address;
+
+  if(currentUser){
+
+    document.getElementById(
+      "settingsUsername"
+    ).textContent =
+      currentUser.username;
+  }
+}
+
+
+// ============================================================
+// WALLETS
+// ============================================================
+
+function renderWallets(){
+
+  const container =
     document.getElementById("walletList");
 
-  list.innerHTML = "";
+  if(!walletData.length){
 
-  if (!data.wallets.length) {
-
-    list.innerHTML =
+    container.innerHTML =
       "<p>Кошельков пока нет.</p>";
 
     return;
   }
 
-  for (const wallet of data.wallets) {
+  container.innerHTML =
+    walletData.map(wallet => {
 
-    const div =
-      document.createElement("div");
+      const active =
+        Number(wallet.id) ===
+        Number(activeWalletId);
 
-    div.className =
-      "wallet" +
-      (
-        Number(wallet.id) === activeWalletId
-          ? " active"
-          : ""
-      );
+      return `
+        <div class="wallet ${active ? "active":""}"
+             onclick="selectWallet(${Number(wallet.id)})">
 
-    div.innerHTML = `
-      <div class="wallet-title">
-        SLX Wallet #${wallet.id}
-      </div>
+          <div class="wallet-name">
+            ${active ? "✓ " : ""}
+            Wallet #${Number(wallet.id)}
+          </div>
 
-      <div class="wallet-balance">
-        ${Number(wallet.balance).toFixed(8)} SLX
-      </div>
+          <div class="wallet-balance">
+            ${formatNumber(Number(wallet.balance || 0))} SLX
+          </div>
 
-      <div class="wallet-address">
-        ${escapeHtml(wallet.address)}
-      </div>
-    `;
+          <div class="muted">
+            ${escapeHTML(wallet.address)}
+          </div>
 
-    div.onclick = async () => {
+        </div>
+      `;
 
-      activeWalletId =
-        Number(wallet.id);
-
-      localStorage.setItem(
-        "slx_active_wallet",
-        String(activeWalletId)
-      );
-
-      await loadWalletDetails();
-      await loadWallets();
-
-      showAlert(
-        "Кошелёк выбран.",
-        true
-      );
-    };
-
-    list.appendChild(div);
-  }
+    }).join("");
 }
 
-async function loadWalletDetails() {
 
-  if (!activeWalletId) return;
+async function selectWallet(id){
 
-  const data =
+  try{
+
     await api(
-      "/api/wallet/" +
-      activeWalletId
+      "/api/wallet/select",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          walletId:id
+        })
+      }
     );
 
-  const wallet =
-    data.wallet;
-
-  document.getElementById("balance").textContent =
-    Number(wallet.balance).toFixed(8);
-
-  document.getElementById("address").textContent =
-    wallet.address;
-
-  renderHistory(
-    wallet.transactions || []
-  );
-}
-
-function renderHistory(transactions) {
-
-  const box =
-    document.getElementById("history");
-
-  if (!transactions.length) {
-
-    box.innerHTML =
-      "<p>Транзакций пока нет.</p>";
-
-    return;
-  }
-
-  box.innerHTML = "";
-
-  for (const tx of transactions) {
-
-    const div =
-      document.createElement("div");
-
-    div.className = "tx";
-
-    let cls = "muted";
-
-    if (tx.type === "SEND")
-      cls = "send";
-
-    if (tx.type === "RECEIVE")
-      cls = "receive";
-
-    if (tx.type === "FAUCET")
-      cls = "faucet";
-
-    let sign = "";
-
-    if (tx.type === "SEND")
-      sign = "-";
-
-    if (
-      tx.type === "RECEIVE" ||
-      tx.type === "FAUCET"
-    )
-      sign = "+";
-
-    div.innerHTML = `
-      <div class="tx-top">
-        <b>${escapeHtml(tx.type)}</b>
-        <b class="${cls}">
-          ${sign}${Number(tx.amount).toFixed(8)} SLX
-        </b>
-      </div>
-
-      <div class="muted">
-        ${escapeHtml(
-          new Date(tx.created_at).toLocaleString("ru-RU")
-        )}
-      </div>
-
-      ${
-        tx.to_wallet
-          ? `<div class="muted">To: ${escapeHtml(tx.to_wallet)}</div>`
-          : ""
-      }
-    `;
-
-    box.appendChild(div);
-  }
-}
-
-async function createWallet() {
-
-  try {
-
-    const data =
-      await api("/api/wallet/create", {
-        method:"POST"
-      });
-
-    activeWalletId =
-      Number(data.wallet.id);
+    activeWalletId = Number(id);
 
     localStorage.setItem(
       "slx_active_wallet",
-      String(activeWalletId)
+      activeWalletId
     );
 
-    await refreshAll();
+    await loadMe();
 
-    showAlert(
-      "Новый SLX кошелёк создан.",
-      true
-    );
+    renderWallet();
+    renderWallets();
 
-  } catch (err) {
+  }catch(err){
 
-    showAlert(err.message);
+    alert(err.message);
   }
 }
 
-async function sendSLX() {
+
+async function createWallet(){
+
+  try{
+
+    const data =
+      await api(
+        "/api/wallet/create",
+        {
+          method:"POST",
+          body:"{}"
+        }
+      );
+
+    if(data.wallet){
+
+      activeWalletId =
+        Number(data.wallet.id);
+
+      localStorage.setItem(
+        "slx_active_wallet",
+        activeWalletId
+      );
+    }
+
+    await loadMe();
+
+    renderWallet();
+    renderWallets();
+
+    alert("Новый SLX Wallet создан.");
+
+  }catch(err){
+
+    alert(err.message);
+  }
+}
+
+
+// ============================================================
+// SEND
+// ============================================================
+
+async function sendSLX(){
+
+  if(!currentWallet){
+    return alert("Кошелёк не найден.");
+  }
 
   const to =
-    document
-      .getElementById("sendTo")
+    document.getElementById("sendTo")
       .value
       .trim()
       .toUpperCase();
 
   const amount =
     Number(
-      document.getElementById("sendAmount").value
+      document.getElementById("sendAmount")
+        .value
     );
 
-  if (!activeWalletId) {
-    showAlert("Сначала выбери кошелёк.");
-    return;
+  if(!/^SLXC[A-F0-9]{32}$/.test(to)){
+    return alert(
+      "Некорректный SLX адрес."
+    );
   }
 
-  if (!/^SLXC[A-F0-9]{32}$/.test(to)) {
-    showAlert("Некорректный адрес получателя.");
-    return;
+  if(!Number.isFinite(amount) || amount <= 0){
+    return alert(
+      "Введите корректную сумму."
+    );
   }
 
-  if (
-    !Number.isFinite(amount) ||
-    amount <= 0
-  ) {
-    showAlert("Некорректная сумма.");
-    return;
+  if(to === currentWallet.address){
+    return alert(
+      "Нельзя отправить самому себе."
+    );
   }
 
-  try {
+  try{
 
-    const walletData =
+    const data =
       await api(
-        "/api/wallet/" +
-        activeWalletId
+        "/api/send",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            from:currentWallet.address,
+            to,
+            amount
+          })
+        }
       );
 
-    const from =
-      walletData.wallet.address;
+    alert(
+      `Успешно отправлено ${data.amount} SLX.\n\nКомиссия: ${data.fee} SLX`
+    );
 
-    const data =
-      await api("/api/send", {
-        method:"POST",
-        body:JSON.stringify({
-          from,
-          to,
-          amount
-        })
-      });
-
-    document.getElementById("sendAmount").value = "";
-    document.getElementById("sendTo").value = "";
+    document.getElementById("sendTo").value="";
+    document.getElementById("sendAmount").value="";
 
     await refreshAll();
 
-    showAlert(
-      data.message || "Транзакция отправлена.",
-      true
-    );
+  }catch(err){
 
-  } catch (err) {
-
-    showAlert(err.message);
+    alert(err.message);
   }
 }
 
-async function faucet() {
 
-  if (!activeWalletId) {
-    showAlert("Сначала выбери кошелёк.");
+// ============================================================
+// FAUCET
+// ============================================================
+
+async function claimFaucet(){
+
+  if(!currentWallet){
+    return alert(
+      "Кошелёк не найден."
+    );
+  }
+
+  try{
+
+    const data =
+      await api(
+        "/api/faucet",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            walletId:Number(currentWallet.id)
+          })
+        }
+      );
+
+    alert(
+      data.message ||
+      "Получено +10 SLX."
+    );
+
+    await refreshAll();
+
+  }catch(err){
+
+    alert(err.message);
+  }
+}
+
+
+// ============================================================
+// HISTORY
+// ============================================================
+
+async function loadHistory(){
+
+  const container =
+    document.getElementById(
+      "historyList"
+    );
+
+  if(!currentWallet){
+
+    container.innerHTML =
+      "<p>Кошелёк не выбран.</p>";
+
     return;
   }
 
-  try {
+  try{
 
     const data =
-      await api("/api/faucet", {
-        method:"POST",
-        body:JSON.stringify({
-          walletId:activeWalletId
-        })
-      });
+      await api(
+        "/api/wallet/" +
+        Number(currentWallet.id)
+      );
 
-    await refreshAll();
+    const tx =
+      data.wallet.transactions || [];
 
-    showAlert(
-      data.message || "Получено +10 SLX.",
-      true
-    );
+    if(!tx.length){
 
-  } catch (err) {
+      container.innerHTML =
+        "<p>Транзакций пока нет.</p>";
 
-    showAlert(err.message);
+      return;
+    }
+
+    container.innerHTML =
+      tx.map(t => {
+
+        let cls="";
+
+        if(t.type === "RECEIVE" ||
+           t.type === "FAUCET"){
+          cls="green";
+        }
+
+        if(t.type === "SEND"){
+          cls="red";
+        }
+
+        const sign =
+          t.type === "SEND"
+            ? "-"
+            : "+";
+
+        return `
+          <div class="tx">
+
+            <div class="tx-top">
+
+              <div class="tx-type">
+                ${escapeHTML(t.type)}
+              </div>
+
+              <div class="tx-amount ${cls}">
+                ${sign}${formatNumber(Number(t.amount))} SLX
+              </div>
+
+            </div>
+
+            <div class="muted">
+              ${escapeHTML(
+                new Date(t.created_at)
+                  .toLocaleString("ru-RU")
+              )}
+            </div>
+
+            ${
+              t.fee
+              ? `<div class="muted">
+                   Fee: ${formatNumber(Number(t.fee))} SLX
+                 </div>`
+              :""
+            }
+
+          </div>
+        `;
+
+      }).join("");
+
+  }catch(err){
+
+    container.innerHTML =
+      `<div class="error">${escapeHTML(err.message)}</div>`;
   }
 }
 
-async function loadStatus() {
 
-  const data =
-    await api("/api/status");
+// ============================================================
+// NETWORK
+// ============================================================
 
-  document.getElementById("networkStatus").textContent =
-    data.status;
+async function loadNetwork(){
 
-  document.getElementById("blockHeight").textContent =
-    data.blockHeight;
+  try{
 
-  document.getElementById("netVersion").textContent =
-    data.version;
+    const [status,economy] =
+      await Promise.all([
+        api("/api/status"),
+        api("/api/economy")
+      ]);
 
-  document.getElementById("netId").textContent =
-    data.networkId;
+    document.getElementById(
+      "homeHeight"
+    ).textContent =
+      status.blockHeight;
 
-  document.getElementById("netBlocks").textContent =
-    data.blocks;
+    document.getElementById(
+      "homeWallets"
+    ).textContent =
+      status.wallets;
 
-  document.getElementById("netWallets").textContent =
-    data.wallets;
+    document.getElementById(
+      "networkVersion"
+    ).textContent =
+      status.version;
 
-  await loadBlocks();
+    document.getElementById(
+      "networkBlocks"
+    ).textContent =
+      status.blocks;
+
+    document.getElementById(
+      "networkWallets"
+    ).textContent =
+      status.wallets;
+
+    document.getElementById(
+      "circulating"
+    ).textContent =
+      formatNumber(
+        economy.circulatingSupply
+      );
+
+    document.getElementById(
+      "maxSupply"
+    ).textContent =
+      formatNumber(
+        economy.maxSupply
+      );
+
+  }catch(err){
+
+    console.error(err);
+  }
 }
 
-async function loadEconomy() {
 
-  const data =
-    await api("/api/economy");
+// ============================================================
+// VERIFY
+// ============================================================
 
-  document.getElementById("walletCount").textContent =
-    data.wallets;
-
-  document.getElementById("circulating").textContent =
-    Number(data.circulatingSupply).toFixed(2);
-
-  document.getElementById("netWallets").textContent =
-    data.wallets;
-}
-
-async function loadBlocks() {
-
-  const data =
-    await api("/api/blocks");
+async function verifyChain(){
 
   const box =
-    document.getElementById("blocks");
+    document.getElementById(
+      "verifyResult"
+    );
 
-  if (!data.blocks.length) {
-    box.innerHTML =
-      "<p>Блоков нет.</p>";
-    return;
-  }
+  box.innerHTML =
+    `<p>Проверяем...</p>`;
 
-  box.innerHTML = "";
-
-  for (const block of data.blocks.slice(0,20)) {
-
-    const div =
-      document.createElement("div");
-
-    div.className = "tx";
-
-    div.innerHTML = `
-      <div class="tx-top">
-        <b>Block #${block.block_index}</b>
-        <span class="small">
-          ${escapeHtml(block.miner || "")}
-        </span>
-      </div>
-
-      <div class="muted">
-        Hash: ${escapeHtml(block.hash)}
-      </div>
-    `;
-
-    box.appendChild(div);
-  }
-}
-
-async function verifyChain() {
-
-  const result =
-    document.getElementById("chainResult");
-
-  result.textContent =
-    "Проверка...";
-
-  try {
+  try{
 
     const data =
-      await api("/api/chain/verify");
+      await api(
+        "/api/chain/verify"
+      );
 
-    result.textContent =
-      data.valid
-        ? "✅ " + data.message +
-          " Блоков: " + data.blocks
-        : "❌ " + data.message;
+    if(data.valid){
 
-  } catch (err) {
+      box.innerHTML =
+        `
+        <div class="success">
+          ✓ ${escapeHTML(data.message)}
+          <br>
+          Блоков: ${Number(data.blocks || 0)}
+        </div>
+        `;
 
-    result.textContent =
-      "❌ " + err.message;
+    }else{
+
+      box.innerHTML =
+        `
+        <div class="error">
+          ✕ ${escapeHTML(data.message)}
+        </div>
+        `;
+    }
+
+  }catch(err){
+
+    box.innerHTML =
+      `<div class="error">${escapeHTML(err.message)}</div>`;
   }
 }
 
-async function recoveryReset() {
+
+// ============================================================
+// RECOVERY
+// ============================================================
+
+function openRecovery(){
+
+  document
+    .getElementById("recoveryModal")
+    .classList.remove("hidden");
+
+  document
+    .getElementById("recoveryMessage")
+    .innerHTML="";
+}
+
+function closeRecovery(){
+
+  document
+    .getElementById("recoveryModal")
+    .classList.add("hidden");
+}
+
+
+async function recoveryReset(){
 
   const username =
-    document.getElementById("recUser").value.trim();
+    document.getElementById(
+      "recoveryUsername"
+    ).value.trim();
 
   const recoveryCode =
-    document.getElementById("recCode").value.trim();
+    document.getElementById(
+      "recoveryCode"
+    ).value.trim();
 
   const newPassword =
-    document.getElementById("recNewPass").value;
+    document.getElementById(
+      "recoveryPassword"
+    ).value;
 
-  try {
+  const box =
+    document.getElementById(
+      "recoveryMessage"
+    );
+
+  try{
 
     const data =
       await api(
@@ -1187,30 +1866,44 @@ async function recoveryReset() {
       token
     );
 
-    hideRecovery();
+    box.innerHTML =
+      `<div class="success">${escapeHTML(data.message)}</div>`;
 
-    await loadApp();
+    setTimeout(async()=>{
 
-    showAlert(
-      "Пароль восстановлен.",
-      true
-    );
+      closeRecovery();
 
-  } catch (err) {
+      await loadMe();
 
-    showAlert(err.message);
+      openApp();
+
+    },900);
+
+  }catch(err){
+
+    box.innerHTML =
+      `<div class="error">${escapeHTML(err.message)}</div>`;
   }
 }
 
-async function changePassword() {
+
+// ============================================================
+// PASSWORD
+// ============================================================
+
+async function changePassword(){
 
   const oldPassword =
-    document.getElementById("oldPass").value;
+    document.getElementById(
+      "oldPassword"
+    ).value;
 
   const newPassword =
-    document.getElementById("newPass").value;
+    document.getElementById(
+      "newPassword"
+    ).value;
 
-  try {
+  try{
 
     const data =
       await api(
@@ -1231,90 +1924,91 @@ async function changePassword() {
       token
     );
 
-    document.getElementById("oldPass").value = "";
-    document.getElementById("newPass").value = "";
+    document.getElementById(
+      "oldPassword"
+    ).value="";
 
-    showAlert(
-      "Пароль изменён.",
-      true
+    document.getElementById(
+      "newPassword"
+    ).value="";
+
+    alert(
+      data.message ||
+      "Пароль изменён."
     );
 
-  } catch (err) {
+  }catch(err){
 
-    showAlert(err.message);
+    alert(err.message);
   }
 }
 
-async function logout() {
 
-  try {
+// ============================================================
+// LOGOUT
+// ============================================================
 
-    await api(
-      "/api/auth/logout",
-      {
-        method:"POST"
-      }
-    );
+async function logout(sendRequest = true){
 
-  } catch {}
+  try{
 
-  token = "";
+    if(sendRequest && token){
+
+      await fetch(
+        API + "/api/auth/logout",
+        {
+          method:"POST",
+          headers:{
+            Authorization:
+              "Bearer " + token,
+            "Content-Type":
+              "application/json"
+          }
+        }
+      );
+    }
+
+  }catch{}
+
+  token=null;
+  currentUser=null;
+  currentWallet=null;
+  walletData=[];
+  activeWalletId=0;
 
   localStorage.removeItem("slx_token");
   localStorage.removeItem("slx_active_wallet");
 
-  location.reload();
+  document
+    .getElementById("mainApp")
+    .classList.add("hidden");
+
+  document
+    .getElementById("bottomNav")
+    .classList.add("hidden");
+
+  document
+    .getElementById("auth")
+    .classList.remove("hidden");
+
+  showAuth("login");
 }
 
-function openPage(page) {
 
-  const pages = [
-    "home",
-    "wallet",
-    "history",
-    "network",
-    "settings"
-  ];
+// ============================================================
+// HELPERS
+// ============================================================
 
-  for (const p of pages) {
+function formatNumber(number){
 
-    document
-      .getElementById("page-" + p)
-      .classList.toggle(
-        "hidden",
-        p !== page
-      );
-
-    const nav =
-      document.getElementById("nav-" + p);
-
-    if (nav) {
-      nav.classList.toggle(
-        "active",
-        p === page
-      );
-    }
-  }
-
-  if (page === "history") {
-    loadWalletDetails().catch(()=>{});
-  }
-
-  if (page === "wallet") {
-    loadWallets().catch(()=>{});
-  }
-
-  if (page === "network") {
-    loadStatus().catch(()=>{});
-  }
-
-  window.scrollTo({
-    top:0,
-    behavior:"smooth"
-  });
+  return Number(number || 0)
+    .toLocaleString("en-US",{
+      minimumFractionDigits:0,
+      maximumFractionDigits:8
+    });
 }
 
-function escapeHtml(value) {
+function escapeHTML(value){
 
   return String(value ?? "")
     .replaceAll("&","&amp;")
@@ -1324,13 +2018,28 @@ function escapeHtml(value) {
     .replaceAll("'","&#039;");
 }
 
-window.addEventListener("load", () => {
 
-  if (token) {
-    loadApp();
+// ============================================================
+// AUTO LOGIN
+// ============================================================
+
+(async function(){
+
+  if(!token){
+    return;
   }
 
-});
+  try{
+
+    await openApp();
+
+  }catch{
+
+    logout(false);
+  }
+
+})();
+
 </script>
 
 </body>
