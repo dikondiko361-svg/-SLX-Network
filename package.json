@@ -1,13 +1,13 @@
 {
   "name": "slx-network",
-  "version": "1.3.0",
-  "description": "SLX Network test network",
+  "version": "1.9.0",
+  "description": "SLX Network cryptographic testnet",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "engines": {
-    "node": ">=18"
+    "node": ">=22.13.0"
   },
   "dependencies": {
     "pg": "^8.16.3"
