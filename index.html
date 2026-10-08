@@ -4,1220 +4,848 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#080b12">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-<title>SLX Network v1.9.0</title>
+<title>SLX Network v1.9</title>
 
 <style>
-:root{
-  --bg:#080b12;
-  --card:#101622;
-  --card2:#151d2b;
-  --line:#263044;
-  --text:#f4f7fb;
-  --muted:#8e9aae;
-  --accent:#7c5cff;
-  --accent2:#5d8cff;
-  --green:#35d07f;
-  --red:#ff5f6d;
-  --yellow:#ffc857;
-  --radius:18px;
-}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#080b12;color:#f4f7fb;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
 
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
-}
+.app{width:100%;max-width:680px;margin:auto;padding-bottom:90px}
 
-html,body{
-  margin:0;
-  padding:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
-}
-
-body{
-  min-height:100vh;
-  padding-bottom:90px;
-}
-
-button,input,select{
-  font:inherit;
-}
-
-button{
-  border:0;
-  cursor:pointer;
-}
-
-.hidden{
-  display:none!important;
-}
-
-.app{
-  width:100%;
-  max-width:640px;
-  margin:auto;
-  padding:18px 16px 30px;
-}
-
-.header{
+header{
+  padding:22px 18px 12px;
   display:flex;
-  align-items:center;
   justify-content:space-between;
-  margin-bottom:18px;
-}
-
-.brand{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  align-items:center
 }
 
 .logo{
-  width:42px;
-  height:42px;
-  border-radius:13px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  font-size:18px;
-  box-shadow:0 8px 30px rgba(124,92,255,.25);
-}
-
-.brand-title{
+  font-size:23px;
   font-weight:800;
-  font-size:17px;
+  letter-spacing:.5px
 }
 
 .version{
   font-size:11px;
-  color:var(--muted);
-  margin-top:2px;
+  color:#8e9aaa;
+  margin-top:3px
 }
 
-.avatar{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:var(--card2);
-  border:1px solid var(--line);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  font-weight:800;
-}
-
-.avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.page{
-  display:none;
-}
-
-.page.active{
-  display:block;
+.badge{
+  background:#12251d;
+  color:#55e28b;
+  border:1px solid #245d3d;
+  padding:6px 9px;
+  border-radius:999px;
+  font-size:11px
 }
 
 .card{
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:var(--radius);
+  margin:10px 14px;
   padding:18px;
-  margin-bottom:14px;
+  border:1px solid #1b2230;
+  background:#0d111a;
+  border-radius:18px;
+  box-shadow:0 10px 30px rgba(0,0,0,.18)
 }
 
-.card-title{
-  font-size:15px;
-  font-weight:800;
-  margin-bottom:12px;
+h2,h3{margin:0 0 12px}
+h2{font-size:21px}
+h3{font-size:16px}
+
+.muted{color:#8d99aa}
+.small{font-size:12px}
+.center{text-align:center}
+
+input{
+  width:100%;
+  background:#090d14;
+  border:1px solid #263043;
+  color:#fff;
+  border-radius:12px;
+  padding:13px 14px;
+  margin:6px 0;
+  outline:none
 }
 
-.muted{
-  color:var(--muted);
+input:focus{border-color:#5c7cff}
+
+button{
+  border:0;
+  border-radius:12px;
+  padding:13px 15px;
+  color:white;
+  background:#5068ff;
+  font-weight:700;
+  margin-top:7px
 }
 
-.small{
-  font-size:12px;
+button.secondary{
+  background:#171e2b;
+  border:1px solid #293346
 }
 
-.balance-card{
-  padding:22px;
-  background:
-    radial-gradient(circle at 100% 0%,rgba(124,92,255,.22),transparent 45%),
-    var(--card);
+button.danger{
+  background:#5d2027
 }
 
-.balance-label{
-  color:var(--muted);
-  font-size:13px;
+button.full{width:100%}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed
+}
+
+.tabs{
+  display:flex;
+  gap:7px;
+  margin-bottom:12px
+}
+
+.tabs button{
+  flex:1;
+  background:#111722;
+  border:1px solid #222b3b;
+  color:#9ba6b6
+}
+
+.tabs button.active{
+  background:#4f64ff;
+  color:white;
+  border-color:#4f64ff
 }
 
 .balance{
-  font-size:38px;
-  font-weight:900;
-  letter-spacing:-1px;
-  margin:6px 0;
-  word-break:break-word;
+  text-align:center;
+  padding:16px 0 12px
 }
 
-.coin{
-  font-size:16px;
-  color:#a9b7ff;
+.balance .amount{
+  font-size:39px;
+  font-weight:800;
+  letter-spacing:-1px
+}
+
+.balance .unit{
+  color:#7f8b9d;
+  font-size:13px
 }
 
 .address{
-  margin-top:12px;
-  padding:11px 12px;
-  background:#090d15;
-  border:1px solid var(--line);
-  border-radius:12px;
+  background:#080c13;
+  border:1px solid #202a3b;
+  padding:11px;
+  border-radius:11px;
+  font-family:monospace;
   font-size:11px;
-  color:#aeb8c9;
   word-break:break-all;
+  color:#aeb8c7
 }
 
-.grid{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
+.row{
+  display:flex;
+  justify-content:space-between;
   gap:10px;
+  align-items:center;
+  margin:8px 0
 }
+
+.row>button{margin-top:0}
 
 .stat{
-  background:var(--card2);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:14px;
-}
-
-.stat-label{
-  color:var(--muted);
-  font-size:11px;
-}
-
-.stat-value{
-  margin-top:5px;
-  font-size:17px;
-  font-weight:800;
-  word-break:break-word;
-}
-
-.btn{
-  width:100%;
-  min-height:46px;
+  background:#0a0e16;
+  border:1px solid #1d2635;
+  padding:12px;
   border-radius:13px;
-  padding:10px 14px;
-  color:white;
-  background:var(--accent);
-  font-weight:800;
-  transition:.15s;
+  margin:7px 0
 }
 
-.btn:active{
-  transform:scale(.98);
-}
-
-.btn.secondary{
-  background:var(--card2);
-  border:1px solid var(--line);
-}
-
-.btn.green{
-  background:#168b55;
-}
-
-.btn.red{
-  background:#a52c39;
-}
-
-.btn.yellow{
-  background:#9b7414;
-}
-
-.btn-row{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-
-.btn-row.three{
-  grid-template-columns:repeat(3,1fr);
-}
-
-.input{
-  width:100%;
-  background:#090d15;
-  border:1px solid var(--line);
-  color:var(--text);
-  border-radius:13px;
-  padding:13px;
-  outline:none;
-  margin-bottom:10px;
-}
-
-.input:focus{
-  border-color:var(--accent);
-}
-
-label{
+.stat b{
   display:block;
-  color:var(--muted);
-  font-size:12px;
-  margin:0 0 6px;
+  font-size:16px;
+  margin-top:3px
 }
 
-.auth{
-  min-height:100vh;
+.tx{
+  padding:12px 0;
+  border-bottom:1px solid #1b2330
+}
+
+.tx:last-child{border-bottom:0}
+
+.tx-title{
+  display:flex;
+  justify-content:space-between;
+  gap:10px
+}
+
+.green{color:#4fe18b}
+.red{color:#ff6875}
+.blue{color:#7290ff}
+
+.nav{
+  position:fixed;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:100%;
+  max-width:680px;
+  background:rgba(8,11,18,.96);
+  backdrop-filter:blur(16px);
+  border-top:1px solid #1c2432;
+  display:flex;
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom));
+  z-index:50
+}
+
+.nav button{
+  flex:1;
+  margin:0;
+  padding:9px 3px;
+  background:transparent;
+  color:#7e8999;
+  font-size:11px
+}
+
+.nav button.active{color:#fff}
+
+.page{display:none}
+.page.active{display:block}
+
+.alert{
+  padding:12px;
+  border-radius:12px;
+  margin:8px 0;
+  font-size:13px;
+  white-space:pre-wrap
+}
+
+.alert.error{
+  background:#30151a;
+  border:1px solid #693039;
+  color:#ff9da6
+}
+
+.alert.ok{
+  background:#10261b;
+  border:1px solid #285e3d;
+  color:#7aeba3
+}
+
+.keybox{
+  background:#080c13;
+  border:1px solid #252e40;
+  padding:12px;
+  border-radius:12px;
+  margin-top:10px
+}
+
+.keybox code{
+  display:block;
+  word-break:break-all;
+  font-size:10px;
+  color:#9eabc0;
+  margin-top:6px
+}
+
+.wallet-item{
+  padding:13px;
+  border:1px solid #202a39;
+  border-radius:13px;
+  margin:7px 0;
+  background:#0a0e16
+}
+
+.wallet-item.active{
+  border-color:#536cff;
+  background:#10162a
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.72);
   display:flex;
   align-items:center;
   justify-content:center;
   padding:20px;
+  z-index:100
 }
 
-.auth-box{
+.modalbox{
   width:100%;
-  max-width:430px;
-}
-
-.auth-logo{
-  width:70px;
-  height:70px;
-  margin:0 auto 15px;
-  border-radius:22px;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-  font-size:26px;
-}
-
-.auth-title{
-  text-align:center;
-  font-size:27px;
-  font-weight:900;
-}
-
-.auth-subtitle{
-  text-align:center;
-  color:var(--muted);
-  margin:7px 0 22px;
-}
-
-.auth-tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:4px;
-  margin-bottom:12px;
-}
-
-.auth-tab{
-  background:transparent;
-  color:var(--muted);
-  padding:11px;
-  border-radius:10px;
-  font-weight:800;
-}
-
-.auth-tab.active{
-  background:var(--card2);
-  color:var(--text);
-}
-
-.wallet-item{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:13px;
-  border:1px solid var(--line);
-  background:var(--card2);
-  border-radius:14px;
-  margin-bottom:9px;
-}
-
-.wallet-icon{
-  width:40px;
-  height:40px;
-  flex:none;
-  border-radius:12px;
-  background:linear-gradient(135deg,#6d54e9,#3e75e8);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:900;
-}
-
-.wallet-info{
-  min-width:0;
-  flex:1;
-}
-
-.wallet-name{
-  font-weight:800;
-}
-
-.wallet-address{
-  font-size:10px;
-  color:var(--muted);
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-  margin-top:3px;
-}
-
-.wallet-balance{
-  font-size:13px;
-  font-weight:800;
-}
-
-.active-badge{
-  font-size:10px;
-  color:var(--green);
-  margin-top:3px;
-}
-
-.transaction{
-  padding:13px 0;
-  border-bottom:1px solid var(--line);
-}
-
-.transaction:last-child{
-  border-bottom:0;
-}
-
-.tx-top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.tx-type{
-  font-weight:800;
-}
-
-.tx-amount{
-  font-weight:900;
-}
-
-.tx-meta{
-  margin-top:5px;
-  color:var(--muted);
-  font-size:10px;
-  word-break:break-all;
-}
-
-.positive{
-  color:var(--green);
-}
-
-.negative{
-  color:var(--red);
-}
-
-.warning{
-  background:rgba(255,200,87,.09);
-  border:1px solid rgba(255,200,87,.25);
-  color:#ffd778;
-  border-radius:13px;
-  padding:12px;
-  font-size:12px;
-  margin-bottom:12px;
-}
-
-.success{
-  background:rgba(53,208,127,.08);
-  border:1px solid rgba(53,208,127,.2);
-  color:#72e8a9;
-  border-radius:13px;
-  padding:12px;
-  font-size:12px;
-  margin-bottom:12px;
-}
-
-.error{
-  background:rgba(255,95,109,.08);
-  border:1px solid rgba(255,95,109,.2);
-  color:#ff8993;
-  border-radius:13px;
-  padding:12px;
-  font-size:12px;
-  margin-bottom:12px;
-}
-
-.qr-box{
-  background:white;
-  border-radius:16px;
-  padding:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:max-content;
-  max-width:100%;
-  margin:10px auto;
-}
-
-.qr-box canvas,
-.qr-box img{
-  display:block;
-  max-width:100%;
-}
-
-.avatar-big{
-  width:90px;
-  height:90px;
-  border-radius:50%;
-  background:var(--card2);
-  border:2px solid var(--line);
-  margin:auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  overflow:hidden;
-  font-size:28px;
-  font-weight:900;
-}
-
-.avatar-big img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-.profile-center{
-  text-align:center;
-}
-
-.nav{
-  position:fixed;
-  left:0;
-  right:0;
-  bottom:0;
-  z-index:50;
-  background:rgba(8,11,18,.95);
-  backdrop-filter:blur(16px);
-  border-top:1px solid var(--line);
-  padding:
-    8px
-    max(8px,env(safe-area-inset-left))
-    calc(8px + env(safe-area-inset-bottom))
-    max(8px,env(safe-area-inset-right));
-}
-
-.nav-inner{
-  max-width:640px;
-  margin:auto;
-  display:grid;
-  grid-template-columns:repeat(5,1fr);
-}
-
-.nav-btn{
-  background:transparent;
-  color:var(--muted);
-  padding:7px 2px;
-  font-size:10px;
-  font-weight:700;
-}
-
-.nav-icon{
-  font-size:19px;
-  display:block;
-  margin-bottom:3px;
-}
-
-.nav-btn.active{
-  color:white;
-}
-
-.modal-backdrop{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  background:rgba(0,0,0,.72);
-  display:none;
-  align-items:flex-end;
-  justify-content:center;
-  padding:10px;
-}
-
-.modal-backdrop.show{
-  display:flex;
-}
-
-.modal{
-  width:100%;
-  max-width:640px;
-  max-height:90vh;
-  overflow:auto;
-  background:var(--card);
-  border:1px solid var(--line);
-  border-radius:22px;
-  padding:18px;
-}
-
-.modal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:15px;
-}
-
-.modal-title{
-  font-size:18px;
-  font-weight:900;
-}
-
-.close{
-  width:36px;
-  height:36px;
-  border-radius:50%;
-  background:var(--card2);
-  color:white;
-  font-size:18px;
-}
-
-.toast{
-  position:fixed;
-  z-index:200;
-  left:50%;
-  bottom:90px;
-  transform:translateX(-50%) translateY(15px);
-  width:calc(100% - 30px);
   max-width:500px;
-  background:#171e2b;
-  border:1px solid var(--line);
-  border-radius:14px;
-  padding:13px 15px;
-  font-size:13px;
-  opacity:0;
-  pointer-events:none;
-  transition:.2s;
-  box-shadow:0 12px 40px rgba(0,0,0,.35);
-}
-
-.toast.show{
-  opacity:1;
-  transform:translateX(-50%) translateY(0);
-}
-
-.loading{
-  opacity:.6;
-  pointer-events:none;
-}
-
-.code-box{
-  background:#090d15;
-  border:1px dashed var(--accent);
-  border-radius:13px;
-  padding:14px;
-  font-family:monospace;
-  font-size:18px;
-  letter-spacing:2px;
-  text-align:center;
-  word-break:break-all;
+  background:#0e131d;
+  border:1px solid #283346;
+  border-radius:18px;
+  padding:18px
 }
 
 hr{
   border:0;
-  border-top:1px solid var(--line);
-  margin:16px 0;
-}
-
-@media(max-width:380px){
-  .balance{
-    font-size:31px;
-  }
-
-  .btn-row.three{
-    grid-template-columns:1fr;
-  }
+  border-top:1px solid #1e2735;
+  margin:16px 0
 }
 </style>
 </head>
 
 <body>
 
-<!-- AUTH -->
-<div id="authScreen" class="auth">
-  <div class="auth-box">
+<div class="app">
 
-    <div class="auth-logo">SLX</div>
-
-    <div class="auth-title">SLX Network</div>
-    <div class="auth-subtitle">Decentralized digital network</div>
-
-    <div class="auth-tabs">
-      <button id="loginTab" class="auth-tab active">Вход</button>
-      <button id="registerTab" class="auth-tab">Регистрация</button>
-    </div>
-
-    <div id="authError" class="error hidden"></div>
-
-    <!-- LOGIN -->
-    <div id="loginForm" class="card">
-
-      <label>Имя пользователя</label>
-      <input id="loginUsername"
-             class="input"
-             autocomplete="username"
-             placeholder="Введите username">
-
-      <label>Пароль</label>
-      <input id="loginPassword"
-             class="input"
-             type="password"
-             autocomplete="current-password"
-             placeholder="Введите пароль">
-
-      <button id="loginBtn" class="btn">
-        Войти
-      </button>
-
-      <div style="height:9px"></div>
-
-      <button id="recoveryOpenBtn" class="btn secondary">
-        Восстановить пароль
-      </button>
-
-    </div>
-
-    <!-- REGISTER -->
-    <div id="registerForm" class="card hidden">
-
-      <label>Имя пользователя</label>
-      <input id="registerUsername"
-             class="input"
-             autocomplete="username"
-             placeholder="Например: Seidar">
-
-      <label>Пароль</label>
-      <input id="registerPassword"
-             class="input"
-             type="password"
-             autocomplete="new-password"
-             placeholder="Минимум 8 символов">
-
-      <button id="registerBtn" class="btn">
-        Создать аккаунт
-      </button>
-
-      <div class="warning" style="margin-top:12px">
-        Это тестовая сеть SLX. Не используй настоящий пароль от других сервисов.
-      </div>
-
-    </div>
-
-    <div style="text-align:center;margin-top:15px" class="small muted">
-      SLX Network v1.8.2 · Testnet
-    </div>
-
+<header>
+  <div>
+    <div class="logo">SLX Network</div>
+    <div class="version">v1.9.0 · Cryptographic Testnet</div>
   </div>
-</div>
+  <div class="badge">ED25519</div>
+</header>
+
+<!-- AUTH -->
+<section id="auth" class="card">
+  <div class="tabs">
+    <button id="loginTab" class="active" onclick="showAuth('login')">Вход</button>
+    <button id="registerTab" onclick="showAuth('register')">Регистрация</button>
+  </div>
+
+  <div id="authMessage"></div>
+
+  <div id="loginForm">
+    <h2>Вход</h2>
+    <div class="muted small">Войди в свой SLX аккаунт.</div>
+
+    <input id="loginUsername" placeholder="Имя пользователя" autocomplete="username">
+    <input id="loginPassword" type="password" placeholder="Пароль" autocomplete="current-password">
+
+    <button class="full" onclick="login()">Войти</button>
+    <button class="secondary full" onclick="showRecovery()">Восстановление</button>
+  </div>
+
+  <div id="registerForm" class="hidden">
+    <h2>Создание кошелька</h2>
+    <div class="muted small">
+      Ключ Ed25519 создаётся прямо на устройстве.
+      Приватный ключ не отправляется на сервер.
+    </div>
+
+    <input id="registerUsername" placeholder="Имя пользователя" autocomplete="username">
+    <input id="registerPassword" type="password" placeholder="Пароль" autocomplete="new-password">
+    <input id="registerPassword2" type="password" placeholder="Повторите пароль" autocomplete="new-password">
+
+    <button class="full" onclick="register()">Создать SLX Wallet</button>
+  </div>
+</section>
 
 <!-- APP -->
-<div id="appScreen" class="hidden">
+<section id="mainApp" class="hidden">
 
-  <div class="app">
-
-    <header class="header">
-
-      <div class="brand">
-        <div class="logo">SLX</div>
-
-        <div>
-          <div class="brand-title">SLX Network</div>
-          <div class="version">v1.8.2 · Testnet</div>
-        </div>
+  <!-- HOME -->
+  <div id="page-home" class="page active">
+    <div class="card">
+      <div class="balance">
+        <div class="muted small">Баланс</div>
+        <div class="amount" id="balance">0</div>
+        <div class="unit">SLX</div>
       </div>
 
-      <button id="headerAvatar"
-              class="avatar"
-              title="Профиль">
-        S
-      </button>
+      <div class="address" id="address">—</div>
 
-    </header>
-
-    <!-- HOME -->
-    <section id="page-home" class="page active">
-
-      <div class="balance-card card">
-
-        <div class="balance-label">
-          Баланс активного кошелька
-        </div>
-
-        <div class="balance">
-          <span id="homeBalance">0</span>
-          <span class="coin">SLX</span>
-        </div>
-
-        <div id="homeAddress" class="address">
-          —
-        </div>
-
-        <div style="height:12px"></div>
-
-        <div class="btn-row">
-
-          <button id="copyAddressBtn" class="btn secondary">
-            📋 Копировать
-          </button>
-
-          <button id="showQrBtn" class="btn secondary">
-            ▣ QR
-          </button>
-
-        </div>
-
+      <div class="row">
+        <button class="secondary" onclick="copyAddress()">Копировать</button>
+        <button onclick="refreshAll()">Обновить</button>
       </div>
-
-      <div class="grid">
-
-        <div class="stat">
-          <div class="stat-label">Сеть</div>
-          <div id="homeNetwork" class="stat-value">
-            —
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Комиссия</div>
-          <div id="homeFee" class="stat-value">
-            —
-          </div>
-        </div>
-
-      </div>
-
-      <div style="height:10px"></div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Быстрые действия
-        </div>
-
-        <div class="btn-row">
-
-          <button id="homeSendBtn" class="btn">
-            ↑ Отправить
-          </button>
-
-          <button id="homeFaucetBtn" class="btn green">
-            +10 SLX
-          </button>
-
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Мои кошельки
-        </div>
-
-        <div id="homeWallets">
-          Загрузка...
-        </div>
-
-        <button id="homeCreateWalletBtn"
-                class="btn secondary">
-          ＋ Создать кошелёк
-        </button>
-
-      </div>
-
-      <div class="warning">
-        SLX сейчас работает как тестовая сеть. Балансы и токены этой версии не являются реальными денежными средствами.
-      </div>
-
-    </section>
-
-    <!-- WALLET -->
-    <section id="page-wallet" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Активный кошелёк
-        </div>
-
-        <div id="walletMain"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Все кошельки
-        </div>
-
-        <div id="walletList">
-          Загрузка...
-        </div>
-
-        <button id="walletCreateBtn"
-                class="btn secondary">
-          ＋ Создать кошелёк
-        </button>
-
-      </div>
-
-    </section>
-
-    <!-- HISTORY -->
-    <section id="page-history" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          История транзакций
-        </div>
-
-        <div id="historyList">
-          Загрузка...
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- NETWORK -->
-    <section id="page-network" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Состояние сети
-        </div>
-
-        <div class="grid">
-
-          <div class="stat">
-            <div class="stat-label">Статус</div>
-            <div id="networkStatus" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Версия</div>
-            <div id="networkVersion" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Блоков</div>
-            <div id="networkBlocksCount" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Комиссия</div>
-            <div id="networkFee" class="stat-value">
-              —
-            </div>
-          </div>
-
-        </div>
-
-        <div style="height:12px"></div>
-
-        <button id="verifyChainBtn"
-                class="btn secondary">
-          🔐 Проверить цепочку
-        </button>
-
-        <div style="height:10px"></div>
-
-        <div id="chainVerifyResult"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Экономика SLX
-        </div>
-
-        <div id="economy"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Последние блоки
-        </div>
-
-        <div id="blocksList">
-          Загрузка...
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="page-settings" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Профиль
-        </div>
-
-        <div class="profile-center">
-
-          <div id="settingsAvatar"
-               class="avatar-big">
-            S
-          </div>
-
-          <div style="height:12px"></div>
-
-          <div id="profileUsername"
-               style="font-weight:900;font-size:18px">
-            —
-          </div>
-
-          <div id="profileWalletCount"
-               class="muted small">
-            —
-          </div>
-
-        </div>
-
-        <div style="height:15px"></div>
-
-        <label>Фото профиля</label>
-
-        <input id="avatarInput"
-               class="input"
-               type="file"
-               accept="image/*">
-
-        <button id="removeAvatarBtn"
-                class="btn secondary">
-          Удалить фото
-        </button>
-
-        <div class="small muted" style="margin-top:8px">
-          Фото хранится локально на этом устройстве.
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Безопасность
-        </div>
-
-        <button id="changePasswordBtn"
-                class="btn secondary">
-          🔑 Изменить пароль
-        </button>
-
-        <div style="height:10px"></div>
-
-        <button id="logoutBtn"
-                class="btn red">
-          Выйти из аккаунта
-        </button>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Информация
-        </div>
-
-        <div class="small muted">
-          SLX Network v1.8.2<br><br>
-          Current stage: Testnet<br>
-          Backend API: v1.8.2<br>
-          Cryptographic wallet signing: следующий этап
-        </div>
-
-      </div>
-
-    </section>
-
-  </div>
-
-  <!-- NAV -->
-  <nav class="nav">
-
-    <div class="nav-inner">
-
-      <button class="nav-btn active"
-              data-page="home">
-        <span class="nav-icon">⌂</span>
-        Главная
-      </button>
-
-      <button class="nav-btn"
-              data-page="wallet">
-        <span class="nav-icon">◈</span>
-        Кошелёк
-      </button>
-
-      <button class="nav-btn"
-              data-page="history">
-        <span class="nav-icon">↔</span>
-        История
-      </button>
-
-      <button class="nav-btn"
-              data-page="network">
-        <span class="nav-icon">◎</span>
-        Сеть
-      </button>
-
-      <button class="nav-btn"
-              data-page="settings">
-        <span class="nav-icon">⚙</span>
-        Настройки
-      </button>
-
     </div>
 
-  </nav>
+    <div class="card">
+      <h3>Отправить SLX</h3>
+
+      <input id="sendTo" placeholder="SLXC...">
+      <input id="sendAmount" type="number" min="0" step="0.00000001" placeholder="Количество SLX">
+
+      <div class="stat">
+        <span class="muted small">Комиссия сети</span>
+        <b id="fee">0.1 SLX</b>
+      </div>
+
+      <button class="full" onclick="sendSLX()">Подписать и отправить</button>
+
+      <div class="muted small" style="margin-top:10px">
+        Транзакция подписывается приватным Ed25519-ключом на устройстве.
+      </div>
+
+      <div id="sendMessage"></div>
+    </div>
+
+    <div class="card">
+      <h3>Faucet</h3>
+      <div class="muted small">Получить тестовые SLX для проверки сети.</div>
+      <button class="full" onclick="claimFaucet()">Получить +10 SLX</button>
+      <div id="faucetMessage"></div>
+    </div>
+  </div>
+
+  <!-- WALLET -->
+  <div id="page-wallet" class="page">
+    <div class="card">
+      <h2>Wallet</h2>
+
+      <div class="address" id="walletAddress">—</div>
+
+      <div class="stat">
+        <span class="muted small">Public Key</span>
+        <code id="publicKey" style="display:block;word-break:break-all;font-size:10px;margin-top:6px">—</code>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Мои кошельки</h3>
+      <div id="walletList">Загрузка...</div>
+
+      <button class="secondary full" onclick="createWallet()">
+        Создать новый кошелёк
+      </button>
+    </div>
+  </div>
+
+  <!-- HISTORY -->
+  <div id="page-history" class="page">
+    <div class="card">
+      <div class="row">
+        <h2>История</h2>
+        <button class="secondary" onclick="loadTransactions()">↻</button>
+      </div>
+
+      <div id="history">Загрузка...</div>
+    </div>
+  </div>
+
+  <!-- NETWORK -->
+  <div id="page-network" class="page">
+    <div class="card">
+      <h2>Network</h2>
+
+      <div class="stat">
+        <span class="muted small">Версия</span>
+        <b id="networkVersion">—</b>
+      </div>
+
+      <div class="stat">
+        <span class="muted small">Network ID</span>
+        <b id="networkId">—</b>
+      </div>
+
+      <div class="stat">
+        <span class="muted small">Максимальное предложение</span>
+        <b id="maxSupply">—</b>
+      </div>
+
+      <div class="stat">
+        <span class="muted small">Циркуляция</span>
+        <b id="circulating">—</b>
+      </div>
+
+      <div class="stat">
+        <span class="muted small">Кошельков</span>
+        <b id="walletCount">—</b>
+      </div>
+
+      <div class="stat">
+        <span class="muted small">Блоков</span>
+        <b id="blockCount">—</b>
+      </div>
+
+      <button class="secondary full" onclick="verifyChain()">
+        Проверить Blockchain
+      </button>
+
+      <div id="chainMessage"></div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="page-settings" class="page">
+    <div class="card">
+      <h2>Настройки</h2>
+
+      <div class="stat">
+        <span class="muted small">Пользователь</span>
+        <b id="profileUsername">—</b>
+      </div>
+
+      <hr>
+
+      <h3>Профиль</h3>
+
+      <input id="avatarInput" type="file" accept="image/*" onchange="saveAvatar(event)">
+
+      <div class="center" style="margin-top:10px">
+        <img id="avatarPreview"
+             style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:2px solid #263149"
+             alt="">
+      </div>
+
+      <hr>
+
+      <h3>Безопасность</h3>
+
+      <div class="muted small">
+        Приватный ключ хранится локально на этом устройстве.
+        Если очистить данные браузера без резервной копии,
+        доступ к кошельку можно потерять.
+      </div>
+
+      <button class="secondary full" onclick="showPrivateKey()">
+        Показать резервную копию ключа
+      </button>
+
+      <hr>
+
+      <h3>Пароль</h3>
+
+      <input id="oldPassword" type="password" placeholder="Текущий пароль">
+      <input id="newPassword" type="password" placeholder="Новый пароль">
+
+      <button class="secondary full" onclick="changePassword()">
+        Изменить пароль
+      </button>
+
+      <hr>
+
+      <button class="danger full" onclick="logout()">
+        Выйти
+      </button>
+
+      <div class="muted small center" style="margin-top:15px">
+        SLX Network v1.9.0 · Testnet
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<nav id="nav" class="nav hidden">
+  <button class="active" onclick="openPage('home',this)">⌂<br>Главная</button>
+  <button onclick="openPage('wallet',this)">◈<br>Wallet</button>
+  <button onclick="openPage('history',this)">↔<br>История</button>
+  <button onclick="openPage('network',this)">◎<br>Network</button>
+  <button onclick="openPage('settings',this)">⚙<br>Настройки</button>
+</nav>
 
 </div>
 
-<!-- MODAL -->
-<div id="modalBackdrop" class="modal-backdrop">
+<!-- RECOVERY MODAL -->
+<div id="recoveryModal" class="modal hidden">
+  <div class="modalbox">
+    <h2>Восстановление</h2>
 
-  <div class="modal">
-
-    <div class="modal-head">
-
-      <div id="modalTitle"
-           class="modal-title">
-        —
-      </div>
-
-      <button id="modalClose"
-              class="close">
-        ×
-      </button>
-
+    <div class="muted small">
+      Введи имя пользователя и recovery code.
     </div>
 
-    <div id="modalBody"></div>
+    <input id="recoveryUsername" placeholder="Имя пользователя">
+    <input id="recoveryCode" placeholder="Recovery code">
 
+    <input id="recoveryNewPassword"
+           type="password"
+           placeholder="Новый пароль">
+
+    <button class="full" onclick="resetPassword()">
+      Восстановить доступ
+    </button>
+
+    <button class="secondary full" onclick="closeRecovery()">
+      Закрыть
+    </button>
+
+    <div id="recoveryMessage"></div>
   </div>
-
 </div>
 
-<div id="toast" class="toast"></div>
+<!-- RECOVERY CODE MODAL -->
+<div id="recoveryCodeModal" class="modal hidden">
+  <div class="modalbox">
+    <h2>Сохрани Recovery Code</h2>
+
+    <div class="alert ok">
+      Этот код нужен для восстановления доступа.
+    </div>
+
+    <div class="keybox">
+      <div class="muted small">Recovery Code</div>
+      <code id="newRecoveryCode"></code>
+    </div>
+
+    <button class="full" onclick="closeRecoveryCode()">
+      Я сохранил код
+    </button>
+  </div>
+</div>
+
+<!-- PRIVATE KEY MODAL -->
+<div id="privateModal" class="modal hidden">
+  <div class="modalbox">
+    <h2>Резервная копия</h2>
+
+    <div class="alert error">
+      Никому не отправляй приватный ключ.
+      Он даёт контроль над этим тестовым кошельком.
+    </div>
+
+    <div class="keybox">
+      <div class="muted small">Private Key PKCS8</div>
+      <code id="privateKeyBackup"></code>
+    </div>
+
+    <button class="secondary full" onclick="copyPrivateKey()">
+      Копировать ключ
+    </button>
+
+    <button class="secondary full" onclick="closePrivateKey()">
+      Закрыть
+    </button>
+  </div>
+</div>
 
 <script>
 "use strict";
 
 /* =========================================================
-   SLX NETWORK v1.8.2
-   Frontend for SLX Network Backend v1.8.2
+   SLX NETWORK v1.9
+   Ed25519 + Signed Transactions
    ========================================================= */
 
 const API_BASE = "";
 
-const TOKEN_KEY = "slx_token";
-const ACTIVE_WALLET_KEY = "slx_active_wallet";
-const AVATAR_KEY = "slx_avatar";
+const STORAGE_TOKEN = "slx_token";
+const STORAGE_PRIVATE = "slx_private_key";
+const STORAGE_PUBLIC = "slx_public_key";
+const STORAGE_ADDRESS = "slx_address";
+const STORAGE_AVATAR = "slx_avatar";
 
-let token = localStorage.getItem(TOKEN_KEY) || "";
-let activeWallet = localStorage.getItem(ACTIVE_WALLET_KEY) || "";
+const NETWORK_ID = "SLX-TESTNET-1";
+const CLIENT_VERSION = "1.9.0";
+
+let token = localStorage.getItem(STORAGE_TOKEN) || "";
 let currentUser = null;
-let wallets = [];
-let networkInfo = null;
+let currentWallet = null;
+let privateKey = null;
+let publicKey = null;
 
 
 /* =========================================================
-   DOM HELPERS
+   HELPERS
    ========================================================= */
 
-const $ = id => document.getElementById(id);
-
-function show(el){
-  if(el) el.classList.remove("hidden");
+function $(id){
+  return document.getElementById(id);
 }
 
-function hide(el){
-  if(el) el.classList.add("hidden");
-}
-
-function escapeHTML(value){
+function esc(value){
   return String(value ?? "")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
 }
 
-
-/* =========================================================
-   TOAST
-   ========================================================= */
-
-let toastTimer = null;
-
-function toast(message){
-  const el = $("toast");
-
-  el.textContent = message;
-  el.classList.add("show");
-
-  clearTimeout(toastTimer);
-
-  toastTimer = setTimeout(() => {
-    el.classList.remove("show");
-  },3000);
+function showMessage(id,text,type="error"){
+  const el = $(id);
+  if(!el)return;
+  el.innerHTML = `<div class="alert ${type}">${esc(text)}</div>`;
 }
 
-
-/* =========================================================
-   MODAL
-   ========================================================= */
-
-function openModal(title,html){
-
-  $("modalTitle").textContent = title;
-  $("modalBody").innerHTML = html;
-
-  $("modalBackdrop").classList.add("show");
+function clearMessage(id){
+  const el=$(id);
+  if(el)el.innerHTML="";
 }
 
-function closeModal(){
+function b64encode(bytes){
+  let binary="";
+  const arr = bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes);
+  const chunk=0x8000;
 
-  $("modalBackdrop").classList.remove("show");
-}
-
-$("modalClose").addEventListener("click",closeModal);
-
-$("modalBackdrop").addEventListener("click",e=>{
-  if(e.target === $("modalBackdrop")){
-    closeModal();
+  for(let i=0;i<arr.length;i+=chunk){
+    binary += String.fromCharCode(...arr.subarray(i,i+chunk));
   }
-});
+
+  return btoa(binary);
+}
+
+function b64decode(str){
+  const binary=atob(str);
+  const arr=new Uint8Array(binary.length);
+
+  for(let i=0;i<binary.length;i++){
+    arr[i]=binary.charCodeAt(i);
+  }
+
+  return arr;
+}
+
+function hex(bytes){
+  return [...new Uint8Array(bytes)]
+    .map(x=>x.toString(16).padStart(2,"0"))
+    .join("")
+    .toUpperCase();
+}
+
+function sleep(ms){
+  return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+
+/* =========================================================
+   CRYPTO
+   ========================================================= */
+
+async function generateEd25519Wallet(){
+
+  if(!window.crypto || !crypto.subtle){
+    throw new Error("Web Crypto API недоступен.");
+  }
+
+  let pair;
+
+  try{
+    pair = await crypto.subtle.generateKey(
+      {name:"Ed25519"},
+      true,
+      ["sign","verify"]
+    );
+  }catch(error){
+    throw new Error(
+      "Этот браузер не поддерживает Ed25519. Открой SLX через HTTPS в современном браузере."
+    );
+  }
+
+  const rawPublic = await crypto.subtle.exportKey(
+    "raw",
+    pair.publicKey
+  );
+
+  const pkcs8Private = await crypto.subtle.exportKey(
+    "pkcs8",
+    pair.privateKey
+  );
+
+  return {
+    publicKey: pair.publicKey,
+    privateKey: pair.privateKey,
+    publicKeyBase64: b64encode(rawPublic),
+    privateKeyBase64: b64encode(pkcs8Private)
+  };
+}
+
+async function importPrivateKey(pkcs8Base64){
+
+  const bytes=b64decode(pkcs8Base64);
+
+  return await crypto.subtle.importKey(
+    "pkcs8",
+    bytes,
+    {name:"Ed25519"},
+    true,
+    ["sign"]
+  );
+}
+
+async function importPublicKey(rawBase64){
+
+  const bytes=b64decode(rawBase64);
+
+  return await crypto.subtle.importKey(
+    "raw",
+    bytes,
+    {name:"Ed25519"},
+    true,
+    ["verify"]
+  );
+}
+
+async function deriveAddress(publicKeyBase64){
+
+  const raw=b64decode(publicKeyBase64);
+
+  const digest=await crypto.subtle.digest(
+    "SHA-256",
+    raw
+  );
+
+  return "SLXC" + hex(digest).slice(0,32);
+}
+
+async function signPayload(payload){
+
+  if(!privateKey){
+    throw new Error("Приватный ключ кошелька не найден на устройстве.");
+  }
+
+  const data=new TextEncoder().encode(payload);
+
+  const signature=await crypto.subtle.sign(
+    {name:"Ed25519"},
+    privateKey,
+    data
+  );
+
+  return b64encode(signature);
+}
+
+
+/* =========================================================
+   LOCAL KEY STORAGE
+   ========================================================= */
+
+async function saveWalletKeys(keys,address){
+
+  localStorage.setItem(
+    STORAGE_PRIVATE,
+    keys.privateKeyBase64
+  );
+
+  localStorage.setItem(
+    STORAGE_PUBLIC,
+    keys.publicKeyBase64
+  );
+
+  localStorage.setItem(
+    STORAGE_ADDRESS,
+    address
+  );
+
+  privateKey=keys.privateKey;
+  publicKey=keys.publicKey;
+}
+
+async function loadWalletKeys(){
+
+  const priv=localStorage.getItem(STORAGE_PRIVATE);
+  const pub=localStorage.getItem(STORAGE_PUBLIC);
+
+  if(!priv || !pub){
+    return false;
+  }
+
+  try{
+    privateKey=await importPrivateKey(priv);
+    publicKey=await importPublicKey(pub);
+
+    return true;
+  }catch(error){
+
+    console.error(error);
+
+    localStorage.removeItem(STORAGE_PRIVATE);
+    localStorage.removeItem(STORAGE_PUBLIC);
+
+    return false;
+  }
+}
 
 
 /* =========================================================
@@ -1226,44 +854,49 @@ $("modalBackdrop").addEventListener("click",e=>{
 
 async function api(path,options={}){
 
-  const headers = {
+  const headers={
     "Content-Type":"application/json",
     ...(options.headers || {})
   };
 
   if(token){
-    headers.Authorization = "Bearer " + token;
+    headers.Authorization="Bearer "+token;
   }
 
-  const response = await fetch(API_BASE + path,{
-    ...options,
-    headers
-  });
+  const response=await fetch(
+    API_BASE+path,
+    {
+      ...options,
+      headers
+    }
+  );
 
-  let data = null;
+  let data=null;
 
   try{
-    data = await response.json();
+    data=await response.json();
   }catch{
-    data = {};
+    data={};
   }
 
-  if(response.status === 401){
+  if(response.status===401){
 
-    token = "";
-    localStorage.removeItem(TOKEN_KEY);
+    token="";
+    localStorage.removeItem(STORAGE_TOKEN);
 
-    showAuth();
+    showAuthScreen();
 
-    throw new Error(data.error || "Сессия закончилась");
+    throw new Error(
+      data.message || "Сессия истекла."
+    );
   }
 
   if(!response.ok){
 
     throw new Error(
-      data.error ||
       data.message ||
-      "Ошибка сервера"
+      data.error ||
+      `HTTP ${response.status}`
     );
   }
 
@@ -1272,118 +905,43 @@ async function api(path,options={}){
 
 
 /* =========================================================
-   AUTH SCREEN
+   AUTH UI
    ========================================================= */
 
-function showAuth(){
+function showAuth(mode){
 
-  hide($("appScreen"));
-  show($("authScreen"));
+  if(mode==="login"){
 
-  $("loginForm").classList.remove("hidden");
-  $("registerForm").classList.add("hidden");
+    $("loginForm").classList.remove("hidden");
+    $("registerForm").classList.add("hidden");
 
-  $("loginTab").classList.add("active");
-  $("registerTab").classList.remove("active");
-}
+    $("loginTab").classList.add("active");
+    $("registerTab").classList.remove("active");
 
-function showApp(){
+  }else{
 
-  hide($("authScreen"));
-  show($("appScreen"));
-}
+    $("loginForm").classList.add("hidden");
+    $("registerForm").classList.remove("hidden");
 
-function authError(message){
-
-  $("authError").textContent = message;
-  show($("authError"));
-}
-
-function clearAuthError(){
-
-  hide($("authError"));
-}
-
-
-/* =========================================================
-   AUTH TABS
-   ========================================================= */
-
-$("loginTab").addEventListener("click",()=>{
-
-  clearAuthError();
-
-  $("loginTab").classList.add("active");
-  $("registerTab").classList.remove("active");
-
-  $("loginForm").classList.remove("hidden");
-  $("registerForm").classList.add("hidden");
-});
-
-$("registerTab").addEventListener("click",()=>{
-
-  clearAuthError();
-
-  $("registerTab").classList.add("active");
-  $("loginTab").classList.remove("active");
-
-  $("registerForm").classList.remove("hidden");
-  $("loginForm").classList.add("hidden");
-});
-
-
-/* =========================================================
-   LOGIN
-   ========================================================= */
-
-$("loginBtn").addEventListener("click",login);
-
-async function login(){
-
-  clearAuthError();
-
-  const username =
-    $("loginUsername").value.trim();
-
-  const password =
-    $("loginPassword").value;
-
-  if(!username || !password){
-
-    authError("Введите username и пароль.");
-    return;
+    $("loginTab").classList.remove("active");
+    $("registerTab").classList.add("active");
   }
 
-  const button = $("loginBtn");
+  clearMessage("authMessage");
+}
 
-  button.disabled = true;
-  button.textContent = "Вход...";
+function showAuthScreen(){
 
-  try{
+  $("auth").classList.remove("hidden");
+  $("mainApp").classList.add("hidden");
+  $("nav").classList.add("hidden");
+}
 
-    const data = await api("/api/auth/login",{
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
+function showAppScreen(){
 
-    token = data.token;
-
-    localStorage.setItem(TOKEN_KEY,token);
-
-    await startApp();
-
-  }catch(error){
-
-    authError(error.message);
-
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "Войти";
-  }
+  $("auth").classList.add("hidden");
+  $("mainApp").classList.remove("hidden");
+  $("nav").classList.remove("hidden");
 }
 
 
@@ -1391,309 +949,272 @@ async function login(){
    REGISTER
    ========================================================= */
 
-$("registerBtn").addEventListener("click",register);
-
 async function register(){
 
-  clearAuthError();
+  clearMessage("authMessage");
 
-  const username =
-    $("registerUsername").value.trim();
+  const username=$("registerUsername").value.trim();
+  const password=$("registerPassword").value;
+  const password2=$("registerPassword2").value;
 
-  const password =
-    $("registerPassword").value;
-
-  if(!username){
-
-    authError("Введите username.");
+  if(username.length<3){
+    showMessage(
+      "authMessage",
+      "Имя пользователя должно содержать минимум 3 символа."
+    );
     return;
   }
 
-  if(password.length < 8){
-
-    authError("Пароль должен содержать минимум 8 символов.");
+  if(password.length<6){
+    showMessage(
+      "authMessage",
+      "Пароль должен содержать минимум 6 символов."
+    );
     return;
   }
 
-  const button = $("registerBtn");
-
-  button.disabled = true;
-  button.textContent = "Создание...";
+  if(password!==password2){
+    showMessage(
+      "authMessage",
+      "Пароли не совпадают."
+    );
+    return;
+  }
 
   try{
 
-    const data = await api("/api/auth/register",{
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
-
-    token = data.token;
-
-    localStorage.setItem(TOKEN_KEY,token);
-
-    if(data.wallet?.id){
-
-      activeWallet = String(data.wallet.id);
-
-      localStorage.setItem(
-        ACTIVE_WALLET_KEY,
-        activeWallet
-      );
-    }
-
-    const recoveryCode =
-      data.recoveryCode || "Не предоставлен";
-
-    openModal(
-      "Аккаунт создан",
-      `
-        <div class="success">
-          Регистрация успешно завершена.
-        </div>
-
-        <p class="small muted">
-          Это твой код восстановления пароля.
-          Сохрани его в безопасном месте.
-        </p>
-
-        <div class="code-box">
-          ${escapeHTML(recoveryCode)}
-        </div>
-
-        <div style="height:12px"></div>
-
-        <button id="copyRecoveryBtn"
-                class="btn secondary">
-          📋 Скопировать код
-        </button>
-
-        <div style="height:10px"></div>
-
-        <button id="continueAfterRegister"
-                class="btn">
-          Продолжить
-        </button>
-      `
+    showMessage(
+      "authMessage",
+      "Генерируем криптографический кошелёк...",
+      "ok"
     );
 
-    $("copyRecoveryBtn").addEventListener("click",async()=>{
+    const keys=await generateEd25519Wallet();
 
-      try{
-        await navigator.clipboard.writeText(recoveryCode);
-        toast("Код скопирован");
-      }catch{
-        toast("Не удалось скопировать");
-      }
+    const address=await deriveAddress(
+      keys.publicKeyBase64
+    );
 
-    });
+    /*
+      ВАЖНО:
+      publicKey отправляется именно в Base64.
+      Приватный ключ серверу НЕ отправляется.
+    */
 
-    $("continueAfterRegister").addEventListener("click",async()=>{
-
-      closeModal();
-      await startApp();
-
-    });
-
-  }catch(error){
-
-    authError(error.message);
-
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "Создать аккаунт";
-  }
-}
-
-
-/* =========================================================
-   RECOVERY
-   ========================================================= */
-
-$("recoveryOpenBtn").addEventListener("click",()=>{
-
-  openModal(
-    "Восстановление пароля",
-    `
-      <label>Username</label>
-      <input id="recoveryUsername"
-             class="input"
-             autocomplete="username"
-             placeholder="Username">
-
-      <label>Код восстановления</label>
-      <input id="recoveryCode"
-             class="input"
-             placeholder="Recovery code">
-
-      <label>Новый пароль</label>
-      <input id="recoveryPassword"
-             class="input"
-             type="password"
-             autocomplete="new-password"
-             placeholder="Минимум 8 символов">
-
-      <button id="recoveryBtn"
-              class="btn">
-        Восстановить
-      </button>
-
-      <div style="height:10px"></div>
-
-      <div class="small muted">
-        Если код восстановления потерян,
-        этот тестовый механизм не сможет подтвердить владельца аккаунта.
-      </div>
-    `
-  );
-
-  $("recoveryBtn").addEventListener(
-    "click",
-    recoveryReset
-  );
-});
-
-
-async function recoveryReset(){
-
-  const username =
-    $("recoveryUsername").value.trim();
-
-  const recoveryCode =
-    $("recoveryCode").value.trim();
-
-  const newPassword =
-    $("recoveryPassword").value;
-
-  if(!username || !recoveryCode){
-
-    toast("Заполни username и код.");
-    return;
-  }
-
-  if(newPassword.length < 8){
-
-    toast("Новый пароль должен быть минимум 8 символов.");
-    return;
-  }
-
-  try{
-
-    const data = await api(
-      "/api/auth/recovery/reset",
+    const data=await api(
+      "/api/auth/register",
       {
         method:"POST",
         body:JSON.stringify({
           username,
-          recoveryCode,
-          newPassword
+          password,
+          publicKey:keys.publicKeyBase64
         })
       }
     );
 
-    token = data.token;
+    if(data.token){
+      token=data.token;
+      localStorage.setItem(
+        STORAGE_TOKEN,
+        token
+      );
+    }
 
-    localStorage.setItem(TOKEN_KEY,token);
+    await saveWalletKeys(keys,address);
 
-    closeModal();
+    if(data.recoveryCode){
+      $("newRecoveryCode").textContent=
+        data.recoveryCode;
 
-    toast("Пароль восстановлен");
+      $("recoveryCodeModal")
+        .classList.remove("hidden");
+    }
 
-    await startApp();
+    showMessage(
+      "authMessage",
+      "Кошелёк успешно создан.",
+      "ok"
+    );
+
+    await loadMe();
 
   }catch(error){
 
-    toast(error.message);
+    console.error(error);
+
+    showMessage(
+      "authMessage",
+      error.message || "Ошибка регистрации."
+    );
   }
 }
 
 
 /* =========================================================
-   START APP
+   LOGIN
    ========================================================= */
 
-async function startApp(){
+async function login(){
+
+  clearMessage("authMessage");
+
+  const username=$("loginUsername").value.trim();
+  const password=$("loginPassword").value;
+
+  if(!username || !password){
+
+    showMessage(
+      "authMessage",
+      "Введите имя пользователя и пароль."
+    );
+
+    return;
+  }
 
   try{
 
-    const me = await api("/api/auth/me");
+    const data=await api(
+      "/api/auth/login",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          username,
+          password
+        })
+      }
+    );
 
-    currentUser = me.user || me;
+    token=data.token || data.sessionToken || "";
 
-    showApp();
+    if(!token){
+      throw new Error(
+        "Сервер не вернул токен авторизации."
+      );
+    }
 
-    loadAvatar();
-    updateProfile();
+    localStorage.setItem(
+      STORAGE_TOKEN,
+      token
+    );
 
-    await loadWallets();
-    await loadNetwork();
-
-    showPage("home");
+    await loadMe();
 
   }catch(error){
 
-    showAuth();
+    console.error(error);
+
+    showMessage(
+      "authMessage",
+      error.message || "Ошибка входа."
+    );
   }
 }
 
 
 /* =========================================================
-   PAGE NAVIGATION
+   ME
    ========================================================= */
 
-document.querySelectorAll(".nav-btn")
-.forEach(button=>{
+async function loadMe(){
 
-  button.addEventListener("click",()=>{
+  try{
 
-    showPage(button.dataset.page);
+    const data=await api(
+      "/api/auth/me"
+    );
 
-  });
+    currentUser=
+      data.user ||
+      data;
 
-});
+    const wallets=
+      data.wallets ||
+      currentUser.wallets ||
+      [];
 
-function showPage(page){
+    if(wallets.length){
 
-  document.querySelectorAll(".page")
-    .forEach(el=>{
-      el.classList.remove("active");
-    });
+      currentWallet=
+        wallets.find(
+          w =>
+            w.address ===
+            localStorage.getItem(STORAGE_ADDRESS)
+        ) || wallets[0];
 
-  const target = $("page-" + page);
+    }else if(data.wallet){
 
-  if(target){
-    target.classList.add("active");
-  }
+      currentWallet=data.wallet;
 
-  document.querySelectorAll(".nav-btn")
-    .forEach(button=>{
-      button.classList.toggle(
-        "active",
-        button.dataset.page === page
+    }else{
+
+      currentWallet=null;
+    }
+
+    /*
+      Если сервер вернул publicKey,
+      синхронизируем его с локальным кошельком.
+    */
+
+    const serverPublic=
+      currentWallet?.publicKey ||
+      currentUser?.publicKey;
+
+    if(serverPublic){
+
+      localStorage.setItem(
+        STORAGE_PUBLIC,
+        serverPublic
       );
-    });
 
-  if(page === "home"){
-    refreshHome();
-  }
+      if(!privateKey){
 
-  if(page === "wallet"){
-    renderWalletPage();
-  }
+        try{
+          await loadWalletKeys();
+        }catch{}
+      }
+    }
 
-  if(page === "history"){
-    loadHistory();
-  }
+    showAppScreen();
 
-  if(page === "network"){
-    loadNetworkPage();
-  }
-
-  if(page === "settings"){
     updateProfile();
+
+    await refreshAll();
+
+  }catch(error){
+
+    console.error(error);
+
+    if(error.message.includes("401")){
+      showAuthScreen();
+    }else{
+      showMessage(
+        "authMessage",
+        error.message
+      );
+    }
+  }
+}
+
+
+/* =========================================================
+   REFRESH
+   ========================================================= */
+
+async function refreshAll(){
+
+  try{
+
+    await Promise.all([
+      loadWallets(),
+      loadStatus(),
+      loadEconomy(),
+      loadTransactions()
+    ]);
+
+  }catch(error){
+
+    console.error(error);
   }
 }
 
@@ -1704,577 +1225,348 @@ function showPage(page){
 
 async function loadWallets(){
 
-  const data = await api("/api/wallets");
+  const data=await api(
+    "/api/wallets"
+  );
 
-  wallets = data.wallets || data || [];
+  const wallets=
+    data.wallets ||
+    data ||
+    [];
 
-  if(!activeWallet && wallets.length){
-
-    activeWallet = String(wallets[0].id);
-
-    localStorage.setItem(
-      ACTIVE_WALLET_KEY,
-      activeWallet
-    );
+  if(!Array.isArray(wallets)){
+    return;
   }
 
-  const exists = wallets.some(
-    w => String(w.id) === String(activeWallet)
-  );
+  const saved=
+    localStorage.getItem(STORAGE_ADDRESS);
 
-  if(!exists && wallets.length){
+  if(saved){
 
-    activeWallet = String(wallets[0].id);
-
-    localStorage.setItem(
-      ACTIVE_WALLET_KEY,
-      activeWallet
-    );
+    currentWallet=
+      wallets.find(
+        w=>w.address===saved
+      ) || currentWallet;
   }
 
-  renderHomeWallets();
-  renderWalletPage();
-  updateProfile();
+  if(!currentWallet && wallets.length){
+    currentWallet=wallets[0];
+  }
+
+  renderWallets(wallets);
+  updateWalletDisplay();
 }
 
-function getActiveWallet(){
+function renderWallets(wallets){
 
-  return wallets.find(
-    w => String(w.id) === String(activeWallet)
-  ) || wallets[0] || null;
+  const box=$("walletList");
+
+  if(!wallets.length){
+
+    box.innerHTML=
+      `<div class="muted">Кошельков нет.</div>`;
+
+    return;
+  }
+
+  box.innerHTML=wallets.map(w=>{
+
+    const active=
+      currentWallet &&
+      String(currentWallet.id)===
+      String(w.id);
+
+    return `
+      <div class="wallet-item ${active?"active":""}">
+        <div class="row">
+          <b>${esc(w.address || "SLX Wallet")}</b>
+          ${
+            active
+            ? `<span class="green small">ACTIVE</span>`
+            : ""
+          }
+        </div>
+
+        <div class="muted small">
+          Баланс: ${esc(w.balance ?? 0)} SLX
+        </div>
+
+        <button
+          class="secondary full"
+          onclick="selectWallet('${esc(String(w.id))}')">
+          ${active ? "Выбран" : "Выбрать"}
+        </button>
+      </div>
+    `;
+  }).join("");
 }
-
-function walletBalance(wallet){
-
-  return Number(
-    wallet?.balance ??
-    wallet?.amount ??
-    0
-  );
-}
-
-function formatAmount(value){
-
-  const n = Number(value || 0);
-
-  return n.toLocaleString(
-    "en-US",
-    {
-      minimumFractionDigits:0,
-      maximumFractionDigits:8
-    }
-  );
-}
-
-
-/* =========================================================
-   SELECT WALLET
-   ========================================================= */
 
 async function selectWallet(id){
 
   try{
 
-    await api("/api/wallet/select",{
-      method:"POST",
-      body:JSON.stringify({
-        walletId:id
-      })
-    });
+    const data=await api(
+      "/api/wallet/select",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          walletId:id
+        })
+      }
+    );
 
-  }catch{
-    // Server may not require selection.
+    currentWallet=
+      data.wallet ||
+      currentWallet;
+
+    if(currentWallet?.address){
+
+      localStorage.setItem(
+        STORAGE_ADDRESS,
+        currentWallet.address
+      );
+    }
+
+    await refreshAll();
+
+  }catch(error){
+
+    alert(error.message);
   }
-
-  activeWallet = String(id);
-
-  localStorage.setItem(
-    ACTIVE_WALLET_KEY,
-    activeWallet
-  );
-
-  await loadWallets();
-  await refreshHome();
-
-  toast("Кошелёк выбран");
 }
-
-
-/* =========================================================
-   CREATE WALLET
-   ========================================================= */
 
 async function createWallet(){
 
   try{
 
-    const data = await api("/api/wallet/create",{
-      method:"POST",
-      body:JSON.stringify({})
-    });
+    const keys=
+      await generateEd25519Wallet();
 
-    const wallet = data.wallet;
-
-    if(wallet?.id){
-
-      activeWallet = String(wallet.id);
-
-      localStorage.setItem(
-        ACTIVE_WALLET_KEY,
-        activeWallet
+    const address=
+      await deriveAddress(
+        keys.publicKeyBase64
       );
-    }
 
-    await loadWallets();
+    const data=await api(
+      "/api/wallet/create",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          publicKey:keys.publicKeyBase64
+        })
+      }
+    );
 
-    toast("Новый кошелёк создан");
+    await saveWalletKeys(
+      keys,
+      data.wallet?.address || address
+    );
+
+    currentWallet=
+      data.wallet || currentWallet;
+
+    await refreshAll();
+
+    alert("Новый криптографический кошелёк создан.");
 
   }catch(error){
 
-    toast(error.message);
+    alert(error.message);
   }
 }
 
-$("homeCreateWalletBtn")
-.addEventListener("click",createWallet);
+function updateWalletDisplay(){
 
-$("walletCreateBtn")
-.addEventListener("click",createWallet);
-
-
-/* =========================================================
-   WALLET RENDER
-   ========================================================= */
-
-function renderHomeWallets(){
-
-  const container = $("homeWallets");
-
-  if(!wallets.length){
-
-    container.innerHTML = `
-      <div class="muted small">
-        Кошельков пока нет.
-      </div>
-    `;
-
+  if(!currentWallet){
     return;
   }
 
-  container.innerHTML = wallets
-    .map(walletCardHTML)
-    .join("");
+  const address=
+    currentWallet.address ||
+    localStorage.getItem(STORAGE_ADDRESS) ||
+    "—";
 
-  bindWalletButtons(container);
-}
+  $("address").textContent=address;
+  $("walletAddress").textContent=address;
 
-function walletCardHTML(wallet){
-
-  const isActive =
-    String(wallet.id) === String(activeWallet);
-
-  const address =
-    wallet.address || "—";
-
-  return `
-    <div class="wallet-item">
-
-      <div class="wallet-icon">
-        S
-      </div>
-
-      <div class="wallet-info">
-
-        <div class="wallet-name">
-          Wallet #${escapeHTML(wallet.id)}
-        </div>
-
-        <div class="wallet-address">
-          ${escapeHTML(address)}
-        </div>
-
-        ${
-          isActive
-          ? `<div class="active-badge">● Активный</div>`
-          : ""
-        }
-
-      </div>
-
-      <div style="text-align:right">
-
-        <div class="wallet-balance">
-          ${formatAmount(walletBalance(wallet))} SLX
-        </div>
-
-        ${
-          !isActive
-          ? `
-            <button
-              class="small-select-wallet"
-              data-wallet-id="${escapeHTML(wallet.id)}"
-              style="
-                background:transparent;
-                color:#9baaff;
-                padding:4px 0;
-                font-size:10px;
-              ">
-              Выбрать
-            </button>
-          `
-          : ""
-        }
-
-      </div>
-
-    </div>
-  `;
-}
-
-function bindWalletButtons(container){
-
-  container
-    .querySelectorAll(".small-select-wallet")
-    .forEach(button=>{
-
-      button.addEventListener("click",()=>{
-
-        selectWallet(button.dataset.walletId);
-
+  $("balance").textContent=
+    Number(currentWallet.balance || 0)
+      .toLocaleString("ru-RU",{
+        maximumFractionDigits:8
       });
 
-    });
+  const pub=
+    currentWallet.publicKey ||
+    localStorage.getItem(STORAGE_PUBLIC) ||
+    "—";
+
+  $("publicKey").textContent=pub;
 }
-
-function renderWalletPage(){
-
-  const main = $("walletMain");
-  const list = $("walletList");
-
-  const wallet = getActiveWallet();
-
-  if(wallet){
-
-    main.innerHTML = `
-
-      <div class="balance-label">
-        Wallet #${escapeHTML(wallet.id)}
-      </div>
-
-      <div class="balance">
-        ${formatAmount(walletBalance(wallet))}
-        <span class="coin">SLX</span>
-      </div>
-
-      <div class="address">
-        ${escapeHTML(wallet.address || "—")}
-      </div>
-
-      <div style="height:12px"></div>
-
-      <div class="btn-row">
-
-        <button id="walletCopyBtn"
-                class="btn secondary">
-          📋 Копировать
-        </button>
-
-        <button id="walletQrBtn"
-                class="btn secondary">
-          ▣ QR
-        </button>
-
-      </div>
-    `;
-
-    $("walletCopyBtn")
-      .addEventListener("click",copyActiveAddress);
-
-    $("walletQrBtn")
-      .addEventListener("click",showAddressQR);
-
-  }else{
-
-    main.innerHTML = `
-      <div class="muted">
-        Нет активного кошелька.
-      </div>
-    `;
-  }
-
-  list.innerHTML = wallets.length
-    ? wallets.map(walletCardHTML).join("")
-    : `<div class="muted small">Нет кошельков.</div>`;
-
-  bindWalletButtons(list);
-}
-
-
-/* =========================================================
-   HOME
-   ========================================================= */
-
-async function refreshHome(){
-
-  try{
-
-    await loadWallets();
-
-    const wallet = getActiveWallet();
-
-    if(!wallet){
-
-      $("homeBalance").textContent = "0";
-      $("homeAddress").textContent = "Нет кошелька";
-
-      return;
-    }
-
-    $("homeBalance").textContent =
-      formatAmount(walletBalance(wallet));
-
-    $("homeAddress").textContent =
-      wallet.address || "—";
-
-    if(networkInfo){
-
-      $("homeNetwork").textContent =
-        networkInfo.status || "online";
-
-      $("homeFee").textContent =
-        formatAmount(networkInfo.transferFee) +
-        " SLX";
-    }
-
-  }catch(error){
-
-    toast(error.message);
-  }
-}
-
-
-/* =========================================================
-   COPY ADDRESS
-   ========================================================= */
-
-async function copyActiveAddress(){
-
-  const wallet = getActiveWallet();
-
-  if(!wallet?.address){
-
-    toast("Адрес отсутствует");
-    return;
-  }
-
-  try{
-
-    await navigator.clipboard.writeText(
-      wallet.address
-    );
-
-    toast("Адрес скопирован");
-
-  }catch{
-
-    toast("Не удалось скопировать адрес");
-  }
-}
-
-$("copyAddressBtn")
-.addEventListener("click",copyActiveAddress);
-
-
-/* =========================================================
-   QR
-   ========================================================= */
-
-function makeQRImage(address){
-
-  const encoded =
-    encodeURIComponent(address);
-
-  return `
-    <div class="qr-box">
-      <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}"
-        alt="SLX wallet QR"
-        width="300"
-        height="300">
-    </div>
-  `;
-}
-
-function showAddressQR(){
-
-  const wallet = getActiveWallet();
-
-  if(!wallet?.address){
-
-    toast("Нет адреса кошелька");
-    return;
-  }
-
-  openModal(
-    "QR кошелька",
-    `
-      ${makeQRImage(wallet.address)}
-
-      <div class="address">
-        ${escapeHTML(wallet.address)}
-      </div>
-
-      <div style="height:10px"></div>
-
-      <button id="qrCopyBtn"
-              class="btn secondary">
-        📋 Скопировать адрес
-      </button>
-    `
-  );
-
-  $("qrCopyBtn")
-    .addEventListener(
-      "click",
-      copyActiveAddress
-    );
-}
-
-$("showQrBtn")
-.addEventListener("click",showAddressQR);
 
 
 /* =========================================================
    SEND
    ========================================================= */
 
-$("homeSendBtn")
-.addEventListener("click",openSendModal);
+async function sendSLX(){
 
-function openSendModal(){
+  clearMessage("sendMessage");
 
-  const wallet = getActiveWallet();
+  if(!currentWallet){
 
-  if(!wallet){
-
-    toast("Сначала создай кошелёк");
-    return;
-  }
-
-  const fee =
-    networkInfo?.transferFee ?? 0.1;
-
-  openModal(
-    "Отправить SLX",
-    `
-      <label>Адрес получателя</label>
-
-      <input id="sendAddress"
-             class="input"
-             inputmode="text"
-             autocapitalize="characters"
-             placeholder="SLXC...">
-
-      <label>Количество SLX</label>
-
-      <input id="sendAmount"
-             class="input"
-             type="number"
-             min="0"
-             step="0.00000001"
-             placeholder="0">
-
-      <div class="stat" style="margin-bottom:12px">
-
-        <div class="stat-label">
-          Комиссия сети
-        </div>
-
-        <div class="stat-value">
-          ${formatAmount(fee)} SLX
-        </div>
-
-      </div>
-
-      <button id="sendConfirmBtn"
-              class="btn">
-        Отправить
-      </button>
-
-      <div style="height:10px"></div>
-
-      <div class="small muted">
-        Общая сумма = количество + комиссия.
-      </div>
-    `
-  );
-
-  $("sendConfirmBtn")
-    .addEventListener(
-      "click",
-      sendTransaction
+    showMessage(
+      "sendMessage",
+      "Кошелёк не выбран."
     );
-}
 
-async function sendTransaction(){
-
-  const to =
-    $("sendAddress").value.trim().toUpperCase();
-
-  const amount =
-    Number($("sendAmount").value);
-
-  if(!to){
-
-    toast("Введите адрес получателя");
     return;
   }
+
+  if(!privateKey){
+
+    const loaded=
+      await loadWalletKeys();
+
+    if(!loaded){
+
+      showMessage(
+        "sendMessage",
+        "Приватный ключ не найден на этом устройстве."
+      );
+
+      return;
+    }
+  }
+
+  const to=$("sendTo").value.trim().toUpperCase();
+  const amount=Number(
+    $("sendAmount").value
+  );
 
   if(!/^SLXC[A-F0-9]{32}$/.test(to)){
 
-    toast("Неверный формат SLX адреса");
+    showMessage(
+      "sendMessage",
+      "Некорректный SLX-адрес."
+    );
+
     return;
   }
 
-  if(!Number.isFinite(amount) || amount <= 0){
+  if(!Number.isFinite(amount) || amount<=0){
 
-    toast("Введите корректную сумму");
+    showMessage(
+      "sendMessage",
+      "Введите корректное количество SLX."
+    );
+
     return;
   }
 
-  const button =
-    $("sendConfirmBtn");
+  const fee=0.1;
 
-  button.disabled = true;
-  button.textContent = "Отправка...";
+  const from=
+    currentWallet.address ||
+    localStorage.getItem(STORAGE_ADDRESS);
+
+  const nonce=
+    Number(
+      currentWallet.nonce ??
+      0
+    );
+
+  const timestamp=
+    Date.now();
+
+  /*
+    Каноническое сообщение.
+    Порядок полей важен.
+  */
+
+  const payloadObject={
+    version:1,
+    chainId:NETWORK_ID,
+    nonce,
+    from,
+    to,
+    amount:amount.toFixed(8),
+    fee:fee.toFixed(8),
+    timestamp
+  };
+
+  const payload=
+    JSON.stringify(payloadObject);
 
   try{
 
-    const data = await api("/api/send",{
-      method:"POST",
-      body:JSON.stringify({
-        to,
-        amount
-      })
-    });
-
-    closeModal();
-
-    toast(
-      "Транзакция отправлена"
+    showMessage(
+      "sendMessage",
+      "Подписываем транзакцию Ed25519...",
+      "ok"
     );
 
-    await loadWallets();
-    await refreshHome();
+    const signature=
+      await signPayload(payload);
+
+    const publicKeyBase64=
+      localStorage.getItem(
+        STORAGE_PUBLIC
+      );
+
+    const data=await api(
+      "/api/send",
+      {
+        method:"POST",
+        body:JSON.stringify({
+
+          from,
+          to,
+
+          amount:
+            amount.toFixed(8),
+
+          fee:
+            fee.toFixed(8),
+
+          nonce,
+
+          timestamp,
+
+          publicKey:
+            publicKeyBase64,
+
+          signature,
+
+          message:
+            payload
+
+        })
+      }
+    );
+
+    showMessage(
+      "sendMessage",
+      data.message ||
+      "Транзакция успешно отправлена.",
+      "ok"
+    );
+
+    $("sendTo").value="";
+    $("sendAmount").value="";
+
+    await sleep(500);
+
+    await refreshAll();
 
   }catch(error){
 
-    toast(error.message);
+    console.error(error);
 
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "Отправить";
+    showMessage(
+      "sendMessage",
+      error.message ||
+      "Ошибка отправки."
+    );
   }
 }
 
@@ -2283,199 +1575,155 @@ async function sendTransaction(){
    FAUCET
    ========================================================= */
 
-$("homeFaucetBtn")
-.addEventListener("click",claimFaucet);
-
 async function claimFaucet(){
 
-  const wallet = getActiveWallet();
-
-  if(!wallet){
-
-    toast("Нет активного кошелька");
-    return;
-  }
-
-  const button =
-    $("homeFaucetBtn");
-
-  button.disabled = true;
-  button.textContent = "Получение...";
+  clearMessage("faucetMessage");
 
   try{
 
-    const data = await api("/api/faucet",{
-      method:"POST",
-      body:JSON.stringify({
-        walletId:wallet.id
-      })
-    });
-
-    toast(
-      data.message ||
-      "Получено 10 SLX"
+    const data=await api(
+      "/api/faucet",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          walletId:
+            currentWallet?.id
+        })
+      }
     );
 
-    await loadWallets();
-    await refreshHome();
+    showMessage(
+      "faucetMessage",
+      data.message ||
+      "Faucet выполнен.",
+      "ok"
+    );
+
+    await refreshAll();
 
   }catch(error){
 
-    toast(error.message);
-
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "+10 SLX";
+    showMessage(
+      "faucetMessage",
+      error.message
+    );
   }
 }
 
 
 /* =========================================================
-   HISTORY
+   TRANSACTIONS
    ========================================================= */
 
-async function loadHistory(){
+async function loadTransactions(){
 
-  const container =
-    $("historyList");
+  if(!currentWallet){
 
-  const wallet =
-    getActiveWallet();
-
-  if(!wallet){
-
-    container.innerHTML = `
-      <div class="muted">
-        Нет активного кошелька.
-      </div>
-    `;
+    $("history").innerHTML=
+      `<div class="muted">Выберите кошелёк.</div>`;
 
     return;
   }
 
-  container.innerHTML =
-    `<div class="muted small">Загрузка...</div>`;
-
   try{
 
-    const data =
+    const data=
       await api(
-        "/api/wallet/" +
-        encodeURIComponent(wallet.id)
+        `/api/wallet/${encodeURIComponent(currentWallet.id)}`
       );
 
-    const transactions =
-      data.transactions || [];
+    const wallet=
+      data.wallet ||
+      data;
 
-    if(!transactions.length){
+    if(wallet){
 
-      container.innerHTML = `
-        <div class="muted small">
-          Транзакций пока нет.
-        </div>
-      `;
+      currentWallet={
+        ...currentWallet,
+        ...wallet
+      };
 
-      return;
+      updateWalletDisplay();
     }
 
-    container.innerHTML =
-      transactions
-        .map(transactionHTML)
-        .join("");
+    const txs=
+      wallet.transactions ||
+      data.transactions ||
+      [];
+
+    renderTransactions(txs);
 
   }catch(error){
 
-    container.innerHTML = `
-      <div class="error">
-        ${escapeHTML(error.message)}
-      </div>
-    `;
+    console.error(error);
+
+    $("history").innerHTML=
+      `<div class="muted">История недоступна.</div>`;
   }
 }
 
-function transactionHTML(tx){
+function renderTransactions(txs){
 
-  const type =
-    String(tx.type || "").toUpperCase();
+  if(!Array.isArray(txs) || !txs.length){
 
-  const amount =
-    Number(tx.amount || 0);
+    $("history").innerHTML=
+      `<div class="muted">Транзакций пока нет.</div>`;
 
-  const positive =
-    type === "RECEIVE" ||
-    type === "FAUCET" ||
-    type === "GENESIS";
+    return;
+  }
 
-  const cls =
-    positive ? "positive" : "negative";
+  $("history").innerHTML=
+    txs.map(tx=>{
 
-  const sign =
-    positive ? "+" : "-";
+      const type=
+        String(tx.type || "").toUpperCase();
 
-  return `
-    <div class="transaction">
+      const incoming=
+        type==="RECEIVE" ||
+        type==="FAUCET" ||
+        Number(tx.amount)>0 &&
+        tx.to_wallet;
 
-      <div class="tx-top">
+      const amount=
+        Number(tx.amount || 0);
 
-        <div class="tx-type">
-          ${escapeHTML(type || "TX")}
-        </div>
+      return `
+        <div class="tx">
 
-        <div class="tx-amount ${cls}">
-          ${sign}${formatAmount(amount)} SLX
-        </div>
+          <div class="tx-title">
 
-      </div>
+            <b>
+              ${
+                incoming
+                ? "Получение"
+                : "Отправка"
+              }
+            </b>
 
-      <div class="tx-meta">
-        ID: ${escapeHTML(tx.id || "—")}
-      </div>
+            <b class="${incoming?"green":"red"}">
+              ${incoming?"+":"-"}${amount} SLX
+            </b>
 
-      ${
-        tx.from_wallet
-        ? `
-          <div class="tx-meta">
-            From: ${escapeHTML(tx.from_wallet)}
           </div>
-        `
-        : ""
-      }
 
-      ${
-        tx.to_wallet
-        ? `
-          <div class="tx-meta">
-            To: ${escapeHTML(tx.to_wallet)}
+          <div class="muted small">
+            ${esc(tx.created_at || tx.timestamp || "")}
           </div>
-        `
-        : ""
-      }
 
-      ${
-        tx.fee !== undefined
-        ? `
-          <div class="tx-meta">
-            Fee: ${formatAmount(tx.fee)} SLX
-          </div>
-        `
-        : ""
-      }
-
-      ${
-        tx.created_at
-        ? `
-          <div class="tx-meta">
-            ${escapeHTML(
-              new Date(tx.created_at).toLocaleString()
+          <div class="muted small">
+            ${esc(
+              tx.to_wallet ||
+              tx.to ||
+              tx.from_wallet ||
+              tx.from ||
+              ""
             )}
           </div>
-        `
-        : ""
-      }
 
-    </div>
-  `;
+        </div>
+      `;
+
+    }).join("");
 }
 
 
@@ -2483,440 +1731,185 @@ function transactionHTML(tx){
    NETWORK
    ========================================================= */
 
-async function loadNetwork(){
+async function loadStatus(){
 
   try{
 
-    networkInfo =
-      await api("/api/status");
+    const data=
+      await api(
+        "/api/status"
+      );
 
-    $("homeNetwork").textContent =
-      networkInfo.status || "online";
+    $("networkVersion").textContent=
+      data.version ||
+      data.networkVersion ||
+      CLIENT_VERSION;
 
-    $("homeFee").textContent =
-      formatAmount(networkInfo.transferFee) +
-      " SLX";
+    $("networkId").textContent=
+      data.networkId ||
+      NETWORK_ID;
 
-  }catch{
-
-    networkInfo = null;
-  }
-}
-
-async function loadNetworkPage(){
-
-  try{
-
-    await loadNetwork();
-
-    const status =
-      networkInfo || {};
-
-    $("networkStatus").textContent =
-      status.status || "unknown";
-
-    $("networkVersion").textContent =
-      status.version || "—";
-
-    $("networkFee").textContent =
-      formatAmount(status.transferFee) +
-      " SLX";
-
-    const blocksData =
-      await api("/api/blocks");
-
-    const blocks =
-      blocksData.blocks || [];
-
-    $("networkBlocksCount").textContent =
-      blocks.length;
-
-    renderBlocks(blocks);
-
-    await loadEconomy();
+    $("blockCount").textContent=
+      data.blockHeight ??
+      data.blocks ??
+      data.height ??
+      "—";
 
   }catch(error){
 
-    toast(error.message);
+    console.error(error);
   }
-}
-
-function renderBlocks(blocks){
-
-  const container =
-    $("blocksList");
-
-  if(!blocks.length){
-
-    container.innerHTML = `
-      <div class="muted small">
-        Блоков нет.
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML =
-    blocks
-      .slice(0,20)
-      .map(block=>`
-
-        <div class="transaction">
-
-          <div class="tx-top">
-
-            <div class="tx-type">
-              Block #${escapeHTML(block.block_index)}
-            </div>
-
-            <div class="tx-amount">
-              ${escapeHTML(
-                block.transaction_count ?? 0
-              )} TX
-            </div>
-
-          </div>
-
-          <div class="tx-meta">
-            Hash:
-            ${escapeHTML(block.hash || "—")}
-          </div>
-
-          <div class="tx-meta">
-            Previous:
-            ${escapeHTML(block.previous_hash || "—")}
-          </div>
-
-          <div class="tx-meta">
-            Merkle:
-            ${escapeHTML(block.merkle_root || "—")}
-          </div>
-
-          <div class="tx-meta">
-            ${block.timestamp
-              ? escapeHTML(
-                  new Date(block.timestamp)
-                  .toLocaleString()
-                )
-              : "—"}
-          </div>
-
-        </div>
-
-      `)
-      .join("");
 }
 
 async function loadEconomy(){
 
-  const container =
-    $("economy");
-
   try{
 
-    const data =
-      await api("/api/economy");
+    const data=
+      await api(
+        "/api/economy"
+      );
 
-    container.innerHTML = `
+    $("maxSupply").textContent=
+      data.maxSupply ??
+      data.maximumSupply ??
+      "21,000,000";
 
-      <div class="grid">
+    $("circulating").textContent=
+      data.circulatingSupply ??
+      data.circulating ??
+      "—";
 
-        <div class="stat">
-          <div class="stat-label">
-            Max Supply
-          </div>
-          <div class="stat-value">
-            ${formatAmount(data.maxSupply)}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">
-            Total Balance
-          </div>
-          <div class="stat-value">
-            ${formatAmount(data.totalBalance)}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">
-            Remaining
-          </div>
-          <div class="stat-value">
-            ${formatAmount(data.remaining)}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">
-            Faucet
-          </div>
-          <div class="stat-value">
-            ${formatAmount(data.faucetAmount)}
-          </div>
-        </div>
-
-      </div>
-    `;
+    $("walletCount").textContent=
+      data.wallets ??
+      data.walletCount ??
+      "—";
 
   }catch(error){
 
-    container.innerHTML = `
-      <div class="error">
-        ${escapeHTML(error.message)}
-      </div>
-    `;
+    console.error(error);
   }
 }
-
-
-/* =========================================================
-   CHAIN VERIFY
-   ========================================================= */
-
-$("verifyChainBtn")
-.addEventListener("click",verifyChain);
 
 async function verifyChain(){
 
-  const button =
-    $("verifyChainBtn");
-
-  const result =
-    $("chainVerifyResult");
-
-  button.disabled = true;
-  button.textContent = "Проверка...";
-
-  result.innerHTML = "";
+  clearMessage("chainMessage");
 
   try{
 
-    const data =
-      await api("/api/chain/verify");
+    const data=
+      await api(
+        "/api/chain/verify"
+      );
 
-    const valid =
-      data.valid === true;
+    const valid=
+      data.valid ??
+      data.ok;
 
-    result.innerHTML = valid
-      ? `
-        <div class="success">
-          ✓ Цепочка блоков корректна.
-          ${data.blocks !== undefined
-            ? `<br>Проверено блоков: ${escapeHTML(data.blocks)}`
-            : ""}
-        </div>
-      `
-      : `
-        <div class="error">
-          ✕ Цепочка содержит ошибку.
-          ${data.error
-            ? `<br>${escapeHTML(data.error)}`
-            : ""}
-        </div>
-      `;
+    if(valid){
+
+      showMessage(
+        "chainMessage",
+        "✓ Blockchain проверен. Цепочка корректна.",
+        "ok"
+      );
+
+    }else{
+
+      showMessage(
+        "chainMessage",
+        data.message ||
+        "Blockchain verification failed."
+      );
+    }
 
   }catch(error){
 
-    result.innerHTML = `
-      <div class="error">
-        Ошибка проверки:
-        ${escapeHTML(error.message)}
-      </div>
-    `;
-
-  }finally{
-
-    button.disabled = false;
-    button.textContent = "🔐 Проверить цепочку";
+    showMessage(
+      "chainMessage",
+      error.message
+    );
   }
 }
 
 
 /* =========================================================
-   PROFILE / AVATAR
+   PROFILE
    ========================================================= */
-
-function loadAvatar(){
-
-  const avatar =
-    localStorage.getItem(AVATAR_KEY);
-
-  renderAvatar(
-    $("headerAvatar"),
-    avatar
-  );
-
-  renderAvatar(
-    $("settingsAvatar"),
-    avatar
-  );
-}
-
-function renderAvatar(element,src){
-
-  if(!element) return;
-
-  if(src){
-
-    element.innerHTML =
-      `<img src="${src}" alt="Avatar">`;
-
-  }else{
-
-    const username =
-      currentUser?.username || "S";
-
-    element.textContent =
-      username.charAt(0).toUpperCase();
-  }
-}
 
 function updateProfile(){
 
-  if(!currentUser) return;
+  $("profileUsername").textContent=
+    currentUser?.username ||
+    currentUser?.name ||
+    "—";
 
-  $("profileUsername").textContent =
-    currentUser.username || "User";
+  const avatar=
+    localStorage.getItem(
+      STORAGE_AVATAR
+    );
 
-  $("profileWalletCount").textContent =
-    `${wallets.length} кошельков`;
+  if(avatar){
 
-  loadAvatar();
+    $("avatarPreview").src=avatar;
+  }
 }
 
-$("headerAvatar")
-.addEventListener("click",()=>{
+function saveAvatar(event){
 
-  showPage("settings");
-
-});
-
-
-/* =========================================================
-   AVATAR UPLOAD
-   ========================================================= */
-
-$("avatarInput")
-.addEventListener("change",event=>{
-
-  const file =
+  const file=
     event.target.files?.[0];
 
-  if(!file) return;
+  if(!file){
+    return;
+  }
 
   if(!file.type.startsWith("image/")){
-
-    toast("Выбери изображение");
     return;
   }
 
-  if(file.size > 5 * 1024 * 1024){
-
-    toast("Фото должно быть меньше 5 MB");
-    return;
-  }
-
-  const reader =
+  const reader=
     new FileReader();
 
-  reader.onload = ()=>{
+  reader.onload=()=>{
 
     localStorage.setItem(
-      AVATAR_KEY,
+      STORAGE_AVATAR,
       reader.result
     );
 
-    loadAvatar();
-
-    toast("Фото профиля сохранено");
-  };
-
-  reader.onerror = ()=>{
-
-    toast("Не удалось прочитать изображение");
+    $("avatarPreview").src=
+      reader.result;
   };
 
   reader.readAsDataURL(file);
-});
-
-
-$("removeAvatarBtn")
-.addEventListener("click",()=>{
-
-  localStorage.removeItem(AVATAR_KEY);
-
-  $("avatarInput").value = "";
-
-  loadAvatar();
-
-  toast("Фото удалено");
-});
+}
 
 
 /* =========================================================
-   CHANGE PASSWORD
+   PASSWORD
    ========================================================= */
-
-$("changePasswordBtn")
-.addEventListener("click",()=>{
-
-  openModal(
-    "Изменить пароль",
-    `
-      <label>Текущий пароль</label>
-
-      <input id="oldPassword"
-             class="input"
-             type="password"
-             autocomplete="current-password">
-
-      <label>Новый пароль</label>
-
-      <input id="newPassword"
-             class="input"
-             type="password"
-             autocomplete="new-password">
-
-      <button id="changePasswordConfirm"
-              class="btn">
-        Изменить пароль
-      </button>
-    `
-  );
-
-  $("changePasswordConfirm")
-    .addEventListener(
-      "click",
-      changePassword
-    );
-});
 
 async function changePassword(){
 
-  const oldPassword =
+  const oldPassword=
     $("oldPassword").value;
 
-  const newPassword =
+  const newPassword=
     $("newPassword").value;
 
-  if(!oldPassword || !newPassword){
+  if(!oldPassword || newPassword.length<6){
 
-    toast("Заполни оба поля");
-    return;
-  }
+    alert(
+      "Введите текущий пароль и новый пароль минимум из 6 символов."
+    );
 
-  if(newPassword.length < 8){
-
-    toast("Новый пароль минимум 8 символов");
     return;
   }
 
   try{
 
-    const data =
+    const data=
       await api(
         "/api/auth/password/change",
         {
@@ -2930,21 +1923,237 @@ async function changePassword(){
 
     if(data.token){
 
-      token = data.token;
+      token=data.token;
 
       localStorage.setItem(
-        TOKEN_KEY,
+        STORAGE_TOKEN,
         token
       );
     }
 
-    closeModal();
+    $("oldPassword").value="";
+    $("newPassword").value="";
 
-    toast("Пароль изменён");
+    alert(
+      data.message ||
+      "Пароль изменён."
+    );
 
   }catch(error){
 
-    toast(error.message);
+    alert(error.message);
+  }
+}
+
+
+/* =========================================================
+   RECOVERY
+   ========================================================= */
+
+function showRecovery(){
+
+  $("recoveryModal")
+    .classList.remove("hidden");
+
+  clearMessage(
+    "recoveryMessage"
+  );
+}
+
+function closeRecovery(){
+
+  $("recoveryModal")
+    .classList.add("hidden");
+}
+
+async function resetPassword(){
+
+  const username=
+    $("recoveryUsername").value.trim();
+
+  const recoveryCode=
+    $("recoveryCode").value.trim();
+
+  const newPassword=
+    $("recoveryNewPassword").value;
+
+  if(!username ||
+     !recoveryCode ||
+     newPassword.length<6){
+
+    showMessage(
+      "recoveryMessage",
+      "Заполни все поля."
+    );
+
+    return;
+  }
+
+  try{
+
+    const data=
+      await api(
+        "/api/auth/recovery/reset",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            username,
+            recoveryCode,
+            newPassword
+          })
+        }
+      );
+
+    if(data.token){
+
+      token=data.token;
+
+      localStorage.setItem(
+        STORAGE_TOKEN,
+        token
+      );
+    }
+
+    showMessage(
+      "recoveryMessage",
+      "Пароль восстановлен.",
+      "ok"
+    );
+
+    await sleep(700);
+
+    closeRecovery();
+
+    await loadMe();
+
+  }catch(error){
+
+    showMessage(
+      "recoveryMessage",
+      error.message
+    );
+  }
+}
+
+function closeRecoveryCode(){
+
+  $("recoveryCodeModal")
+    .classList.add("hidden");
+}
+
+
+/* =========================================================
+   PRIVATE KEY BACKUP
+   ========================================================= */
+
+function showPrivateKey(){
+
+  const key=
+    localStorage.getItem(
+      STORAGE_PRIVATE
+    );
+
+  if(!key){
+
+    alert(
+      "Приватный ключ на этом устройстве не найден."
+    );
+
+    return;
+  }
+
+  $("privateKeyBackup").textContent=
+    key;
+
+  $("privateModal")
+    .classList.remove("hidden");
+}
+
+function closePrivateKey(){
+
+  $("privateModal")
+    .classList.add("hidden");
+}
+
+async function copyPrivateKey(){
+
+  const key=
+    localStorage.getItem(
+      STORAGE_PRIVATE
+    );
+
+  if(!key){
+    return;
+  }
+
+  await navigator.clipboard.writeText(key);
+
+  alert("Приватный ключ скопирован.");
+}
+
+
+/* =========================================================
+   ADDRESS
+   ========================================================= */
+
+async function copyAddress(){
+
+  const address=
+    currentWallet?.address ||
+    localStorage.getItem(STORAGE_ADDRESS);
+
+  if(!address){
+    return;
+  }
+
+  await navigator.clipboard.writeText(
+    address
+  );
+
+  alert("SLX-адрес скопирован.");
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function openPage(name,button){
+
+  document
+    .querySelectorAll(".page")
+    .forEach(page=>{
+      page.classList.remove("active");
+    });
+
+  const page=
+    $("page-"+name);
+
+  if(page){
+    page.classList.add("active");
+  }
+
+  document
+    .querySelectorAll(".nav button")
+    .forEach(btn=>{
+      btn.classList.remove("active");
+    });
+
+  if(button){
+    button.classList.add("active");
+  }
+
+  if(name==="history"){
+    loadTransactions();
+  }
+
+  if(name==="network"){
+    loadStatus();
+    loadEconomy();
+  }
+
+  if(name==="wallet"){
+    loadWallets();
   }
 }
 
@@ -2953,75 +2162,79 @@ async function changePassword(){
    LOGOUT
    ========================================================= */
 
-$("logoutBtn")
-.addEventListener("click",logout);
-
 async function logout(){
 
   try{
 
-    await api("/api/auth/logout",{
-      method:"POST",
-      body:JSON.stringify({})
-    });
+    await api(
+      "/api/auth/logout",
+      {
+        method:"POST"
+      }
+    );
 
-  }catch{
-    // Continue local logout even if server fails.
-  }
+  }catch{}
 
-  token = "";
-  currentUser = null;
-  wallets = [];
-  activeWallet = "";
+  token="";
 
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(ACTIVE_WALLET_KEY);
+  localStorage.removeItem(
+    STORAGE_TOKEN
+  );
 
-  showAuth();
+  currentUser=null;
+  currentWallet=null;
 
-  toast("Вы вышли из аккаунта");
+  showAuthScreen();
+  showAuth("login");
 }
 
 
 /* =========================================================
-   KEYBOARD
+   START
    ========================================================= */
 
-$("loginPassword")
-.addEventListener("keydown",event=>{
+async function boot(){
 
-  if(event.key === "Enter"){
-    login();
+  $("fee").textContent=
+    "0.1 SLX";
+
+  const avatar=
+    localStorage.getItem(
+      STORAGE_AVATAR
+    );
+
+  if(avatar){
+    $("avatarPreview").src=avatar;
   }
 
-});
+  /*
+    Загружаем приватный ключ локально.
+    Сервер его никогда не получает.
+  */
 
-$("registerPassword")
-.addEventListener("keydown",event=>{
-
-  if(event.key === "Enter"){
-    register();
-  }
-
-});
-
-
-/* =========================================================
-   INITIAL START
-   ========================================================= */
-
-(async function(){
+  await loadWalletKeys();
 
   if(token){
 
-    await startApp();
+    try{
+
+      await loadMe();
+
+    }catch(error){
+
+      console.error(error);
+
+      showAuthScreen();
+    }
 
   }else{
 
-    showAuth();
+    showAuthScreen();
   }
+}
 
-})();
+boot();
+
 </script>
 
 </body>
