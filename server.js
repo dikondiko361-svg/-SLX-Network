@@ -45,49 +45,78 @@ const sessions = new Map();
 // Helpers
 // ============================================================
 
-function json(res, status, data) {
-  res.writeHead(status, {
-    "Content-Type": "application/json; charset=utf-8",
-    "Cache-Control": "no-store"
-  });
+function walletCardHTML(wallet){
+  const activeId = localStorage.getItem("slx_active_wallet");
+  const isActive = String(wallet.id) === String(activeId);
 
-  res.end(JSON.stringify(data));
+  const balance = Number(wallet.balance ?? wallet.amount ?? 0);
+
+  const address = wallet.address || "";
+
+  const shortAddress =
+    address.length > 18
+      ? address.slice(0, 10) + "..." + address.slice(-6)
+      : address;
+
+  const walletId = String(wallet.id || "unknown");
+
+  const shortWalletId =
+    walletId.length > 17
+      ? walletId.slice(0, 12) + "..."
+      : walletId;
+
+  return `
+    <div class="wallet-card ${isActive ? "active" : ""}">
+
+      <div class="wallet-icon">S</div>
+
+      <div class="wallet-main">
+
+        <div class="wallet-title">
+          Wallet #${escapeHtml(shortWalletId)}
+        </div>
+
+        <div class="wallet-address">
+          ${escapeHtml(shortAddress)}
+        </div>
+
+        ${
+          isActive
+            ? `
+              <div class="wallet-status">
+                <span class="wallet-status-dot"></span>
+                Активный
+              </div>
+            `
+            : ""
+        }
+
+      </div>
+
+      <div class="wallet-right">
+
+        <div class="wallet-balance">
+          ${formatSLX(balance)} SLX
+        </div>
+
+        ${
+          isActive
+            ? ""
+            : `
+              <button
+                class="wallet-select"
+                onclick="selectWallet('${escapeJs(wallet.id)}')"
+              >
+                Выбрать
+              </button>
+            `
+        }
+
+      </div>
+
+    </div>
+  `;
 }
-
-function sendText(
-  res,
-  status,
-  text,
-  contentType = "text/plain; charset=utf-8"
-) {
-  res.writeHead(status, {
-    "Content-Type": contentType
-  });
-
-  res.end(text);
-}
-
-function makeId(prefix) {
-  return (
-    prefix +
-    crypto.randomBytes(12).toString("hex").toUpperCase()
-  );
-}
-
-function makeAddress() {
-  return (
-    "SLXC" +
-    crypto.randomBytes(16).toString("hex").toUpperCase()
-  );
-}
-
-function sha256(text) {
-  return crypto
-    .createHash("sha256")
-    .update(String(text))
-    .digest("hex");
-}
-
 function isValidUsername(username) {
   return /^[a-zA-Z0-9_.-]{3,32}$/.test(username);
 }
