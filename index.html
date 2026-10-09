@@ -10,26 +10,199 @@
 <title>SLX Network v1.9.0</title>
 
 <style>
-:root{
-  --bg:#080b12;
-  --card:#101622;
-  --card2:#151d2b;
-  --line:#263044;
-  --text:#f4f7fb;
-  --muted:#8e9aae;
-  --accent:#7c5cff;
-  --accent2:#5d8cff;
-  --green:#35d07f;
-  --red:#ff5f6d;
-  --yellow:#ffc857;
-  --radius:18px;
+/* =========================
+   COMPACT WALLET v2
+   ========================= */
+
+.wallet-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:14px;
 }
 
-*{
+.wallet-card{
+  width:100%;
+  min-height:74px;
   box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:10px 12px;
+  border:1px solid #263044;
+  border-radius:18px;
+  background:#151d2b;
+  overflow:hidden;
 }
 
+.wallet-card:hover{
+  border-color:#3b4a68;
+}
+
+.wallet-card.active{
+  border-color:#4968d8;
+  background:#172033;
+}
+
+.wallet-icon{
+  width:48px;
+  height:48px;
+  min-width:48px;
+  border-radius:14px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#7658ff,#416fe8);
+  color:#fff;
+  font-size:23px;
+  font-weight:900;
+}
+
+.wallet-main{
+  min-width:0;
+  flex:1;
+  overflow:hidden;
+}
+
+.wallet-title{
+  display:block;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:17px;
+  line-height:21px;
+  font-weight:800;
+  color:#f4f7fb;
+}
+
+.wallet-address{
+  display:block;
+  margin-top:3px;
+  max-width:100%;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:12px;
+  line-height:16px;
+  color:#8e9aae;
+  font-weight:600;
+}
+
+.wallet-status{
+  margin-top:3px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  font-size:11px;
+  line-height:14px;
+  color:#35d07f;
+  font-weight:800;
+}
+
+.wallet-status-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#35d07f;
+  display:inline-block;
+}
+
+.wallet-right{
+  min-width:92px;
+  max-width:125px;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-end;
+  justify-content:center;
+  gap:4px;
+  text-align:right;
+}
+
+.wallet-balance{
+  max-width:125px;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  font-size:16px;
+  line-height:20px;
+  font-weight:900;
+  color:#f4f7fb;
+}
+
+.wallet-select{
+  border:0;
+  background:transparent;
+  padding:0;
+  margin:0;
+  color:#7c8cff;
+  font-size:12px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.wallet-select:active{
+  opacity:.65;
+}
+
+.wallet-create{
+  width:100%;
+  min-height:54px;
+  margin-top:10px;
+  border:1px solid #263044;
+  border-radius:16px;
+  background:#151d2b;
+  color:#f4f7fb;
+  font-size:16px;
+  font-weight:800;
+}
+
+.wallet-create:active{
+  transform:scale(.985);
+}
+
+/* На маленьком экране ещё компактнее */
+@media(max-width:420px){
+  .wallet-card{
+    min-height:68px;
+    padding:8px 10px;
+    border-radius:16px;
+    gap:9px;
+  }
+
+  .wallet-icon{
+    width:42px;
+    height:42px;
+    min-width:42px;
+    border-radius:12px;
+    font-size:20px;
+  }
+
+  .wallet-title{
+    font-size:15px;
+    line-height:19px;
+  }
+
+  .wallet-address{
+    font-size:11px;
+    line-height:14px;
+  }
+
+  .wallet-right{
+    min-width:82px;
+    max-width:100px;
+  }
+
+  .wallet-balance{
+    max-width:100px;
+    font-size:14px;
+    line-height:18px;
+  }
+
+  .wallet-select{
+    font-size:11px;
+  }
+}
 html,body{
   margin:0;
   padding:0;
