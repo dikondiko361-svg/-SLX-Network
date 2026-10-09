@@ -1,16 +1,18 @@
 {
   "name": "slx-network",
-  "version": "1.8.2",
-  "description": "SLX Network cryptographic testnet",
+  "version": "1.9.0",
+  "description": "SLX Network Simple Testnet",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
-  "engines": {
-    "node": ">=22.13.0"
-  },
   "dependencies": {
-    "pg": "^8.16.3"
+    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "bcryptjs": "^3.0.2",
+    "jsonwebtoken": "^9.0.2"
   },
-  "license": "MIT"
+  "engines": {
+    "node": ">=18"
+  }
 }
