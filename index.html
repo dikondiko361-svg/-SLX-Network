@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-<title>SLX Network v1.8.2</title>
+<title>SLX Network v1.9.0</title>
 
 <style>
 :root{
@@ -610,11 +610,6 @@ label{
   transform:translateX(-50%) translateY(0);
 }
 
-.loading{
-  opacity:.6;
-  pointer-events:none;
-}
-
 .code-box{
   background:#090d15;
   border:1px dashed var(--accent);
@@ -625,6 +620,47 @@ label{
   letter-spacing:2px;
   text-align:center;
   word-break:break-all;
+}
+
+.scanner-wrap{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  background:#000;
+  border-radius:18px;
+  overflow:hidden;
+}
+
+.scanner-video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.scanner-frame{
+  position:absolute;
+  inset:15%;
+  border:3px solid var(--accent);
+  border-radius:18px;
+  box-shadow:0 0 0 999px rgba(0,0,0,.38);
+  pointer-events:none;
+}
+
+.scanner-line{
+  position:absolute;
+  left:18%;
+  right:18%;
+  top:50%;
+  height:2px;
+  background:#7c5cff;
+  box-shadow:0 0 12px #7c5cff;
+  animation:scanline 1.8s linear infinite;
+}
+
+@keyframes scanline{
+  0%{transform:translateY(-100px)}
+  50%{transform:translateY(100px)}
+  100%{transform:translateY(-100px)}
 }
 
 hr{
@@ -663,7 +699,6 @@ hr{
 
     <div id="authError" class="error hidden"></div>
 
-    <!-- LOGIN -->
     <div id="loginForm" class="card">
 
       <label>Имя пользователя</label>
@@ -691,7 +726,6 @@ hr{
 
     </div>
 
-    <!-- REGISTER -->
     <div id="registerForm" class="card hidden">
 
       <label>Имя пользователя</label>
@@ -718,423 +752,444 @@ hr{
     </div>
 
     <div style="text-align:center;margin-top:15px" class="small muted">
-      SLX Network v1.8.2 · Testnet
+      SLX Network v1.9.0 · Testnet
     </div>
 
   </div>
 </div>
+
 
 <!-- APP -->
 <div id="appScreen" class="hidden">
 
-  <div class="app">
+<div class="app">
 
-    <header class="header">
+<header class="header">
 
-      <div class="brand">
-        <div class="logo">SLX</div>
+  <div class="brand">
+    <div class="logo">SLX</div>
 
-        <div>
-          <div class="brand-title">SLX Network</div>
-          <div class="version">v1.8.2 · Testnet</div>
-        </div>
-      </div>
+    <div>
+      <div class="brand-title">SLX Network</div>
+      <div class="version">v1.9.0 · Testnet</div>
+    </div>
+  </div>
 
-      <button id="headerAvatar"
-              class="avatar"
-              title="Профиль">
-        S
-      </button>
+  <button id="headerAvatar"
+          class="avatar">
+    S
+  </button>
 
-    </header>
+</header>
 
-    <!-- HOME -->
-    <section id="page-home" class="page active">
 
-      <div class="balance-card card">
+<!-- HOME -->
+<section id="page-home" class="page active">
 
-        <div class="balance-label">
-          Баланс активного кошелька
-        </div>
+<div class="balance-card card">
 
-        <div class="balance">
-          <span id="homeBalance">0</span>
-          <span class="coin">SLX</span>
-        </div>
+  <div class="balance-label">
+    Баланс активного кошелька
+  </div>
 
-        <div id="homeAddress" class="address">
-          —
-        </div>
+  <div class="balance">
+    <span id="homeBalance">0</span>
+    <span class="coin">SLX</span>
+  </div>
 
-        <div style="height:12px"></div>
+  <div id="homeAddress" class="address">
+    —
+  </div>
 
-        <div class="btn-row">
+  <div style="height:12px"></div>
 
-          <button id="copyAddressBtn" class="btn secondary">
-            📋 Копировать
-          </button>
+  <div class="btn-row">
 
-          <button id="showQrBtn" class="btn secondary">
-            ▣ QR
-          </button>
+    <button id="copyAddressBtn"
+            class="btn secondary">
+      📋 Копировать
+    </button>
 
-        </div>
-
-      </div>
-
-      <div class="grid">
-
-        <div class="stat">
-          <div class="stat-label">Сеть</div>
-          <div id="homeNetwork" class="stat-value">
-            —
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-label">Комиссия</div>
-          <div id="homeFee" class="stat-value">
-            —
-          </div>
-        </div>
-
-      </div>
-
-      <div style="height:10px"></div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Быстрые действия
-        </div>
-
-        <div class="btn-row">
-
-          <button id="homeSendBtn" class="btn">
-            ↑ Отправить
-          </button>
-
-          <button id="homeFaucetBtn" class="btn green">
-            +10 SLX
-          </button>
-
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Мои кошельки
-        </div>
-
-        <div id="homeWallets">
-          Загрузка...
-        </div>
-
-        <button id="homeCreateWalletBtn"
-                class="btn secondary">
-          ＋ Создать кошелёк
-        </button>
-
-      </div>
-
-      <div class="warning">
-        SLX сейчас работает как тестовая сеть. Балансы и токены этой версии не являются реальными денежными средствами.
-      </div>
-
-    </section>
-
-    <!-- WALLET -->
-    <section id="page-wallet" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Активный кошелёк
-        </div>
-
-        <div id="walletMain"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Все кошельки
-        </div>
-
-        <div id="walletList">
-          Загрузка...
-        </div>
-
-        <button id="walletCreateBtn"
-                class="btn secondary">
-          ＋ Создать кошелёк
-        </button>
-
-      </div>
-
-    </section>
-
-    <!-- HISTORY -->
-    <section id="page-history" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          История транзакций
-        </div>
-
-        <div id="historyList">
-          Загрузка...
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- NETWORK -->
-    <section id="page-network" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Состояние сети
-        </div>
-
-        <div class="grid">
-
-          <div class="stat">
-            <div class="stat-label">Статус</div>
-            <div id="networkStatus" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Версия</div>
-            <div id="networkVersion" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Блоков</div>
-            <div id="networkBlocksCount" class="stat-value">
-              —
-            </div>
-          </div>
-
-          <div class="stat">
-            <div class="stat-label">Комиссия</div>
-            <div id="networkFee" class="stat-value">
-              —
-            </div>
-          </div>
-
-        </div>
-
-        <div style="height:12px"></div>
-
-        <button id="verifyChainBtn"
-                class="btn secondary">
-          🔐 Проверить цепочку
-        </button>
-
-        <div style="height:10px"></div>
-
-        <div id="chainVerifyResult"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Экономика SLX
-        </div>
-
-        <div id="economy"></div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Последние блоки
-        </div>
-
-        <div id="blocksList">
-          Загрузка...
-        </div>
-
-      </div>
-
-    </section>
-
-    <!-- SETTINGS -->
-    <section id="page-settings" class="page">
-
-      <div class="card">
-
-        <div class="card-title">
-          Профиль
-        </div>
-
-        <div class="profile-center">
-
-          <div id="settingsAvatar"
-               class="avatar-big">
-            S
-          </div>
-
-          <div style="height:12px"></div>
-
-          <div id="profileUsername"
-               style="font-weight:900;font-size:18px">
-            —
-          </div>
-
-          <div id="profileWalletCount"
-               class="muted small">
-            —
-          </div>
-
-        </div>
-
-        <div style="height:15px"></div>
-
-        <label>Фото профиля</label>
-
-        <input id="avatarInput"
-               class="input"
-               type="file"
-               accept="image/*">
-
-        <button id="removeAvatarBtn"
-                class="btn secondary">
-          Удалить фото
-        </button>
-
-        <div class="small muted" style="margin-top:8px">
-          Фото хранится локально на этом устройстве.
-        </div>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Безопасность
-        </div>
-
-        <button id="changePasswordBtn"
-                class="btn secondary">
-          🔑 Изменить пароль
-        </button>
-
-        <div style="height:10px"></div>
-
-        <button id="logoutBtn"
-                class="btn red">
-          Выйти из аккаунта
-        </button>
-
-      </div>
-
-      <div class="card">
-
-        <div class="card-title">
-          Информация
-        </div>
-
-        <div class="small muted">
-          SLX Network v1.8.2<br><br>
-          Current stage: Testnet<br>
-          Backend API: v1.8.2<br>
-          Cryptographic wallet signing: следующий этап
-        </div>
-
-      </div>
-
-    </section>
+    <button id="showQrBtn"
+            class="btn secondary">
+      ▣ QR
+    </button>
 
   </div>
 
-  <!-- NAV -->
-  <nav class="nav">
+  <div style="height:10px"></div>
 
-    <div class="nav-inner">
-
-      <button class="nav-btn active"
-              data-page="home">
-        <span class="nav-icon">⌂</span>
-        Главная
-      </button>
-
-      <button class="nav-btn"
-              data-page="wallet">
-        <span class="nav-icon">◈</span>
-        Кошелёк
-      </button>
-
-      <button class="nav-btn"
-              data-page="history">
-        <span class="nav-icon">↔</span>
-        История
-      </button>
-
-      <button class="nav-btn"
-              data-page="network">
-        <span class="nav-icon">◎</span>
-        Сеть
-      </button>
-
-      <button class="nav-btn"
-              data-page="settings">
-        <span class="nav-icon">⚙</span>
-        Настройки
-      </button>
-
-    </div>
-
-  </nav>
+  <button id="scanQrBtn"
+          class="btn">
+    📷 Сканировать QR
+  </button>
 
 </div>
+
+
+<div class="grid">
+
+  <div class="stat">
+    <div class="stat-label">Сеть</div>
+    <div id="homeNetwork" class="stat-value">—</div>
+  </div>
+
+  <div class="stat">
+    <div class="stat-label">Комиссия</div>
+    <div id="homeFee" class="stat-value">—</div>
+  </div>
+
+</div>
+
+
+<div style="height:10px"></div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Быстрые действия
+  </div>
+
+  <div class="btn-row">
+
+    <button id="homeSendBtn" class="btn">
+      ↑ Отправить
+    </button>
+
+    <button id="homeFaucetBtn" class="btn green">
+      +10 SLX
+    </button>
+
+  </div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Мои кошельки
+  </div>
+
+  <div id="homeWallets">
+    Загрузка...
+  </div>
+
+  <button id="homeCreateWalletBtn"
+          class="btn secondary">
+    ＋ Создать кошелёк
+  </button>
+
+</div>
+
+
+<div class="warning">
+  SLX сейчас работает как тестовая сеть. Балансы и токены этой версии не являются реальными денежными средствами.
+</div>
+
+</section>
+
+
+<!-- WALLET -->
+<section id="page-wallet" class="page">
+
+<div class="card">
+
+  <div class="card-title">
+    Активный кошелёк
+  </div>
+
+  <div id="walletMain"></div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Все кошельки
+  </div>
+
+  <div id="walletList">
+    Загрузка...
+  </div>
+
+  <button id="walletCreateBtn"
+          class="btn secondary">
+    ＋ Создать кошелёк
+  </button>
+
+</div>
+
+</section>
+
+
+<!-- HISTORY -->
+<section id="page-history" class="page">
+
+<div class="card">
+
+  <div class="card-title">
+    История транзакций
+  </div>
+
+  <div id="historyList">
+    Загрузка...
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- NETWORK -->
+<section id="page-network" class="page">
+
+<div class="card">
+
+  <div class="card-title">
+    Состояние сети
+  </div>
+
+  <div class="grid">
+
+    <div class="stat">
+      <div class="stat-label">Статус</div>
+      <div id="networkStatus" class="stat-value">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Версия</div>
+      <div id="networkVersion" class="stat-value">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Блоков</div>
+      <div id="networkBlocksCount" class="stat-value">—</div>
+    </div>
+
+    <div class="stat">
+      <div class="stat-label">Комиссия</div>
+      <div id="networkFee" class="stat-value">—</div>
+    </div>
+
+  </div>
+
+  <div style="height:12px"></div>
+
+  <button id="verifyChainBtn"
+          class="btn secondary">
+    🔐 Проверить цепочку
+  </button>
+
+  <div style="height:10px"></div>
+
+  <div id="chainVerifyResult"></div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Экономика SLX
+  </div>
+
+  <div id="economy"></div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Последние блоки
+  </div>
+
+  <div id="blocksList">
+    Загрузка...
+  </div>
+
+</div>
+
+</section>
+
+
+<!-- SETTINGS -->
+<section id="page-settings" class="page">
+
+<div class="card">
+
+  <div class="card-title">
+    Профиль
+  </div>
+
+  <div class="profile-center">
+
+    <div id="settingsAvatar"
+         class="avatar-big">
+      S
+    </div>
+
+    <div style="height:12px"></div>
+
+    <div id="profileUsername"
+         style="font-weight:900;font-size:18px">
+      —
+    </div>
+
+    <div id="profileWalletCount"
+         class="muted small">
+      —
+    </div>
+
+  </div>
+
+  <div style="height:15px"></div>
+
+  <label>Фото профиля</label>
+
+  <input id="avatarInput"
+         class="input"
+         type="file"
+         accept="image/*">
+
+  <button id="removeAvatarBtn"
+          class="btn secondary">
+    Удалить фото
+  </button>
+
+  <div class="small muted" style="margin-top:8px">
+    Фото хранится локально на этом устройстве.
+  </div>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Безопасность
+  </div>
+
+  <button id="changePasswordBtn"
+          class="btn secondary">
+    🔑 Изменить пароль
+  </button>
+
+  <div style="height:10px"></div>
+
+  <button id="logoutBtn"
+          class="btn red">
+    Выйти из аккаунта
+  </button>
+
+</div>
+
+
+<div class="card">
+
+  <div class="card-title">
+    Информация
+  </div>
+
+  <div class="small muted">
+    SLX Network v1.9.0<br><br>
+    Current stage: Simple Testnet<br>
+    QR wallet scanner: enabled<br>
+    Cryptographic wallet signing: следующий этап
+  </div>
+
+</div>
+
+</section>
+
+</div>
+
+
+<!-- NAV -->
+<nav class="nav">
+
+<div class="nav-inner">
+
+<button class="nav-btn active"
+        data-page="home">
+  <span class="nav-icon">⌂</span>
+  Главная
+</button>
+
+<button class="nav-btn"
+        data-page="wallet">
+  <span class="nav-icon">◈</span>
+  Кошелёк
+</button>
+
+<button class="nav-btn"
+        data-page="history">
+  <span class="nav-icon">↔</span>
+  История
+</button>
+
+<button class="nav-btn"
+        data-page="network">
+  <span class="nav-icon">◎</span>
+  Сеть
+</button>
+
+<button class="nav-btn"
+        data-page="settings">
+  <span class="nav-icon">⚙</span>
+  Настройки
+</button>
+
+</div>
+
+</nav>
+
+</div>
+
 
 <!-- MODAL -->
-<div id="modalBackdrop" class="modal-backdrop">
+<div id="modalBackdrop"
+     class="modal-backdrop">
 
-  <div class="modal">
+<div class="modal">
 
-    <div class="modal-head">
+<div class="modal-head">
 
-      <div id="modalTitle"
-           class="modal-title">
-        —
-      </div>
+<div id="modalTitle"
+     class="modal-title">
+  —
+</div>
 
-      <button id="modalClose"
-              class="close">
-        ×
-      </button>
-
-    </div>
-
-    <div id="modalBody"></div>
-
-  </div>
+<button id="modalClose"
+        class="close">
+  ×
+</button>
 
 </div>
 
+<div id="modalBody"></div>
+
+</div>
+
+</div>
+
+
 <div id="toast" class="toast"></div>
+
+
+<!-- QR DECODER -->
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+
 
 <script>
 "use strict";
 
+
 /* =========================================================
-   SLX NETWORK v1.8.2
-   Frontend for SLX Network Backend v1.8.2
+   CONFIG
    ========================================================= */
 
 const API_BASE = "";
@@ -1143,28 +1198,41 @@ const TOKEN_KEY = "slx_token";
 const ACTIVE_WALLET_KEY = "slx_active_wallet";
 const AVATAR_KEY = "slx_avatar";
 
-let token = localStorage.getItem(TOKEN_KEY) || "";
-let activeWallet = localStorage.getItem(ACTIVE_WALLET_KEY) || "";
+
+let token =
+  localStorage.getItem(TOKEN_KEY) || "";
+
+let activeWallet =
+  localStorage.getItem(ACTIVE_WALLET_KEY) || "";
+
 let currentUser = null;
 let wallets = [];
 let networkInfo = null;
 
+let qrStream = null;
+let qrAnimation = null;
+
 
 /* =========================================================
-   DOM HELPERS
+   HELPERS
    ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
+
 
 function show(el){
   if(el) el.classList.remove("hidden");
 }
 
+
 function hide(el){
   if(el) el.classList.add("hidden");
 }
 
+
 function escapeHTML(value){
+
   return String(value ?? "")
     .replace(/&/g,"&amp;")
     .replace(/</g,"&lt;")
@@ -1174,23 +1242,41 @@ function escapeHTML(value){
 }
 
 
+function formatAmount(value){
+
+  const n = Number(value || 0);
+
+  return n.toLocaleString(
+    "en-US",
+    {
+      minimumFractionDigits:0,
+      maximumFractionDigits:8
+    }
+  );
+}
+
+
 /* =========================================================
    TOAST
    ========================================================= */
 
 let toastTimer = null;
 
+
 function toast(message){
+
   const el = $("toast");
 
   el.textContent = message;
+
   el.classList.add("show");
 
   clearTimeout(toastTimer);
 
-  toastTimer = setTimeout(() => {
-    el.classList.remove("show");
-  },3000);
+  toastTimer =
+    setTimeout(()=>{
+      el.classList.remove("show");
+    },3000);
 }
 
 
@@ -1203,21 +1289,43 @@ function openModal(title,html){
   $("modalTitle").textContent = title;
   $("modalBody").innerHTML = html;
 
-  $("modalBackdrop").classList.add("show");
+  $("modalBackdrop")
+    .classList.add("show");
 }
+
 
 function closeModal(){
 
-  $("modalBackdrop").classList.remove("show");
+  stopQRScanner();
+
+  $("modalBackdrop")
+    .classList.remove("show");
 }
 
-$("modalClose").addEventListener("click",closeModal);
 
-$("modalBackdrop").addEventListener("click",e=>{
-  if(e.target === $("modalBackdrop")){
-    closeModal();
+$("modalClose")
+.addEventListener(
+  "click",
+  closeModal
+);
+
+
+$("modalBackdrop")
+.addEventListener(
+  "click",
+  event=>{
+
+    if(
+      event.target ===
+      $("modalBackdrop")
+    ){
+
+      closeModal();
+
+    }
+
   }
-});
+);
 
 
 /* =========================================================
@@ -1232,47 +1340,93 @@ async function api(path,options={}){
   };
 
   if(token){
-    headers.Authorization = "Bearer " + token;
+
+    headers.Authorization =
+      "Bearer " + token;
   }
 
-  const response = await fetch(API_BASE + path,{
-    ...options,
-    headers
-  });
+  const response =
+    await fetch(
+      API_BASE + path,
+      {
+        ...options,
+        headers
+      }
+    );
+
 
   let data = null;
 
+  const contentType =
+    response.headers.get("content-type") || "";
+
+
   try{
-    data = await response.json();
+
+    if(
+      contentType.includes(
+        "application/json"
+      )
+    ){
+
+      data = await response.json();
+
+    }else{
+
+      const text =
+        await response.text();
+
+      data = {
+        message:text
+      };
+
+    }
+
   }catch{
+
     data = {};
+
   }
+
 
   if(response.status === 401){
 
     token = "";
-    localStorage.removeItem(TOKEN_KEY);
+
+    localStorage.removeItem(
+      TOKEN_KEY
+    );
 
     showAuth();
 
-    throw new Error(data.error || "Сессия закончилась");
+    throw new Error(
+      data.error ||
+      data.message ||
+      "Сессия закончилась"
+    );
+
   }
+
 
   if(!response.ok){
 
     throw new Error(
       data.error ||
       data.message ||
-      "Ошибка сервера"
+      data.details ||
+      "Ошибка сервера: HTTP " +
+      response.status
     );
+
   }
+
 
   return data;
 }
 
 
 /* =========================================================
-   AUTH SCREEN
+   AUTH
    ========================================================= */
 
 function showAuth(){
@@ -1280,12 +1434,19 @@ function showAuth(){
   hide($("appScreen"));
   show($("authScreen"));
 
-  $("loginForm").classList.remove("hidden");
-  $("registerForm").classList.add("hidden");
+  $("loginForm")
+    .classList.remove("hidden");
 
-  $("loginTab").classList.add("active");
-  $("registerTab").classList.remove("active");
+  $("registerForm")
+    .classList.add("hidden");
+
+  $("loginTab")
+    .classList.add("active");
+
+  $("registerTab")
+    .classList.remove("active");
 }
+
 
 function showApp(){
 
@@ -1293,11 +1454,15 @@ function showApp(){
   show($("appScreen"));
 }
 
+
 function authError(message){
 
-  $("authError").textContent = message;
+  $("authError").textContent =
+    message;
+
   show($("authError"));
 }
+
 
 function clearAuthError(){
 
@@ -1309,80 +1474,141 @@ function clearAuthError(){
    AUTH TABS
    ========================================================= */
 
-$("loginTab").addEventListener("click",()=>{
+$("loginTab")
+.addEventListener(
+  "click",
+  ()=>{
 
-  clearAuthError();
+    clearAuthError();
 
-  $("loginTab").classList.add("active");
-  $("registerTab").classList.remove("active");
+    $("loginTab")
+      .classList.add("active");
 
-  $("loginForm").classList.remove("hidden");
-  $("registerForm").classList.add("hidden");
-});
+    $("registerTab")
+      .classList.remove("active");
 
-$("registerTab").addEventListener("click",()=>{
+    $("loginForm")
+      .classList.remove("hidden");
 
-  clearAuthError();
+    $("registerForm")
+      .classList.add("hidden");
 
-  $("registerTab").classList.add("active");
-  $("loginTab").classList.remove("active");
+  }
+);
 
-  $("registerForm").classList.remove("hidden");
-  $("loginForm").classList.add("hidden");
-});
+
+$("registerTab")
+.addEventListener(
+  "click",
+  ()=>{
+
+    clearAuthError();
+
+    $("registerTab")
+      .classList.add("active");
+
+    $("loginTab")
+      .classList.remove("active");
+
+    $("registerForm")
+      .classList.remove("hidden");
+
+    $("loginForm")
+      .classList.add("hidden");
+
+  }
+);
 
 
 /* =========================================================
    LOGIN
    ========================================================= */
 
-$("loginBtn").addEventListener("click",login);
+$("loginBtn")
+.addEventListener(
+  "click",
+  login
+);
+
 
 async function login(){
 
   clearAuthError();
 
   const username =
-    $("loginUsername").value.trim();
+    $("loginUsername")
+      .value
+      .trim();
 
   const password =
-    $("loginPassword").value;
+    $("loginPassword")
+      .value;
+
 
   if(!username || !password){
 
-    authError("Введите username и пароль.");
+    authError(
+      "Введите username и пароль."
+    );
+
     return;
   }
 
-  const button = $("loginBtn");
+
+  const button =
+    $("loginBtn");
 
   button.disabled = true;
   button.textContent = "Вход...";
 
+
   try{
 
-    const data = await api("/api/auth/login",{
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
+    const data =
+      await api(
+        "/api/auth/login",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            username,
+            password
+          })
+        }
+      );
+
+
+    if(!data.token){
+
+      throw new Error(
+        "Сервер не вернул токен авторизации."
+      );
+
+    }
+
 
     token = data.token;
 
-    localStorage.setItem(TOKEN_KEY,token);
+    localStorage.setItem(
+      TOKEN_KEY,
+      token
+    );
+
 
     await startApp();
 
+
   }catch(error){
 
-    authError(error.message);
+    authError(
+      error.message
+    );
+
 
   }finally{
 
     button.disabled = false;
     button.textContent = "Войти";
+
   }
 }
 
@@ -1391,61 +1617,113 @@ async function login(){
    REGISTER
    ========================================================= */
 
-$("registerBtn").addEventListener("click",register);
+$("registerBtn")
+.addEventListener(
+  "click",
+  register
+);
+
 
 async function register(){
 
   clearAuthError();
 
   const username =
-    $("registerUsername").value.trim();
+    $("registerUsername")
+      .value
+      .trim();
 
   const password =
-    $("registerPassword").value;
+    $("registerPassword")
+      .value;
+
 
   if(!username){
 
-    authError("Введите username.");
+    authError(
+      "Введите username."
+    );
+
     return;
   }
+
+
+  if(!/^[a-zA-Z0-9_]{3,32}$/.test(username)){
+
+    authError(
+      "Username: 3–32 символа, только латиница, цифры и _."
+    );
+
+    return;
+  }
+
 
   if(password.length < 8){
 
-    authError("Пароль должен содержать минимум 8 символов.");
+    authError(
+      "Пароль должен содержать минимум 8 символов."
+    );
+
     return;
   }
 
-  const button = $("registerBtn");
+
+  const button =
+    $("registerBtn");
 
   button.disabled = true;
   button.textContent = "Создание...";
 
+
   try{
 
-    const data = await api("/api/auth/register",{
-      method:"POST",
-      body:JSON.stringify({
-        username,
-        password
-      })
-    });
+    const data =
+      await api(
+        "/api/auth/register",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            username,
+            password
+          })
+        }
+      );
+
+
+    if(!data.token){
+
+      throw new Error(
+        "Регистрация выполнена, но сервер не вернул токен."
+      );
+
+    }
+
 
     token = data.token;
 
-    localStorage.setItem(TOKEN_KEY,token);
+    localStorage.setItem(
+      TOKEN_KEY,
+      token
+    );
+
 
     if(data.wallet?.id){
 
-      activeWallet = String(data.wallet.id);
+      activeWallet =
+        String(data.wallet.id);
 
       localStorage.setItem(
         ACTIVE_WALLET_KEY,
         activeWallet
       );
+
     }
 
+
     const recoveryCode =
-      data.recoveryCode || "Не предоставлен";
+      data.recoveryCode ||
+      "Не предоставлен";
+
 
     openModal(
       "Аккаунт создан",
@@ -1455,8 +1733,7 @@ async function register(){
         </div>
 
         <p class="small muted">
-          Это твой код восстановления пароля.
-          Сохрани его в безопасном месте.
+          Код восстановления сохрани в безопасном месте.
         </p>
 
         <div class="code-box">
@@ -1479,134 +1756,59 @@ async function register(){
       `
     );
 
-    $("copyRecoveryBtn").addEventListener("click",async()=>{
 
-      try{
-        await navigator.clipboard.writeText(recoveryCode);
-        toast("Код скопирован");
-      }catch{
-        toast("Не удалось скопировать");
-      }
+    $("copyRecoveryBtn")
+      .addEventListener(
+        "click",
+        async()=>{
 
-    });
+          try{
 
-    $("continueAfterRegister").addEventListener("click",async()=>{
+            await navigator.clipboard
+              .writeText(recoveryCode);
 
-      closeModal();
-      await startApp();
+            toast(
+              "Код скопирован"
+            );
 
-    });
+          }catch{
+
+            toast(
+              "Не удалось скопировать"
+            );
+
+          }
+
+        }
+      );
+
+
+    $("continueAfterRegister")
+      .addEventListener(
+        "click",
+        async()=>{
+
+          closeModal();
+
+          await startApp();
+
+        }
+      );
+
 
   }catch(error){
 
-    authError(error.message);
+    authError(
+      error.message
+    );
+
 
   }finally{
 
     button.disabled = false;
-    button.textContent = "Создать аккаунт";
-  }
-}
+    button.textContent =
+      "Создать аккаунт";
 
-
-/* =========================================================
-   RECOVERY
-   ========================================================= */
-
-$("recoveryOpenBtn").addEventListener("click",()=>{
-
-  openModal(
-    "Восстановление пароля",
-    `
-      <label>Username</label>
-      <input id="recoveryUsername"
-             class="input"
-             autocomplete="username"
-             placeholder="Username">
-
-      <label>Код восстановления</label>
-      <input id="recoveryCode"
-             class="input"
-             placeholder="Recovery code">
-
-      <label>Новый пароль</label>
-      <input id="recoveryPassword"
-             class="input"
-             type="password"
-             autocomplete="new-password"
-             placeholder="Минимум 8 символов">
-
-      <button id="recoveryBtn"
-              class="btn">
-        Восстановить
-      </button>
-
-      <div style="height:10px"></div>
-
-      <div class="small muted">
-        Если код восстановления потерян,
-        этот тестовый механизм не сможет подтвердить владельца аккаунта.
-      </div>
-    `
-  );
-
-  $("recoveryBtn").addEventListener(
-    "click",
-    recoveryReset
-  );
-});
-
-
-async function recoveryReset(){
-
-  const username =
-    $("recoveryUsername").value.trim();
-
-  const recoveryCode =
-    $("recoveryCode").value.trim();
-
-  const newPassword =
-    $("recoveryPassword").value;
-
-  if(!username || !recoveryCode){
-
-    toast("Заполни username и код.");
-    return;
-  }
-
-  if(newPassword.length < 8){
-
-    toast("Новый пароль должен быть минимум 8 символов.");
-    return;
-  }
-
-  try{
-
-    const data = await api(
-      "/api/auth/recovery/reset",
-      {
-        method:"POST",
-        body:JSON.stringify({
-          username,
-          recoveryCode,
-          newPassword
-        })
-      }
-    );
-
-    token = data.token;
-
-    localStorage.setItem(TOKEN_KEY,token);
-
-    closeModal();
-
-    toast("Пароль восстановлен");
-
-    await startApp();
-
-  }catch(error){
-
-    toast(error.message);
   }
 }
 
@@ -1619,9 +1821,15 @@ async function startApp(){
 
   try{
 
-    const me = await api("/api/auth/me");
+    const me =
+      await api(
+        "/api/auth/me"
+      );
 
-    currentUser = me.user || me;
+
+    currentUser =
+      me.user || me;
+
 
     showApp();
 
@@ -1633,68 +1841,99 @@ async function startApp(){
 
     showPage("home");
 
+
   }catch(error){
 
+    console.error(
+      "SLX start error:",
+      error
+    );
+
+    token = "";
+
+    localStorage.removeItem(
+      TOKEN_KEY
+    );
+
     showAuth();
+
   }
 }
 
 
 /* =========================================================
-   PAGE NAVIGATION
+   NAVIGATION
    ========================================================= */
 
-document.querySelectorAll(".nav-btn")
-.forEach(button=>{
+document
+  .querySelectorAll(".nav-btn")
+  .forEach(button=>{
 
-  button.addEventListener("click",()=>{
+    button.addEventListener(
+      "click",
+      ()=>{
 
-    showPage(button.dataset.page);
+        showPage(
+          button.dataset.page
+        );
+
+      }
+    );
 
   });
 
-});
 
 function showPage(page){
 
-  document.querySelectorAll(".page")
+  document
+    .querySelectorAll(".page")
     .forEach(el=>{
-      el.classList.remove("active");
+      el.classList.remove(
+        "active"
+      );
     });
 
-  const target = $("page-" + page);
+
+  const target =
+    $("page-" + page);
+
 
   if(target){
-    target.classList.add("active");
+
+    target.classList.add(
+      "active"
+    );
+
   }
 
-  document.querySelectorAll(".nav-btn")
+
+  document
+    .querySelectorAll(".nav-btn")
     .forEach(button=>{
+
       button.classList.toggle(
         "active",
         button.dataset.page === page
       );
+
     });
 
-  if(page === "home"){
+
+  if(page === "home")
     refreshHome();
-  }
 
-  if(page === "wallet"){
+  if(page === "wallet")
     renderWalletPage();
-  }
 
-  if(page === "history"){
+  if(page === "history")
     loadHistory();
-  }
 
-  if(page === "network"){
+  if(page === "network")
     loadNetworkPage();
-  }
 
-  if(page === "settings"){
+  if(page === "settings")
     updateProfile();
-  }
+
 }
 
 
@@ -1704,45 +1943,79 @@ function showPage(page){
 
 async function loadWallets(){
 
-  const data = await api("/api/wallets");
+  const data =
+    await api(
+      "/api/wallets"
+    );
 
-  wallets = data.wallets || data || [];
 
-  if(!activeWallet && wallets.length){
+  wallets =
+    data.wallets ||
+    data ||
+    [];
 
-    activeWallet = String(wallets[0].id);
+
+  if(!Array.isArray(wallets))
+    wallets = [];
+
+
+  if(
+    !activeWallet &&
+    wallets.length
+  ){
+
+    activeWallet =
+      String(wallets[0].id);
 
     localStorage.setItem(
       ACTIVE_WALLET_KEY,
       activeWallet
     );
+
   }
 
-  const exists = wallets.some(
-    w => String(w.id) === String(activeWallet)
-  );
 
-  if(!exists && wallets.length){
+  const exists =
+    wallets.some(
+      w =>
+        String(w.id) ===
+        String(activeWallet)
+    );
 
-    activeWallet = String(wallets[0].id);
+
+  if(
+    !exists &&
+    wallets.length
+  ){
+
+    activeWallet =
+      String(wallets[0].id);
 
     localStorage.setItem(
       ACTIVE_WALLET_KEY,
       activeWallet
     );
+
   }
+
 
   renderHomeWallets();
   renderWalletPage();
   updateProfile();
+
 }
+
 
 function getActiveWallet(){
 
   return wallets.find(
-    w => String(w.id) === String(activeWallet)
+    w =>
+      String(w.id) ===
+      String(activeWallet)
   ) || wallets[0] || null;
+
 }
+
 
 function walletBalance(wallet){
 
@@ -1751,19 +2024,7 @@ function walletBalance(wallet){
     wallet?.amount ??
     0
   );
-}
 
-function formatAmount(value){
-
-  const n = Number(value || 0);
-
-  return n.toLocaleString(
-    "en-US",
-    {
-      minimumFractionDigits:0,
-      maximumFractionDigits:8
-    }
-  );
 }
 
 
@@ -1775,28 +2036,42 @@ async function selectWallet(id){
 
   try{
 
-    await api("/api/wallet/select",{
-      method:"POST",
-      body:JSON.stringify({
-        walletId:id
-      })
-    });
+    await api(
+      "/api/wallet/select",
+      {
+        method:"POST",
+        body:JSON.stringify({
+          walletId:id
+        })
+      }
+    );
 
-  }catch{
-    // Server may not require selection.
+  }catch(error){
+
+    console.warn(
+      "wallet/select:",
+      error.message
+    );
+
   }
 
-  activeWallet = String(id);
+
+  activeWallet =
+    String(id);
 
   localStorage.setItem(
     ACTIVE_WALLET_KEY,
     activeWallet
   );
 
+
   await loadWallets();
   await refreshHome();
 
-  toast("Кошелёк выбран");
+  toast(
+    "Кошелёк выбран"
+  );
+
 }
 
 
@@ -1808,73 +2083,74 @@ async function createWallet(){
 
   try{
 
-    const data = await api("/api/wallet/create",{
-      method:"POST",
-      body:JSON.stringify({})
-    });
+    const data =
+      await api(
+        "/api/wallet/create",
+        {
+          method:"POST",
+          body:JSON.stringify({})
+        }
+      );
 
-    const wallet = data.wallet;
+
+    const wallet =
+      data.wallet;
+
 
     if(wallet?.id){
 
-      activeWallet = String(wallet.id);
+      activeWallet =
+        String(wallet.id);
 
       localStorage.setItem(
         ACTIVE_WALLET_KEY,
         activeWallet
       );
+
     }
+
 
     await loadWallets();
 
-    toast("Новый кошелёк создан");
+    toast(
+      "Новый кошелёк создан"
+    );
+
 
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
   }
 }
 
+
 $("homeCreateWalletBtn")
-.addEventListener("click",createWallet);
+.addEventListener(
+  "click",
+  createWallet
+);
+
 
 $("walletCreateBtn")
-.addEventListener("click",createWallet);
+.addEventListener(
+  "click",
+  createWallet
+);
 
 
 /* =========================================================
-   WALLET RENDER
+   WALLET LIST
    ========================================================= */
-
-function renderHomeWallets(){
-
-  const container = $("homeWallets");
-
-  if(!wallets.length){
-
-    container.innerHTML = `
-      <div class="muted small">
-        Кошельков пока нет.
-      </div>
-    `;
-
-    return;
-  }
-
-  container.innerHTML = wallets
-    .map(walletCardHTML)
-    .join("");
-
-  bindWalletButtons(container);
-}
 
 function walletCardHTML(wallet){
 
   const isActive =
-    String(wallet.id) === String(activeWallet);
+    String(wallet.id) ===
+    String(activeWallet);
 
-  const address =
-    wallet.address || "—";
 
   return `
     <div class="wallet-item">
@@ -1890,12 +2166,18 @@ function walletCardHTML(wallet){
         </div>
 
         <div class="wallet-address">
-          ${escapeHTML(address)}
+          ${escapeHTML(
+            wallet.address || "—"
+          )}
         </div>
 
         ${
           isActive
-          ? `<div class="active-badge">● Активный</div>`
+          ? `
+            <div class="active-badge">
+              ● Активный
+            </div>
+          `
           : ""
         }
 
@@ -1904,7 +2186,9 @@ function walletCardHTML(wallet){
       <div style="text-align:right">
 
         <div class="wallet-balance">
-          ${formatAmount(walletBalance(wallet))} SLX
+          ${formatAmount(
+            walletBalance(wallet)
+          )} SLX
         </div>
 
         ${
@@ -1931,43 +2215,95 @@ function walletCardHTML(wallet){
   `;
 }
 
+
 function bindWalletButtons(container){
 
   container
-    .querySelectorAll(".small-select-wallet")
+    .querySelectorAll(
+      ".small-select-wallet"
+    )
     .forEach(button=>{
 
-      button.addEventListener("click",()=>{
+      button.addEventListener(
+        "click",
+        ()=>{
 
-        selectWallet(button.dataset.walletId);
+          selectWallet(
+            button.dataset.walletId
+          );
 
-      });
+        }
+      );
 
     });
+
 }
+
+
+function renderHomeWallets(){
+
+  const container =
+    $("homeWallets");
+
+
+  if(!wallets.length){
+
+    container.innerHTML = `
+      <div class="muted small">
+        Кошельков пока нет.
+      </div>
+    `;
+
+    return;
+  }
+
+
+  container.innerHTML =
+    wallets
+      .map(walletCardHTML)
+      .join("");
+
+
+  bindWalletButtons(
+    container
+  );
+
+}
+
 
 function renderWalletPage(){
 
-  const main = $("walletMain");
-  const list = $("walletList");
+  const main =
+    $("walletMain");
 
-  const wallet = getActiveWallet();
+  const list =
+    $("walletList");
+
+  const wallet =
+    getActiveWallet();
+
 
   if(wallet){
 
     main.innerHTML = `
 
       <div class="balance-label">
-        Wallet #${escapeHTML(wallet.id)}
+        Активный Wallet #${escapeHTML(wallet.id)}
       </div>
 
       <div class="balance">
-        ${formatAmount(walletBalance(wallet))}
-        <span class="coin">SLX</span>
+        ${formatAmount(
+          walletBalance(wallet)
+        )}
+        <span class="coin">
+          SLX
+        </span>
       </div>
 
       <div class="address">
-        ${escapeHTML(wallet.address || "—")}
+        ${escapeHTML(
+          wallet.address || "—"
+        )}
       </div>
 
       <div style="height:12px"></div>
@@ -1985,13 +2321,50 @@ function renderWalletPage(){
         </button>
 
       </div>
+
+      <div style="height:10px"></div>
+
+      <button id="walletScanQrBtn"
+              class="btn">
+        📷 Сканировать QR
+      </button>
+
+      <div style="height:10px"></div>
+
+      <button id="walletSendBtn"
+              class="btn green">
+        ↑ Отправить с этого кошелька
+      </button>
     `;
 
+
     $("walletCopyBtn")
-      .addEventListener("click",copyActiveAddress);
+      .addEventListener(
+        "click",
+        copyActiveAddress
+      );
+
 
     $("walletQrBtn")
-      .addEventListener("click",showAddressQR);
+      .addEventListener(
+        "click",
+        showAddressQR
+      );
+
+
+    $("walletScanQrBtn")
+      .addEventListener(
+        "click",
+        startQRScanner
+      );
+
+
+    $("walletSendBtn")
+      .addEventListener(
+        "click",
+        openSendModal
+      );
+
 
   }else{
 
@@ -2000,13 +2373,24 @@ function renderWalletPage(){
         Нет активного кошелька.
       </div>
     `;
+
   }
 
-  list.innerHTML = wallets.length
-    ? wallets.map(walletCardHTML).join("")
-    : `<div class="muted small">Нет кошельков.</div>`;
+
+  list.innerHTML =
+    wallets.length
+    ? wallets
+        .map(walletCardHTML)
+        .join("")
+    : `
+      <div class="muted small">
+        Нет кошельков.
+      </div>
+    `;
+
 
   bindWalletButtons(list);
+
 }
 
 
@@ -2020,108 +2404,160 @@ async function refreshHome(){
 
     await loadWallets();
 
-    const wallet = getActiveWallet();
+    const wallet =
+      getActiveWallet();
+
 
     if(!wallet){
 
-      $("homeBalance").textContent = "0";
-      $("homeAddress").textContent = "Нет кошелька";
+      $("homeBalance")
+        .textContent = "0";
+
+      $("homeAddress")
+        .textContent =
+        "Нет кошелька";
 
       return;
     }
 
-    $("homeBalance").textContent =
-      formatAmount(walletBalance(wallet));
 
-    $("homeAddress").textContent =
+    $("homeBalance")
+      .textContent =
+      formatAmount(
+        walletBalance(wallet)
+      );
+
+
+    $("homeAddress")
+      .textContent =
       wallet.address || "—";
+
 
     if(networkInfo){
 
-      $("homeNetwork").textContent =
-        networkInfo.status || "online";
+      $("homeNetwork")
+        .textContent =
+        networkInfo.status ||
+        "online";
 
-      $("homeFee").textContent =
-        formatAmount(networkInfo.transferFee) +
-        " SLX";
+
+      $("homeFee")
+        .textContent =
+        formatAmount(
+          networkInfo.transferFee
+        ) + " SLX";
+
     }
+
 
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
   }
+
 }
 
 
 /* =========================================================
-   COPY ADDRESS
+   COPY
    ========================================================= */
 
 async function copyActiveAddress(){
 
-  const wallet = getActiveWallet();
+  const wallet =
+    getActiveWallet();
+
 
   if(!wallet?.address){
 
-    toast("Адрес отсутствует");
+    toast(
+      "Адрес отсутствует"
+    );
+
     return;
   }
 
+
   try{
 
-    await navigator.clipboard.writeText(
-      wallet.address
-    );
+    await navigator.clipboard
+      .writeText(
+        wallet.address
+      );
 
-    toast("Адрес скопирован");
+    toast(
+      "Адрес скопирован"
+    );
 
   }catch{
 
-    toast("Не удалось скопировать адрес");
+    toast(
+      "Не удалось скопировать адрес"
+    );
+
   }
+
 }
 
+
 $("copyAddressBtn")
-.addEventListener("click",copyActiveAddress);
+.addEventListener(
+  "click",
+  copyActiveAddress
+);
 
 
 /* =========================================================
-   QR
+   QR GENERATOR
    ========================================================= */
 
 function makeQRImage(address){
 
-  const encoded =
-    encodeURIComponent(address);
-
   return `
     <div class="qr-box">
+
       <img
-        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encoded}"
+        src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(address)}"
         alt="SLX wallet QR"
         width="300"
         height="300">
+
     </div>
   `;
+
 }
+
 
 function showAddressQR(){
 
-  const wallet = getActiveWallet();
+  const wallet =
+    getActiveWallet();
+
 
   if(!wallet?.address){
 
-    toast("Нет адреса кошелька");
+    toast(
+      "Нет адреса кошелька"
+    );
+
     return;
   }
+
 
   openModal(
     "QR кошелька",
     `
-      ${makeQRImage(wallet.address)}
+      ${makeQRImage(
+        wallet.address
+      )}
 
       <div class="address">
-        ${escapeHTML(wallet.address)}
+        ${escapeHTML(
+          wallet.address
+        )}
       </div>
 
       <div style="height:10px"></div>
@@ -2133,15 +2569,462 @@ function showAddressQR(){
     `
   );
 
+
   $("qrCopyBtn")
     .addEventListener(
       "click",
       copyActiveAddress
     );
+
 }
 
+
 $("showQrBtn")
-.addEventListener("click",showAddressQR);
+.addEventListener(
+  "click",
+  showAddressQR
+);
+
+
+/* =========================================================
+   QR SCANNER
+   ========================================================= */
+
+function extractSLXAddress(text){
+
+  if(!text)
+    return null;
+
+
+  const value =
+    String(text)
+      .trim()
+      .toUpperCase();
+
+
+  const match =
+    value.match(
+      /SLXC[A-F0-9]{32}/
+    );
+
+
+  return match
+    ? match[0]
+    : null;
+
+}
+
+
+async function startQRScanner(){
+
+  if(
+    !window.isSecureContext &&
+    location.hostname !== "localhost"
+  ){
+
+    openModal(
+      "Камера недоступна",
+      `
+        <div class="error">
+          QR-сканер требует HTTPS.
+        </div>
+
+        <div class="small muted">
+          Открой SLX Network через HTTPS.
+          На Render это должно работать автоматически.
+        </div>
+      `
+    );
+
+    return;
+  }
+
+
+  openModal(
+    "Сканирование QR",
+    `
+      <div class="scanner-wrap">
+
+        <video
+          id="qrVideo"
+          class="scanner-video"
+          autoplay
+          muted
+          playsinline>
+        </video>
+
+        <div class="scanner-frame"></div>
+
+        <div class="scanner-line"></div>
+
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div id="qrScannerStatus"
+           class="small muted"
+           style="text-align:center">
+        Наведи камеру на QR-код SLX
+      </div>
+
+      <canvas id="qrCanvas"
+              class="hidden">
+      </canvas>
+
+      <div style="height:12px"></div>
+
+      <button id="stopQrScanner"
+              class="btn secondary">
+        Закрыть сканер
+      </button>
+    `
+  );
+
+
+  $("stopQrScanner")
+    .addEventListener(
+      "click",
+      stopQRScanner
+    );
+
+
+  try{
+
+    if(
+      !navigator.mediaDevices ||
+      !navigator.mediaDevices.getUserMedia
+    ){
+
+      throw new Error(
+        "Камера не поддерживается браузером."
+      );
+
+    }
+
+
+    qrStream =
+      await navigator.mediaDevices
+        .getUserMedia({
+          video:{
+            facingMode:{
+              ideal:"environment"
+            },
+            width:{
+              ideal:1280
+            },
+            height:{
+              ideal:720
+            }
+          },
+          audio:false
+        });
+
+
+    const video =
+      $("qrVideo");
+
+
+    video.srcObject =
+      qrStream;
+
+
+    await video.play();
+
+
+    scanQRFrame();
+
+
+  }catch(error){
+
+    console.error(
+      "QR scanner:",
+      error
+    );
+
+
+    const status =
+      $("qrScannerStatus");
+
+
+    if(status){
+
+      status.innerHTML = `
+        <div class="error">
+          Не удалось открыть камеру.
+          <br><br>
+          Разреши доступ к камере для SLX Network
+          в настройках браузера.
+        </div>
+      `;
+
+    }
+
+  }
+
+}
+
+
+function scanQRFrame(){
+
+  const video =
+    $("qrVideo");
+
+  const canvas =
+    $("qrCanvas");
+
+
+  if(!video || !canvas)
+    return;
+
+
+  if(
+    video.readyState <
+    HTMLMediaElement.HAVE_ENOUGH_DATA
+  ){
+
+    qrAnimation =
+      requestAnimationFrame(
+        scanQRFrame
+      );
+
+    return;
+  }
+
+
+  const width =
+    video.videoWidth;
+
+  const height =
+    video.videoHeight;
+
+
+  if(!width || !height){
+
+    qrAnimation =
+      requestAnimationFrame(
+        scanQRFrame
+      );
+
+    return;
+  }
+
+
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  const ctx =
+    canvas.getContext(
+      "2d",
+      {
+        willReadFrequently:true
+      }
+    );
+
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      width,
+      height
+    );
+
+
+  if(typeof jsQR === "function"){
+
+    const result =
+      jsQR(
+        imageData.data,
+        imageData.width,
+        imageData.height,
+        {
+          inversionAttempts:
+            "attemptBoth"
+        }
+      );
+
+
+    if(
+      result &&
+      result.data
+    ){
+
+      const address =
+        extractSLXAddress(
+          result.data
+        );
+
+
+      if(address){
+
+        handleScannedAddress(
+          address
+        );
+
+        return;
+
+      }
+
+
+      const status =
+        $("qrScannerStatus");
+
+
+      if(status){
+
+        status.textContent =
+          "QR найден, но это не SLX-адрес.";
+
+      }
+
+    }
+
+  }
+
+
+  qrAnimation =
+    requestAnimationFrame(
+      scanQRFrame
+    );
+
+}
+
+
+function handleScannedAddress(address){
+
+  stopQRScanner();
+
+
+  openModal(
+    "QR найден",
+    `
+      <div class="success">
+        ✓ SLX-адрес успешно распознан.
+      </div>
+
+      <div class="address">
+        ${escapeHTML(address)}
+      </div>
+
+      <div style="height:12px"></div>
+
+      <button id="scanSendBtn"
+              class="btn">
+        ↑ Отправить на этот адрес
+      </button>
+
+      <div style="height:10px"></div>
+
+      <button id="scanCopyBtn"
+              class="btn secondary">
+        📋 Скопировать адрес
+      </button>
+    `
+  );
+
+
+  $("scanSendBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+
+        closeModal();
+
+        openSendModal(
+          address
+        );
+
+      }
+    );
+
+
+  $("scanCopyBtn")
+    .addEventListener(
+      "click",
+      async()=>{
+
+        try{
+
+          await navigator.clipboard
+            .writeText(address);
+
+          toast(
+            "Адрес скопирован"
+          );
+
+        }catch{
+
+          toast(
+            "Не удалось скопировать"
+          );
+
+        }
+
+      }
+    );
+
+}
+
+
+function stopQRScanner(){
+
+  if(qrAnimation){
+
+    cancelAnimationFrame(
+      qrAnimation
+    );
+
+    qrAnimation = null;
+  }
+
+
+  if(qrStream){
+
+    qrStream
+      .getTracks()
+      .forEach(
+        track=>{
+          track.stop();
+        }
+      );
+
+    qrStream = null;
+
+  }
+
+
+  const video =
+    $("qrVideo");
+
+
+  if(video){
+
+    video.srcObject =
+      null;
+
+  }
+
+}
+
+
+$("scanQrBtn")
+.addEventListener(
+  "click",
+  startQRScanner
+);
 
 
 /* =========================================================
@@ -2149,49 +3032,70 @@ $("showQrBtn")
    ========================================================= */
 
 $("homeSendBtn")
-.addEventListener("click",openSendModal);
+.addEventListener(
+  "click",
+  ()=>openSendModal()
+);
 
-function openSendModal(){
 
-  const wallet = getActiveWallet();
+function openSendModal(prefillAddress=""){
+
+  const wallet =
+    getActiveWallet();
+
 
   if(!wallet){
 
-    toast("Сначала создай кошелёк");
+    toast(
+      "Сначала создай кошелёк"
+    );
+
     return;
   }
 
+
   const fee =
-    networkInfo?.transferFee ?? 0.1;
+    networkInfo?.transferFee ??
+    0.1;
+
 
   openModal(
     "Отправить SLX",
     `
-      <label>Адрес получателя</label>
+      <label>
+        Адрес получателя
+      </label>
 
-      <input id="sendAddress"
-             class="input"
-             inputmode="text"
-             autocapitalize="characters"
-             placeholder="SLXC...">
+      <input
+        id="sendAddress"
+        class="input"
+        inputmode="text"
+        autocapitalize="characters"
+        value="${escapeHTML(prefillAddress)}"
+        placeholder="SLXC...">
 
-      <label>Количество SLX</label>
+      <label>
+        Количество SLX
+      </label>
 
-      <input id="sendAmount"
-             class="input"
-             type="number"
-             min="0"
-             step="0.00000001"
-             placeholder="0">
+      <input
+        id="sendAmount"
+        class="input"
+        type="number"
+        min="0"
+        step="0.00000001"
+        placeholder="0">
 
-      <div class="stat" style="margin-bottom:12px">
+      <div class="stat"
+           style="margin-bottom:12px">
 
         <div class="stat-label">
           Комиссия сети
         </div>
 
         <div class="stat-value">
-          ${formatAmount(fee)} SLX
+          ${formatAmount(fee)}
+          SLX
         </div>
 
       </div>
@@ -2203,79 +3107,356 @@ function openSendModal(){
 
       <div style="height:10px"></div>
 
+      <button id="sendScanBtn"
+              class="btn secondary">
+        📷 Сканировать QR
+      </button>
+
+      <div style="height:10px"></div>
+
       <div class="small muted">
         Общая сумма = количество + комиссия.
       </div>
     `
   );
 
+
   $("sendConfirmBtn")
     .addEventListener(
       "click",
       sendTransaction
     );
+
+
+  $("sendScanBtn")
+    .addEventListener(
+      "click",
+      ()=>{
+
+        startQRScannerForSend();
+
+      }
+    );
+
 }
+
 
 async function sendTransaction(){
 
   const to =
-    $("sendAddress").value.trim().toUpperCase();
+    $("sendAddress")
+      .value
+      .trim()
+      .toUpperCase();
+
 
   const amount =
-    Number($("sendAmount").value);
+    Number(
+      $("sendAmount").value
+    );
+
 
   if(!to){
 
-    toast("Введите адрес получателя");
+    toast(
+      "Введите адрес получателя"
+    );
+
     return;
   }
 
-  if(!/^SLXC[A-F0-9]{32}$/.test(to)){
 
-    toast("Неверный формат SLX адреса");
+  if(
+    !/^SLXC[A-F0-9]{32}$/.test(to)
+  ){
+
+    toast(
+      "Неверный формат SLX адреса"
+    );
+
     return;
   }
 
-  if(!Number.isFinite(amount) || amount <= 0){
 
-    toast("Введите корректную сумму");
+  if(
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ){
+
+    toast(
+      "Введите корректную сумму"
+    );
+
     return;
   }
+
 
   const button =
     $("sendConfirmBtn");
 
+
   button.disabled = true;
-  button.textContent = "Отправка...";
+  button.textContent =
+    "Отправка...";
+
 
   try{
 
-    const data = await api("/api/send",{
-      method:"POST",
-      body:JSON.stringify({
-        to,
-        amount
-      })
-    });
+    const data =
+      await api(
+        "/api/send",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            to,
+            amount
+          })
+        }
+      );
+
 
     closeModal();
 
+
     toast(
+      data.message ||
       "Транзакция отправлена"
     );
+
 
     await loadWallets();
     await refreshHome();
 
+
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
 
   }finally{
 
     button.disabled = false;
-    button.textContent = "Отправить";
+    button.textContent =
+      "Отправить";
+
   }
+
+}
+
+
+/* =========================================================
+   QR -> SEND
+   ========================================================= */
+
+async function startQRScannerForSend(){
+
+  stopQRScanner();
+
+
+  openModal(
+    "Сканирование адреса",
+    `
+      <div class="scanner-wrap">
+
+        <video
+          id="qrVideo"
+          class="scanner-video"
+          autoplay
+          muted
+          playsinline>
+        </video>
+
+        <div class="scanner-frame"></div>
+
+        <div class="scanner-line"></div>
+
+      </div>
+
+      <div style="height:12px"></div>
+
+      <div id="qrScannerStatus"
+           class="small muted"
+           style="text-align:center">
+        Наведи камеру на QR-адрес
+      </div>
+
+      <canvas id="qrCanvas"
+              class="hidden">
+      </canvas>
+
+      <div style="height:12px"></div>
+
+      <button id="stopQrScanner"
+              class="btn secondary">
+        Отмена
+      </button>
+    `
+  );
+
+
+  $("stopQrScanner")
+    .addEventListener(
+      "click",
+      stopQRScanner
+    );
+
+
+  try{
+
+    qrStream =
+      await navigator.mediaDevices
+        .getUserMedia({
+          video:{
+            facingMode:{
+              ideal:"environment"
+            }
+          },
+          audio:false
+        });
+
+
+    const video =
+      $("qrVideo");
+
+
+    video.srcObject =
+      qrStream;
+
+
+    await video.play();
+
+
+    scanQRFrameForSend();
+
+
+  }catch(error){
+
+    const status =
+      $("qrScannerStatus");
+
+
+    if(status){
+
+      status.innerHTML = `
+        <div class="error">
+          Камера недоступна.
+        </div>
+      `;
+
+    }
+
+  }
+
+}
+
+
+function scanQRFrameForSend(){
+
+  const video =
+    $("qrVideo");
+
+  const canvas =
+    $("qrCanvas");
+
+
+  if(!video || !canvas)
+    return;
+
+
+  if(
+    video.readyState <
+    HTMLMediaElement.HAVE_ENOUGH_DATA
+  ){
+
+    qrAnimation =
+      requestAnimationFrame(
+        scanQRFrameForSend
+      );
+
+    return;
+  }
+
+
+  canvas.width =
+    video.videoWidth;
+
+  canvas.height =
+    video.videoHeight;
+
+
+  const ctx =
+    canvas.getContext(
+      "2d",
+      {
+        willReadFrequently:true
+      }
+    );
+
+
+  ctx.drawImage(
+    video,
+    0,
+    0,
+    canvas.width,
+    canvas.height
+  );
+
+
+  const imageData =
+    ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+
+  if(typeof jsQR === "function"){
+
+    const result =
+      jsQR(
+        imageData.data,
+        imageData.width,
+        imageData.height,
+        {
+          inversionAttempts:
+            "attemptBoth"
+        }
+      );
+
+
+    if(result?.data){
+
+      const address =
+        extractSLXAddress(
+          result.data
+        );
+
+
+      if(address){
+
+        stopQRScanner();
+
+        openSendModal(
+          address
+        );
+
+        return;
+
+      }
+
+    }
+
+  }
+
+
+  qrAnimation =
+    requestAnimationFrame(
+      scanQRFrameForSend
+    );
+
 }
 
 
@@ -2284,50 +3465,76 @@ async function sendTransaction(){
    ========================================================= */
 
 $("homeFaucetBtn")
-.addEventListener("click",claimFaucet);
+.addEventListener(
+  "click",
+  claimFaucet
+);
+
 
 async function claimFaucet(){
 
-  const wallet = getActiveWallet();
+  const wallet =
+    getActiveWallet();
+
 
   if(!wallet){
 
-    toast("Нет активного кошелька");
+    toast(
+      "Нет активного кошелька"
+    );
+
     return;
   }
+
 
   const button =
     $("homeFaucetBtn");
 
+
   button.disabled = true;
-  button.textContent = "Получение...";
+  button.textContent =
+    "Получение...";
+
 
   try{
 
-    const data = await api("/api/faucet",{
-      method:"POST",
-      body:JSON.stringify({
-        walletId:wallet.id
-      })
-    });
+    const data =
+      await api(
+        "/api/faucet",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            walletId:wallet.id
+          })
+        }
+      );
+
 
     toast(
       data.message ||
       "Получено 10 SLX"
     );
 
+
     await loadWallets();
     await refreshHome();
 
+
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
 
   }finally{
 
     button.disabled = false;
-    button.textContent = "+10 SLX";
+    button.textContent =
+      "+10 SLX";
+
   }
+
 }
 
 
@@ -2343,6 +3550,7 @@ async function loadHistory(){
   const wallet =
     getActiveWallet();
 
+
   if(!wallet){
 
     container.innerHTML = `
@@ -2354,19 +3562,29 @@ async function loadHistory(){
     return;
   }
 
+
   container.innerHTML =
-    `<div class="muted small">Загрузка...</div>`;
+    `<div class="muted small">
+      Загрузка...
+    </div>`;
+
 
   try{
 
     const data =
       await api(
         "/api/wallet/" +
-        encodeURIComponent(wallet.id)
+        encodeURIComponent(
+          wallet.id
+        )
       );
 
+
     const transactions =
-      data.transactions || [];
+      data.transactions ||
+      data.wallet?.transactions ||
+      [];
+
 
     if(!transactions.length){
 
@@ -2379,39 +3597,59 @@ async function loadHistory(){
       return;
     }
 
+
     container.innerHTML =
       transactions
         .map(transactionHTML)
         .join("");
 
+
   }catch(error){
 
     container.innerHTML = `
       <div class="error">
-        ${escapeHTML(error.message)}
+        ${escapeHTML(
+          error.message
+        )}
       </div>
     `;
+
   }
+
 }
+
 
 function transactionHTML(tx){
 
   const type =
-    String(tx.type || "").toUpperCase();
+    String(
+      tx.type || ""
+    ).toUpperCase();
+
 
   const amount =
-    Number(tx.amount || 0);
+    Number(
+      tx.amount || 0
+    );
+
 
   const positive =
     type === "RECEIVE" ||
     type === "FAUCET" ||
     type === "GENESIS";
 
+
   const cls =
-    positive ? "positive" : "negative";
+    positive
+    ? "positive"
+    : "negative";
+
 
   const sign =
-    positive ? "+" : "-";
+    positive
+    ? "+"
+    : "-";
+
 
   return `
     <div class="transaction">
@@ -2419,24 +3657,34 @@ function transactionHTML(tx){
       <div class="tx-top">
 
         <div class="tx-type">
-          ${escapeHTML(type || "TX")}
+          ${escapeHTML(
+            type || "TX"
+          )}
         </div>
 
         <div class="tx-amount ${cls}">
-          ${sign}${formatAmount(amount)} SLX
+          ${sign}${formatAmount(
+            amount
+          )} SLX
         </div>
 
       </div>
 
       <div class="tx-meta">
-        ID: ${escapeHTML(tx.id || "—")}
+        ID:
+        ${escapeHTML(
+          tx.id || "—"
+        )}
       </div>
 
       ${
         tx.from_wallet
         ? `
           <div class="tx-meta">
-            From: ${escapeHTML(tx.from_wallet)}
+            From:
+            ${escapeHTML(
+              tx.from_wallet
+            )}
           </div>
         `
         : ""
@@ -2446,7 +3694,10 @@ function transactionHTML(tx){
         tx.to_wallet
         ? `
           <div class="tx-meta">
-            To: ${escapeHTML(tx.to_wallet)}
+            To:
+            ${escapeHTML(
+              tx.to_wallet
+            )}
           </div>
         `
         : ""
@@ -2456,7 +3707,10 @@ function transactionHTML(tx){
         tx.fee !== undefined
         ? `
           <div class="tx-meta">
-            Fee: ${formatAmount(tx.fee)} SLX
+            Fee:
+            ${formatAmount(
+              tx.fee
+            )} SLX
           </div>
         `
         : ""
@@ -2467,7 +3721,9 @@ function transactionHTML(tx){
         ? `
           <div class="tx-meta">
             ${escapeHTML(
-              new Date(tx.created_at).toLocaleString()
+              new Date(
+                tx.created_at
+              ).toLocaleString()
             )}
           </div>
         `
@@ -2476,6 +3732,7 @@ function transactionHTML(tx){
 
     </div>
   `;
+
 }
 
 
@@ -2488,20 +3745,32 @@ async function loadNetwork(){
   try{
 
     networkInfo =
-      await api("/api/status");
+      await api(
+        "/api/status"
+      );
 
-    $("homeNetwork").textContent =
-      networkInfo.status || "online";
 
-    $("homeFee").textContent =
-      formatAmount(networkInfo.transferFee) +
-      " SLX";
+    $("homeNetwork")
+      .textContent =
+      networkInfo.status ||
+      "online";
+
+
+    $("homeFee")
+      .textContent =
+      formatAmount(
+        networkInfo.transferFee
+      ) + " SLX";
+
 
   }catch{
 
     networkInfo = null;
+
   }
+
 }
+
 
 async function loadNetworkPage(){
 
@@ -2509,42 +3778,88 @@ async function loadNetworkPage(){
 
     await loadNetwork();
 
+
     const status =
       networkInfo || {};
 
-    $("networkStatus").textContent =
-      status.status || "unknown";
 
-    $("networkVersion").textContent =
-      status.version || "—";
+    $("networkStatus")
+      .textContent =
+      status.status ||
+      "unknown";
 
-    $("networkFee").textContent =
-      formatAmount(status.transferFee) +
-      " SLX";
 
-    const blocksData =
-      await api("/api/blocks");
+    $("networkVersion")
+      .textContent =
+      status.version ||
+      "—";
 
-    const blocks =
-      blocksData.blocks || [];
 
-    $("networkBlocksCount").textContent =
-      blocks.length;
+    $("networkFee")
+      .textContent =
+      formatAmount(
+        status.transferFee
+      ) + " SLX";
 
-    renderBlocks(blocks);
+
+    try{
+
+      const blocksData =
+        await api(
+          "/api/blocks"
+        );
+
+
+      const blocks =
+        blocksData.blocks ||
+        [];
+
+
+      $("networkBlocksCount")
+        .textContent =
+        blocks.length;
+
+
+      renderBlocks(
+        blocks
+      );
+
+    }catch{
+
+      $("networkBlocksCount")
+        .textContent =
+        status.blocks ??
+        "—";
+
+      $("blocksList").innerHTML =
+        `
+          <div class="muted small">
+            API блоков недоступен.
+          </div>
+        `;
+
+    }
+
 
     await loadEconomy();
 
+
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
   }
+
 }
+
 
 function renderBlocks(blocks){
 
   const container =
     $("blocksList");
+
 
   if(!blocks.length){
 
@@ -2557,17 +3872,21 @@ function renderBlocks(blocks){
     return;
   }
 
+
   container.innerHTML =
     blocks
       .slice(0,20)
-      .map(block=>`
+      .map(
+        block=>`
 
         <div class="transaction">
 
           <div class="tx-top">
 
             <div class="tx-type">
-              Block #${escapeHTML(block.block_index)}
+              Block #${escapeHTML(
+                block.block_index
+              )}
             </div>
 
             <div class="tx-amount">
@@ -2580,95 +3899,136 @@ function renderBlocks(blocks){
 
           <div class="tx-meta">
             Hash:
-            ${escapeHTML(block.hash || "—")}
+            ${escapeHTML(
+              block.hash || "—"
+            )}
           </div>
 
           <div class="tx-meta">
             Previous:
-            ${escapeHTML(block.previous_hash || "—")}
+            ${escapeHTML(
+              block.previous_hash || "—"
+            )}
           </div>
 
           <div class="tx-meta">
             Merkle:
-            ${escapeHTML(block.merkle_root || "—")}
+            ${escapeHTML(
+              block.merkle_root || "—"
+            )}
           </div>
 
           <div class="tx-meta">
-            ${block.timestamp
+            ${
+              block.timestamp
               ? escapeHTML(
-                  new Date(block.timestamp)
-                  .toLocaleString()
+                  new Date(
+                    block.timestamp
+                  ).toLocaleString()
                 )
-              : "—"}
+              : "—"
+            }
           </div>
 
         </div>
 
-      `)
+      `
+      )
       .join("");
+
 }
+
 
 async function loadEconomy(){
 
   const container =
     $("economy");
 
+
   try{
 
     const data =
-      await api("/api/economy");
+      await api(
+        "/api/economy"
+      );
+
 
     container.innerHTML = `
 
       <div class="grid">
 
         <div class="stat">
+
           <div class="stat-label">
             Max Supply
           </div>
+
           <div class="stat-value">
-            ${formatAmount(data.maxSupply)}
+            ${formatAmount(
+              data.maxSupply
+            )}
           </div>
+
         </div>
 
         <div class="stat">
+
           <div class="stat-label">
             Total Balance
           </div>
+
           <div class="stat-value">
-            ${formatAmount(data.totalBalance)}
+            ${formatAmount(
+              data.totalBalance
+            )}
           </div>
+
         </div>
 
         <div class="stat">
+
           <div class="stat-label">
             Remaining
           </div>
+
           <div class="stat-value">
-            ${formatAmount(data.remaining)}
+            ${formatAmount(
+              data.remaining
+            )}
           </div>
+
         </div>
 
         <div class="stat">
+
           <div class="stat-label">
             Faucet
           </div>
+
           <div class="stat-value">
-            ${formatAmount(data.faucetAmount)}
+            ${formatAmount(
+              data.faucetAmount
+            )}
           </div>
+
         </div>
 
       </div>
     `;
+
 
   }catch(error){
 
     container.innerHTML = `
       <div class="error">
-        ${escapeHTML(error.message)}
+        ${escapeHTML(
+          error.message
+        )}
       </div>
     `;
+
   }
+
 }
 
 
@@ -2677,7 +4037,11 @@ async function loadEconomy(){
    ========================================================= */
 
 $("verifyChainBtn")
-.addEventListener("click",verifyChain);
+.addEventListener(
+  "click",
+  verifyChain
+);
+
 
 async function verifyChain(){
 
@@ -2687,173 +4051,423 @@ async function verifyChain(){
   const result =
     $("chainVerifyResult");
 
+
   button.disabled = true;
-  button.textContent = "Проверка...";
+  button.textContent =
+    "Проверка...";
 
   result.innerHTML = "";
+
 
   try{
 
     const data =
-      await api("/api/chain/verify");
+      await api(
+        "/api/chain/verify"
+      );
+
 
     const valid =
       data.valid === true;
 
-    result.innerHTML = valid
+
+    result.innerHTML =
+      valid
       ? `
         <div class="success">
           ✓ Цепочка блоков корректна.
-          ${data.blocks !== undefined
-            ? `<br>Проверено блоков: ${escapeHTML(data.blocks)}`
-            : ""}
+          ${
+            data.blocks !== undefined
+            ? `<br>Проверено блоков:
+               ${escapeHTML(
+                 data.blocks
+               )}`
+            : ""
+          }
         </div>
       `
       : `
         <div class="error">
           ✕ Цепочка содержит ошибку.
-          ${data.error
-            ? `<br>${escapeHTML(data.error)}`
-            : ""}
+          ${
+            data.error
+            ? `<br>${escapeHTML(
+                data.error
+              )}`
+            : ""
+          }
         </div>
       `;
+
 
   }catch(error){
 
     result.innerHTML = `
       <div class="error">
         Ошибка проверки:
-        ${escapeHTML(error.message)}
+        ${escapeHTML(
+          error.message
+        )}
       </div>
     `;
 
   }finally{
 
     button.disabled = false;
-    button.textContent = "🔐 Проверить цепочку";
+    button.textContent =
+      "🔐 Проверить цепочку";
+
   }
+
 }
 
 
 /* =========================================================
-   PROFILE / AVATAR
+   PROFILE
    ========================================================= */
 
 function loadAvatar(){
 
   const avatar =
-    localStorage.getItem(AVATAR_KEY);
+    localStorage.getItem(
+      AVATAR_KEY
+    );
+
 
   renderAvatar(
     $("headerAvatar"),
     avatar
   );
 
+
   renderAvatar(
     $("settingsAvatar"),
     avatar
   );
+
 }
 
-function renderAvatar(element,src){
 
-  if(!element) return;
+function renderAvatar(
+  element,
+  src
+){
+
+  if(!element)
+    return;
+
 
   if(src){
 
     element.innerHTML =
-      `<img src="${src}" alt="Avatar">`;
+      `<img
+        src="${src}"
+        alt="Avatar">`;
 
   }else{
 
     const username =
-      currentUser?.username || "S";
+      currentUser?.username ||
+      "S";
+
 
     element.textContent =
-      username.charAt(0).toUpperCase();
+      username
+        .charAt(0)
+        .toUpperCase();
+
   }
+
 }
+
 
 function updateProfile(){
 
-  if(!currentUser) return;
+  if(!currentUser)
+    return;
 
-  $("profileUsername").textContent =
-    currentUser.username || "User";
 
-  $("profileWalletCount").textContent =
+  $("profileUsername")
+    .textContent =
+    currentUser.username ||
+    "User";
+
+
+  $("profileWalletCount")
+    .textContent =
     `${wallets.length} кошельков`;
 
+
   loadAvatar();
+
 }
 
+
 $("headerAvatar")
-.addEventListener("click",()=>{
-
-  showPage("settings");
-
-});
+.addEventListener(
+  "click",
+  ()=>{
+    showPage(
+      "settings"
+    );
+  }
+);
 
 
 /* =========================================================
-   AVATAR UPLOAD
+   AVATAR
    ========================================================= */
 
 $("avatarInput")
-.addEventListener("change",event=>{
+.addEventListener(
+  "change",
+  event=>{
 
-  const file =
-    event.target.files?.[0];
+    const file =
+      event.target.files?.[0];
 
-  if(!file) return;
 
-  if(!file.type.startsWith("image/")){
+    if(!file)
+      return;
 
-    toast("Выбери изображение");
-    return;
-  }
 
-  if(file.size > 5 * 1024 * 1024){
+    if(
+      !file.type.startsWith(
+        "image/"
+      )
+    ){
 
-    toast("Фото должно быть меньше 5 MB");
-    return;
-  }
+      toast(
+        "Выбери изображение"
+      );
 
-  const reader =
-    new FileReader();
+      return;
+    }
 
-  reader.onload = ()=>{
 
-    localStorage.setItem(
-      AVATAR_KEY,
-      reader.result
+    if(
+      file.size >
+      5 * 1024 * 1024
+    ){
+
+      toast(
+        "Фото должно быть меньше 5 MB"
+      );
+
+      return;
+    }
+
+
+    const reader =
+      new FileReader();
+
+
+    reader.onload = ()=>{
+
+      localStorage.setItem(
+        AVATAR_KEY,
+        reader.result
+      );
+
+
+      loadAvatar();
+
+
+      toast(
+        "Фото профиля сохранено"
+      );
+
+    };
+
+
+    reader.onerror = ()=>{
+
+      toast(
+        "Не удалось прочитать изображение"
+      );
+
+    };
+
+
+    reader.readAsDataURL(
+      file
     );
 
-    loadAvatar();
-
-    toast("Фото профиля сохранено");
-  };
-
-  reader.onerror = ()=>{
-
-    toast("Не удалось прочитать изображение");
-  };
-
-  reader.readAsDataURL(file);
-});
+  }
+);
 
 
 $("removeAvatarBtn")
-.addEventListener("click",()=>{
+.addEventListener(
+  "click",
+  ()=>{
 
-  localStorage.removeItem(AVATAR_KEY);
+    localStorage.removeItem(
+      AVATAR_KEY
+    );
 
-  $("avatarInput").value = "";
+    $("avatarInput").value =
+      "";
 
-  loadAvatar();
+    loadAvatar();
 
-  toast("Фото удалено");
-});
+    toast(
+      "Фото удалено"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   RECOVERY
+   ========================================================= */
+
+$("recoveryOpenBtn")
+.addEventListener(
+  "click",
+  ()=>{
+
+    openModal(
+      "Восстановление пароля",
+      `
+        <label>Username</label>
+
+        <input
+          id="recoveryUsername"
+          class="input"
+          autocomplete="username"
+          placeholder="Username">
+
+        <label>
+          Код восстановления
+        </label>
+
+        <input
+          id="recoveryCode"
+          class="input"
+          placeholder="Recovery code">
+
+        <label>
+          Новый пароль
+        </label>
+
+        <input
+          id="recoveryPassword"
+          class="input"
+          type="password"
+          autocomplete="new-password"
+          placeholder="Минимум 8 символов">
+
+        <button
+          id="recoveryBtn"
+          class="btn">
+          Восстановить
+        </button>
+      `
+    );
+
+
+    $("recoveryBtn")
+      .addEventListener(
+        "click",
+        recoveryReset
+      );
+
+  }
+);
+
+
+async function recoveryReset(){
+
+  const username =
+    $("recoveryUsername")
+      .value
+      .trim();
+
+  const recoveryCode =
+    $("recoveryCode")
+      .value
+      .trim();
+
+  const newPassword =
+    $("recoveryPassword")
+      .value;
+
+
+  if(
+    !username ||
+    !recoveryCode
+  ){
+
+    toast(
+      "Заполни username и код."
+    );
+
+    return;
+  }
+
+
+  if(
+    newPassword.length < 8
+  ){
+
+    toast(
+      "Новый пароль минимум 8 символов."
+    );
+
+    return;
+  }
+
+
+  try{
+
+    const data =
+      await api(
+        "/api/auth/recovery/reset",
+        {
+          method:"POST",
+          body:JSON.stringify({
+            username,
+            recoveryCode,
+            newPassword
+          })
+        }
+      );
+
+
+    if(data.token){
+
+      token =
+        data.token;
+
+      localStorage.setItem(
+        TOKEN_KEY,
+        token
+      );
+
+    }
+
+
+    closeModal();
+
+    toast(
+      "Пароль восстановлен"
+    );
+
+
+    await startApp();
+
+
+  }catch(error){
+
+    toast(
+      error.message
+    );
+
+  }
+
+}
 
 
 /* =========================================================
@@ -2861,58 +4475,85 @@ $("removeAvatarBtn")
    ========================================================= */
 
 $("changePasswordBtn")
-.addEventListener("click",()=>{
+.addEventListener(
+  "click",
+  ()=>{
 
-  openModal(
-    "Изменить пароль",
-    `
-      <label>Текущий пароль</label>
+    openModal(
+      "Изменить пароль",
+      `
+        <label>
+          Текущий пароль
+        </label>
 
-      <input id="oldPassword"
-             class="input"
-             type="password"
-             autocomplete="current-password">
+        <input
+          id="oldPassword"
+          class="input"
+          type="password">
 
-      <label>Новый пароль</label>
+        <label>
+          Новый пароль
+        </label>
 
-      <input id="newPassword"
-             class="input"
-             type="password"
-             autocomplete="new-password">
+        <input
+          id="newPassword"
+          class="input"
+          type="password">
 
-      <button id="changePasswordConfirm"
-              class="btn">
-        Изменить пароль
-      </button>
-    `
-  );
-
-  $("changePasswordConfirm")
-    .addEventListener(
-      "click",
-      changePassword
+        <button
+          id="changePasswordConfirm"
+          class="btn">
+          Изменить пароль
+        </button>
+      `
     );
-});
+
+
+    $("changePasswordConfirm")
+      .addEventListener(
+        "click",
+        changePassword
+      );
+
+  }
+);
+
 
 async function changePassword(){
 
   const oldPassword =
-    $("oldPassword").value;
+    $("oldPassword")
+      .value;
 
   const newPassword =
-    $("newPassword").value;
+    $("newPassword")
+      .value;
 
-  if(!oldPassword || !newPassword){
 
-    toast("Заполни оба поля");
+  if(
+    !oldPassword ||
+    !newPassword
+  ){
+
+    toast(
+      "Заполни оба поля"
+    );
+
     return;
   }
 
-  if(newPassword.length < 8){
 
-    toast("Новый пароль минимум 8 символов");
+  if(
+    newPassword.length < 8
+  ){
+
+    toast(
+      "Новый пароль минимум 8 символов"
+    );
+
     return;
   }
+
 
   try{
 
@@ -2928,24 +4569,35 @@ async function changePassword(){
         }
       );
 
+
     if(data.token){
 
-      token = data.token;
+      token =
+        data.token;
 
       localStorage.setItem(
         TOKEN_KEY,
         token
       );
+
     }
+
 
     closeModal();
 
-    toast("Пароль изменён");
+    toast(
+      "Пароль изменён"
+    );
+
 
   }catch(error){
 
-    toast(error.message);
+    toast(
+      error.message
+    );
+
   }
+
 }
 
 
@@ -2954,32 +4606,54 @@ async function changePassword(){
    ========================================================= */
 
 $("logoutBtn")
-.addEventListener("click",logout);
+.addEventListener(
+  "click",
+  logout
+);
+
 
 async function logout(){
 
   try{
 
-    await api("/api/auth/logout",{
-      method:"POST",
-      body:JSON.stringify({})
-    });
+    await api(
+      "/api/auth/logout",
+      {
+        method:"POST",
+        body:JSON.stringify({})
+      }
+    );
 
   }catch{
-    // Continue local logout even if server fails.
+
+    // local logout
   }
+
+
+  stopQRScanner();
+
 
   token = "";
   currentUser = null;
   wallets = [];
   activeWallet = "";
 
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(ACTIVE_WALLET_KEY);
+
+  localStorage.removeItem(
+    TOKEN_KEY
+  );
+
+  localStorage.removeItem(
+    ACTIVE_WALLET_KEY
+  );
+
 
   showAuth();
 
-  toast("Вы вышли из аккаунта");
+  toast(
+    "Вы вышли из аккаунта"
+  );
+
 }
 
 
@@ -2988,22 +4662,27 @@ async function logout(){
    ========================================================= */
 
 $("loginPassword")
-.addEventListener("keydown",event=>{
+.addEventListener(
+  "keydown",
+  event=>{
 
-  if(event.key === "Enter"){
-    login();
+    if(event.key === "Enter")
+      login();
+
   }
+);
 
-});
 
 $("registerPassword")
-.addEventListener("keydown",event=>{
+.addEventListener(
+  "keydown",
+  event=>{
 
-  if(event.key === "Enter"){
-    register();
+    if(event.key === "Enter")
+      register();
+
   }
-
-});
+);
 
 
 /* =========================================================
@@ -3019,6 +4698,7 @@ $("registerPassword")
   }else{
 
     showAuth();
+
   }
 
 })();
