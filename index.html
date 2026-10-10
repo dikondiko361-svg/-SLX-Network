@@ -2,2734 +2,2131 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#080b12">
-<title>SLX Network</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1020">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>SLX Network v1.9.1</title>
 
-<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  -webkit-tap-highlight-color:transparent;
+:root{
+  --bg:#070b14;
+  --panel:#0f1626;
+  --panel2:#131c30;
+  --line:#24304a;
+  --text:#f4f7fb;
+  --muted:#91a0ba;
+  --accent:#7c5cff;
+  --accent2:#4f8cff;
+  --good:#31d08a;
+  --warn:#ffc857;
+  --bad:#ff5f6d;
+  --shadow:0 12px 32px rgba(0,0,0,.28);
+  --radius:20px;
 }
 
-html,body{
-  margin:0;
-  padding:0;
-  min-height:100%;
-  background:#080b12;
-  color:#fff;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+body{min-height:100vh;padding-bottom:92px}
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.55;cursor:not-allowed}
+.hidden{display:none!important}
+.app{width:min(100%,680px);margin:0 auto;padding:14px 14px 0}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 2px 14px;
 }
-
-body{padding:14px}
-button,input{font:inherit}
-button{border:0;cursor:pointer;color:inherit}
-
-.app{
-  width:100%;
-  max-width:760px;
-  margin:auto;
-  padding-bottom:20px;
-}
-
-/* HEADER */
-
-.header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:14px;
-}
-
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
 .logo{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  font-weight:900;box-shadow:var(--shadow);flex:none;
 }
-
-.logo-icon{
-  width:48px;
-  height:48px;
-  border-radius:15px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:linear-gradient(135deg,#5967ff,#32b7ff);
-  font-size:23px;
-  font-weight:900;
-}
-
-.logo-title{
-  font-size:21px;
-  font-weight:850;
-}
-
-.logo-sub{
-  color:#7d8798;
-  font-size:12px;
-  margin-top:2px;
-}
-
-.status{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  padding:9px 13px;
-  border:1px solid #202938;
-  background:#10151f;
-  border-radius:15px;
-  color:#9da7b7;
-  font-size:13px;
-}
-
-.dot{
-  width:8px;
-  height:8px;
-  border-radius:50%;
-  background:#35d889;
-  box-shadow:0 0 10px #35d889;
-}
-
-/* NAV */
-
-.nav{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:7px;
-  margin-bottom:12px;
-}
-
-.nav button{
-  min-height:43px;
-  border-radius:12px;
-  background:#101620;
-  border:1px solid #202a39;
-  color:#8d98aa;
-  font-size:11px;
-  font-weight:700;
-}
-
-.nav button.active{
-  background:#202951;
-  border-color:#5261ff;
-  color:#fff;
-}
-
-/* CARDS */
-
-.card{
-  background:#0e131c;
-  border:1px solid #1d2635;
-  border-radius:20px;
-  padding:16px;
-  margin-bottom:12px;
-}
-
-.balance-card{
-  padding:20px;
-  border-radius:23px;
-  background:
-    radial-gradient(circle at 90% 5%,rgba(84,98,255,.25),transparent 38%),
-    linear-gradient(145deg,#121925,#0d121b);
-}
-
-.label{
-  color:#8993a5;
-  font-size:13px;
-}
-
-.balance{
-  font-size:40px;
-  font-weight:850;
-  margin-top:7px;
-}
-
-.balance-unit{
-  color:#8e99aa;
-  font-size:20px;
-}
-
-.address{
-  color:#727e91;
-  font-size:12px;
-  margin-top:13px;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-/* SECTION */
-
-.section-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:12px;
-}
-
-.title{
-  font-size:20px;
-  font-weight:850;
-}
-
-.muted{
-  color:#697588;
-  font-size:12px;
-}
-
-/* WALLET */
-
-.wallet-list{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.wallet{
-  display:flex;
-  align-items:center;
-  gap:9px;
-  min-width:0;
-  padding:10px;
-  border-radius:15px;
-  background:#111721;
-  border:1px solid #1d2735;
-}
-
-.wallet.active{
-  border-color:#4d5cff;
-  background:#131a2c;
-}
-
-.wallet-icon{
-  width:38px;
-  height:38px;
-  flex:none;
-  border-radius:11px;
-  background:#1b2432;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:18px;
-}
-
-.wallet-main{
-  flex:1;
-  min-width:0;
-  cursor:pointer;
-}
-
-.wallet-name{
-  font-size:13px;
-  font-weight:800;
-}
-
-.wallet-address{
-  color:#687487;
-  font-size:9px;
-  margin-top:3px;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.wallet-balance{
-  color:#a2adbd;
-  font-size:11px;
-  white-space:nowrap;
-}
-
-.wallet-actions{
-  display:flex;
-  gap:5px;
-}
-
-.icon-btn{
-  width:34px;
-  height:34px;
-  border-radius:10px;
-  background:#1a2331;
-  color:#bac3d0;
-}
-
-.add{
-  width:100%;
-  height:42px;
-  margin-top:9px;
-  border-radius:12px;
-  background:#151c28;
-  color:#929daf;
-  border:1px dashed #303a4b;
-}
-
-/* FORM */
-
-.form{
-  display:flex;
-  flex-direction:column;
-  gap:9px;
-}
-
-.field-label{
-  color:#7e899b;
-  font-size:11px;
-  margin-bottom:6px;
-}
-
-.input{
-  width:100%;
-  height:47px;
-  border-radius:13px;
-  border:1px solid #273141;
-  background:#090e15;
-  color:#fff;
-  padding:0 13px;
-  outline:none;
-  font-size:13px;
-}
-
-.input:focus{
-  border-color:#5361ff;
-}
-
-.address-row{
-  display:flex;
-  gap:8px;
-}
-
-.address-row .input{
-  flex:1;
-}
-
-.scan{
-  width:47px;
-  height:47px;
-  flex:none;
-  border-radius:13px;
-  background:#4857ff;
-  font-size:21px;
-}
-
-.primary{
-  width:100%;
-  height:48px;
-  border-radius:13px;
-  background:linear-gradient(135deg,#5865ff,#765cff);
-  color:#fff;
-  font-size:14px;
-  font-weight:800;
-}
-
-.secondary{
-  width:100%;
-  height:43px;
-  border-radius:12px;
-  background:#171f2c;
-  border:1px solid #293344;
-  color:#adb7c5;
-  font-size:12px;
-}
-
-/* INFO */
-
-.info-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
-
-.info{
-  padding:12px;
-  border-radius:14px;
-  background:#111721;
-  border:1px solid #1d2735;
-}
-
-.info-name{
-  color:#697588;
-  font-size:10px;
-}
-
-.info-value{
-  font-size:14px;
-  font-weight:800;
-  margin-top:5px;
-}
-
-/* LIST */
-
-.list{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
-
-.list-item{
-  padding:12px;
-  border-radius:13px;
-  background:#111721;
-  border:1px solid #1d2735;
-}
-
-.list-top{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.list-title{
-  font-weight:750;
-  font-size:12px;
-}
-
-.list-value{
-  font-size:12px;
-  font-weight:750;
-}
-
-.list-sub{
-  color:#687487;
-  font-size:9px;
-  margin-top:5px;
-  word-break:break-all;
-}
-
-/* PROFILE */
-
-.profile{
-  display:flex;
-  align-items:center;
-  gap:13px;
-  padding:14px;
-  border-radius:15px;
-  background:#111721;
-  border:1px solid #1d2735;
-}
-
+.brand-title{font-size:18px;font-weight:800;line-height:1}
+.brand-sub{font-size:11px;color:var(--muted);margin-top:4px}
 .avatar{
-  width:50px;
-  height:50px;
-  border-radius:15px;
-  background:linear-gradient(135deg,#5665ff,#35b8ff);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:21px;
-  font-weight:900;
+  width:42px;height:42px;border-radius:50%;object-fit:cover;
+  background:var(--panel2);border:1px solid var(--line);flex:none;
 }
-
-.profile-name{
-  font-size:16px;
-  font-weight:800;
+.card{
+  background:linear-gradient(180deg,rgba(19,28,48,.98),rgba(12,18,32,.98));
+  border:1px solid var(--line);border-radius:var(--radius);
+  padding:16px;box-shadow:var(--shadow);margin-bottom:12px;
 }
-
-.profile-sub{
-  color:#697588;
-  font-size:10px;
-  margin-top:3px;
+.card h2,.card h3{margin:0 0 12px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.tiny{font-size:11px}
+.row{display:flex;align-items:center;gap:10px}
+.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stack{display:flex;flex-direction:column;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{
+  width:100%;border:0;border-radius:14px;padding:13px 14px;
+  background:var(--panel2);color:var(--text);font-weight:800;
 }
-
-/* SETTINGS */
-
-.setting{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-  padding:14px 0;
-  border-bottom:1px solid #1c2532;
+.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
+.btn.good{background:rgba(49,208,138,.16);border:1px solid rgba(49,208,138,.32);color:#8df1bd}
+.btn.warn{background:rgba(255,200,87,.13);border:1px solid rgba(255,200,87,.28);color:#ffd97c}
+.btn.danger{background:rgba(255,95,109,.12);border:1px solid rgba(255,95,109,.25);color:#ff9aa3}
+.btn.smallbtn{width:auto;padding:8px 9px;border-radius:10px;font-size:11px;min-width:48px}
+.input,.select{
+  width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--line);
+  outline:none;background:#0a1020;color:var(--text);
 }
-
-.setting:last-child{
-  border-bottom:0;
+.input:focus,.select:focus{border-color:var(--accent)}
+.label{font-size:12px;color:var(--muted);margin-bottom:6px}
+.field{display:flex;flex-direction:column;gap:6px}
+.balance{font-size:40px;font-weight:900;letter-spacing:-1px;margin:8px 0 4px}
+.token{font-size:14px;color:#b7c0d0}
+.wallet-address{
+  word-break:break-all;padding:11px 12px;border-radius:12px;
+  background:#090e1b;border:1px dashed #34415f;color:#cad3e5;font-size:12px;
 }
-
-.setting-name{
-  font-size:13px;
-  font-weight:700;
+.badge{
+  display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;
+  font-size:11px;font-weight:800;background:rgba(145,160,186,.12);color:#c5cede;
 }
+.badge.good{background:rgba(49,208,138,.12);color:#86efb7}
+.badge.warn{background:rgba(255,200,87,.12);color:#ffd76d}
+.badge.bad{background:rgba(255,95,109,.12);color:#ff9aa4}
 
-.setting-sub{
-  color:#687487;
-  font-size:9px;
-  margin-top:3px;
+.wallet-item{
+  padding:9px;border-radius:14px;border:1px solid var(--line);background:#0b1120;
+  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;overflow:hidden;
 }
+.wallet-item.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(124,92,255,.25) inset}
+.wallet-left{min-width:0;overflow:hidden}
+.wallet-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wallet-mini{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wallet-balance{font-size:12px;font-weight:800;margin-top:5px}
+.wallet-actions{display:flex;gap:6px;flex-shrink:0}
+.wallet-actions .smallbtn{min-width:48px;padding:8px 9px;border-radius:10px;font-size:11px}
 
-.switch{
-  width:45px;
-  height:26px;
-  border-radius:20px;
-  background:#252e3c;
-  padding:3px;
+.scan-frame{position:relative;margin-top:10px;border-radius:18px;overflow:hidden;background:#000;border:1px solid var(--line)}
+.scan-frame:after{content:"";position:absolute;inset:16%;border:2px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.08);pointer-events:none}
+.tx{padding:12px;border-radius:14px;border:1px solid var(--line);background:#0b1120}
+.tx-head{display:flex;justify-content:space-between;gap:10px}
+.tx-type{font-weight:800}
+.amount.plus{color:#75e8a9}
+.amount.minus{color:#ff8c97}
+.kv{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:13px}
+.kv div:nth-child(odd){color:var(--muted)}
+.section-title{font-weight:900;font-size:17px;margin:4px 0 10px}
+.empty{padding:18px 8px;text-align:center;color:var(--muted)}
+.info{
+  padding:11px 12px;border-radius:13px;background:rgba(79,140,255,.09);
+  border:1px solid rgba(79,140,255,.22);font-size:12px;line-height:1.45;
 }
-
-.switch span{
-  display:block;
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  background:#7c8797;
+.warning{
+  padding:11px 12px;border-radius:13px;background:rgba(255,200,87,.08);
+  border:1px solid rgba(255,200,87,.22);font-size:12px;line-height:1.45;
 }
-
-.switch.on{
-  background:#4857ff;
+.success{
+  padding:11px 12px;border-radius:13px;background:rgba(49,208,138,.08);
+  border:1px solid rgba(49,208,138,.22);font-size:12px;line-height:1.45;
 }
-
-.switch.on span{
-  margin-left:19px;
-  background:#fff;
+.recovery-code{
+  padding:16px;border-radius:14px;background:#090e1a;border:1px solid #3d4c6b;
+  text-align:center;font-size:24px;font-weight:900;letter-spacing:4px;user-select:text;
 }
-
-/* MESSAGE */
-
-.message{
-  display:none;
-  padding:10px;
-  border-radius:11px;
-  font-size:11px;
-  text-align:center;
+.qr-box{
+  width:240px;height:240px;margin:0 auto;border-radius:18px;background:white;
+  display:grid;place-items:center;padding:12px;
 }
-
-.message.show{display:block}
-.message.error{background:#321a20;color:#ff9ca8}
-.message.success{background:#142c22;color:#7ee0ae}
-
-/* MODAL */
-
+#qrCode{display:grid;place-items:center}
+#qrCode img,#qrCode canvas{max-width:216px!important;max-height:216px!important}
 .modal{
-  position:fixed;
-  inset:0;
-  z-index:100;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
-  background:rgba(0,0,0,.76);
-  backdrop-filter:blur(9px);
+  position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
+  display:flex;align-items:flex-end;justify-content:center;z-index:1000;padding:10px;
 }
-
-.modal.show{
-  display:flex;
-}
-
 .modal-box{
-  width:100%;
-  max-width:440px;
-  max-height:92vh;
-  overflow:auto;
-  border-radius:20px;
-  background:#0d131d;
-  border:1px solid #293345;
-  padding:16px;
+  width:min(100%,680px);max-height:88vh;overflow:auto;
+  background:#0d1424;border:1px solid var(--line);border-radius:24px;padding:16px;
 }
-
-.modal-head{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:13px;
+.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.iconbtn{
+  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
+  background:#10192c;color:var(--text);
 }
-
-.modal-title{
-  font-size:18px;
-  font-weight:850;
+.toast{
+  position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);
+  width:min(calc(100% - 28px),620px);padding:13px 15px;border-radius:14px;
+  background:#111a2d;border:1px solid var(--line);box-shadow:var(--shadow);
+  opacity:0;pointer-events:none;transition:.22s;z-index:1200;font-size:13px;
 }
-
-.close{
-  width:34px;
-  height:34px;
-  border-radius:10px;
-  background:#18202c;
-  color:#aeb8c7;
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.good{border-color:rgba(49,208,138,.4)}
+.toast.bad{border-color:rgba(255,95,109,.45)}
+.bottom-nav{
+  position:fixed;left:0;right:0;bottom:0;z-index:900;
+  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+  background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-top:1px solid var(--line);
 }
-
-/* QR */
-
-.qr{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  min-height:250px;
-  background:#fff;
-  border-radius:15px;
-  padding:15px;
+.nav-inner{width:min(100%,680px);margin:0 auto;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
+.nav-btn{
+  border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:12px;
+  font-size:10px;font-weight:800;line-height:1.35;min-width:0;
 }
-
-.qr-address{
-  margin-top:10px;
-  padding:10px;
-  border-radius:10px;
-  background:#090e15;
-  color:#8994a6;
-  text-align:center;
-  font-size:9px;
-  word-break:break-all;
+.nav-btn.active{background:#131d33;color:#fff}
+.auth{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:18px;
 }
-
-/* SCANNER */
-
-.scanner{
-  position:relative;
-  width:100%;
-  aspect-ratio:1;
-  overflow:hidden;
-  border-radius:16px;
-  background:#000;
+.auth-box{width:min(100%,560px)}
+.auth-logo{margin:0 auto 14px}
+.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.tab{
+  border:1px solid var(--line);background:#0c1322;color:var(--muted);padding:11px;border-radius:12px;font-weight:800;
 }
-
-#video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+.tab.active{background:#151f37;color:#fff;border-color:#3b4b72}
+.file-btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:11px 13px;border-radius:13px;background:#10192c;border:1px solid var(--line);font-weight:800;
 }
+#avatarInput{display:none}
+.avatar-preview{width:90px;height:90px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:#10192c}
+.scanner-video{width:100%;border-radius:16px;background:#000;aspect-ratio:1/1;object-fit:cover}
+hr{border:0;border-top:1px solid var(--line);margin:14px 0}
 
-#scanCanvas{display:none}
-
-.scan-frame{
-  position:absolute;
-  inset:17%;
-  border:2px solid #fff;
-  border-radius:15px;
-  box-shadow:0 0 0 999px rgba(0,0,0,.28);
-  pointer-events:none;
-}
-
-.scan-line{
-  position:absolute;
-  left:18%;
-  right:18%;
-  top:18%;
-  height:2px;
-  background:#5f70ff;
-  box-shadow:0 0 12px #5f70ff;
-  animation:scan 2s linear infinite;
-}
-
-@keyframes scan{
-  0%{top:18%}
-  50%{top:80%}
-  100%{top:18%}
-}
-
-.scan-text{
-  text-align:center;
-  color:#7d8899;
-  font-size:10px;
-  margin:10px 0;
-}
-
-/* AUTH */
-
-.auth-tabs{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:6px;
-  margin-bottom:12px;
-}
-
-.auth-tabs button{
-  height:40px;
-  border-radius:10px;
-  background:#151c27;
-  color:#8490a1;
-}
-
-.auth-tabs button.active{
-  background:#4857ff;
-  color:#fff;
-}
-
-.auth-hidden{
-  display:none;
-}
-
-/* FOOTER */
-
-.footer{
-  text-align:center;
-  color:#4f5a6b;
-  font-size:9px;
-  padding:8px 0 18px;
-}
-
-@media(max-width:430px){
-  body{padding:10px}
-  .balance{font-size:36px}
-  .logo-title{font-size:20px}
-  .card{border-radius:17px}
+@media(min-width:560px){.modal{align-items:center}}
+@media(max-width:390px){
+  .nav-btn{font-size:9px;padding-left:1px;padding-right:1px}
+  .wallet-actions{gap:4px}
+  .wallet-actions .smallbtn{min-width:42px;padding:7px 6px}
 }
 </style>
 </head>
 
 <body>
 
-<div class="app">
+<!-- АВТОРИЗАЦИЯ -->
 
-<header class="header">
+<div id="authScreen" class="auth">
+  <div class="auth-box">
+    <div class="card">
+      <div class="logo auth-logo">SLX</div>
+      <h1 style="text-align:center;margin:0 0 6px">SLX Network</h1>
+      <div class="muted small" style="text-align:center;margin-bottom:18px">Testnet • v1.9.1</div>
 
-  <div class="logo">
-
-    <div class="logo-icon">S</div>
-
-    <div>
-      <div class="logo-title">SLX Network</div>
-      <div class="logo-sub">v1.9.1 · Testnet</div>
-    </div>
-
-  </div>
-
-  <div class="status">
-    <span class="dot"></span>
-    <span id="statusText">Online</span>
-  </div>
-
-</header>
-
-
-<!-- НАВИГАЦИЯ -->
-
-<nav class="nav">
-
-  <button class="active" onclick="showPage('walletsPage',this)">
-    Кошелёк
-  </button>
-
-  <button onclick="showPage('historyPage',this)">
-    История
-  </button>
-
-  <button onclick="showPage('networkPage',this)">
-    Сеть
-  </button>
-
-  <button onclick="showPage('profilePage',this)">
-    Профиль
-  </button>
-
-</nav>
-
-
-<!-- =========================
-     КОШЕЛЁК
-========================= -->
-
-<div id="walletsPage">
-
-<section class="card balance-card">
-
-  <div class="label">Общий баланс</div>
-
-  <div class="balance">
-    <span id="balance">0.00</span>
-    <span class="balance-unit">SLX</span>
-  </div>
-
-  <div class="address" id="mainAddress">
-    Кошелёк не выбран
-  </div>
-
-</section>
-
-
-<section class="card">
-
-  <div class="section-head">
-
-    <div class="title">Кошельки</div>
-
-    <div class="muted" id="walletCount">
-      0 кошельков
-    </div>
-
-  </div>
-
-  <div class="wallet-list" id="walletList">
-
-    <div style="text-align:center;color:#687487;padding:20px">
-      Загрузка...
-    </div>
-
-  </div>
-
-  <button class="add" onclick="createWallet()">
-    ＋ Создать новый кошелёк
-  </button>
-
-</section>
-
-
-<section class="card">
-
-  <div class="section-head">
-
-    <div class="title">Отправить SLX</div>
-
-    <div class="muted">
-      Комиссия 0.1 SLX
-    </div>
-
-  </div>
-
-  <div class="form">
-
-    <div>
-
-      <div class="field-label">
-        Адрес получателя
+      <div class="auth-tabs">
+        <button id="loginTab" class="tab active" type="button">Вход</button>
+        <button id="registerTab" class="tab" type="button">Регистрация</button>
       </div>
 
-      <div class="address-row">
-
-        <input
-          id="toAddress"
-          class="input"
-          placeholder="SLXC..."
-          autocomplete="off"
-        >
-
-        <button
-          class="scan"
-          onclick="openScanner()"
-        >
-          ⌗
-        </button>
-
-      </div>
-
-    </div>
-
-
-    <div>
-
-      <div class="field-label">
-        Количество SLX
-      </div>
-
-      <input
-        id="sendAmount"
-        class="input"
-        type="number"
-        min="0.1"
-        step="0.1"
-        placeholder="0.0"
-      >
-
-    </div>
-
-
-    <button class="primary" onclick="sendSLX()">
-      Отправить
-    </button>
-
-    <div id="sendMessage" class="message"></div>
-
-  </div>
-
-</section>
-
-</div>
-
-
-<!-- =========================
-     ИСТОРИЯ
-========================= -->
-
-<div id="historyPage" style="display:none">
-
-<section class="card">
-
-  <div class="section-head">
-    <div class="title">История</div>
-
-    <button
-      class="secondary"
-      style="width:auto;padding:0 12px"
-      onclick="loadHistory()"
-    >
-      Обновить
-    </button>
-  </div>
-
-  <div id="historyList" class="list">
-    <div style="text-align:center;color:#687487;padding:20px">
-      Загрузка истории...
-    </div>
-  </div>
-
-</section>
-
-</div>
-
-
-<!-- =========================
-     СЕТЬ
-========================= -->
-
-<div id="networkPage" style="display:none">
-
-<section class="card">
-
-  <div class="section-head">
-    <div class="title">Сеть SLX</div>
-
-    <div class="muted" id="networkStatus">
-      Online
-    </div>
-  </div>
-
-  <div class="info-grid">
-
-    <div class="info">
-      <div class="info-name">Сеть</div>
-      <div class="info-value" id="networkName">
-        SLX-Testnet
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info-name">Версия</div>
-      <div class="info-value" id="networkVersion">
-        1.9.1
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info-name">Высота</div>
-      <div class="info-value" id="blockHeight">
-        0
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info-name">Комиссия</div>
-      <div class="info-value">
-        0.1 SLX
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info-name">Общее предложение</div>
-      <div class="info-value" id="totalSupply">
-        0 SLX
-      </div>
-    </div>
-
-    <div class="info">
-      <div class="info-name">Статус</div>
-      <div class="info-value">
-        Online
-      </div>
-    </div>
-
-  </div>
-
-</section>
-
-
-<section class="card">
-
-  <div class="section-head">
-    <div class="title">Последние блоки</div>
-  </div>
-
-  <div id="blocksList" class="list">
-    Загрузка...
-  </div>
-
-</section>
-
-</div>
-
-
-<!-- =========================
-     ПРОФИЛЬ
-========================= -->
-
-<div id="profilePage" style="display:none">
-
-<section class="card">
-
-  <div class="section-head">
-    <div class="title">Профиль</div>
-  </div>
-
-  <div class="profile">
-
-    <div class="avatar" id="avatar">
-      S
-    </div>
-
-    <div>
-      <div class="profile-name" id="profileName">
-        Пользователь
-      </div>
-
-      <div class="profile-sub" id="profileEmail">
-        Авторизация не выполнена
-      </div>
-    </div>
-
-  </div>
-
-</section>
-
-
-<section class="card">
-
-  <div class="section-head">
-    <div class="title">Настройки</div>
-  </div>
-
-  <div class="setting">
-
-    <div>
-      <div class="setting-name">
-        Автообновление
-      </div>
-
-      <div class="setting-sub">
-        Обновлять баланс каждые 15 секунд
-      </div>
-    </div>
-
-    <button
-      id="autoSwitch"
-      class="switch on"
-      onclick="toggleAutoUpdate()"
-    >
-      <span></span>
-    </button>
-
-  </div>
-
-
-  <div class="setting">
-
-    <div>
-      <div class="setting-name">
-        Безопасность
-      </div>
-
-      <div class="setting-sub">
-        Смена пароля
-      </div>
-    </div>
-
-    <button
-      class="secondary"
-      style="width:auto;padding:0 12px"
-      onclick="openPasswordModal()"
-    >
-      Изменить
-    </button>
-
-  </div>
-
-
-  <div class="setting">
-
-    <div>
-      <div class="setting-name">
-        Сессия
-      </div>
-
-      <div class="setting-sub">
-        Завершить текущую авторизацию
-      </div>
-    </div>
-
-    <button
-      class="secondary"
-      style="width:auto;padding:0 12px"
-      onclick="logout()"
-    >
-      Выйти
-    </button>
-
-  </div>
-
-</section>
-
-</div>
-
-
-<div class="footer">
-  SLX Network · Testnet · v1.9.1
-</div>
-
-</div>
-
-
-<!-- =========================
-     QR
-========================= -->
-
-<div class="modal" id="qrModal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <div class="modal-title">
-        QR кошелька
-      </div>
-
-      <button class="close" onclick="closeQR()">
-        ✕
-      </button>
-
-    </div>
-
-    <div class="qr">
-      <div id="qrCode"></div>
-    </div>
-
-    <div class="qr-address" id="qrAddress"></div>
-
-    <button
-      class="secondary"
-      style="margin-top:10px"
-      onclick="copyAddress()"
-    >
-      Копировать адрес
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- =========================
-     СКАНЕР
-========================= -->
-
-<div class="modal" id="scannerModal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <div class="modal-title">
-        Сканировать QR
-      </div>
-
-      <button class="close" onclick="closeScanner()">
-        ✕
-      </button>
-
-    </div>
-
-    <div class="scanner">
-
-      <video
-        id="video"
-        autoplay
-        muted
-        playsinline
-      ></video>
-
-      <canvas id="scanCanvas"></canvas>
-
-      <div class="scan-frame"></div>
-      <div class="scan-line"></div>
-
-    </div>
-
-    <div class="scan-text">
-      Наведи камеру на QR-код SLX
-    </div>
-
-    <div id="scanMessage" class="message"></div>
-
-    <button
-      class="secondary"
-      onclick="closeScanner()"
-    >
-      Закрыть
-    </button>
-
-  </div>
-
-</div>
-
-
-<!-- =========================
-     AUTH
-========================= -->
-
-<div class="modal" id="authModal">
-
-  <div class="modal-box">
-
-    <div class="modal-head">
-
-      <div class="modal-title">
-        SLX Network
-      </div>
-
-    </div>
-
-    <div class="auth-tabs">
-
-      <button
-        id="loginTab"
-        class="active"
-        onclick="authMode('login')"
-      >
-        Войти
-      </button>
-
-      <button
-        id="registerTab"
-        onclick="authMode('register')"
-      >
-        Регистрация
-      </button>
-
-    </div>
-
-
-    <div class="form">
-
-      <div>
-
-        <div class="field-label">
-          Имя пользователя
+      <form id="loginForm" class="stack">
+        <div class="field">
+          <div class="label">Имя пользователя</div>
+          <input id="loginUsername" class="input" autocomplete="username" required>
         </div>
-
-        <input
-          id="authUsername"
-          class="input"
-          autocomplete="username"
-          placeholder="username"
-        >
-
-      </div>
-
-
-      <div id="emailBox" class="auth-hidden">
-
-        <div class="field-label">
-          Email
+        <div class="field">
+          <div class="label">Пароль</div>
+          <input id="loginPassword" class="input" type="password" autocomplete="current-password" required>
         </div>
+        <button class="btn primary" type="submit">Войти</button>
+        <button id="showRecoveryBtn" class="btn" type="button">Восстановить пароль</button>
+      </form>
 
-        <input
-          id="authEmail"
-          class="input"
-          type="email"
-          placeholder="email"
-        >
-
-      </div>
-
-
-      <div>
-
-        <div class="field-label">
-          Пароль
+      <form id="registerForm" class="stack hidden">
+        <div class="field">
+          <div class="label">Имя пользователя</div>
+          <input id="registerUsername" class="input" autocomplete="username" required>
         </div>
+        <div class="field">
+          <div class="label">Пароль</div>
+          <input id="registerPassword" class="input" type="password" autocomplete="new-password" required>
+        </div>
+        <div class="field">
+          <div class="label">Повтор пароля</div>
+          <input id="registerPassword2" class="input" type="password" autocomplete="new-password" required>
+        </div>
+        <button class="btn primary" type="submit">Создать аккаунт</button>
+      </form>
 
-        <input
-          id="authPassword"
-          class="input"
-          type="password"
-          autocomplete="current-password"
-          placeholder="••••••••"
-        >
-
+      <div class="info" style="margin-top:14px">
+        SLX Network работает как тестовая сеть. Балансы SLX здесь являются тестовыми данными и не являются банковскими деньгами.
       </div>
-
-
-      <button
-        class="primary"
-        onclick="submitAuth()"
-      >
-        Продолжить
-      </button>
-
-      <div id="authMessage" class="message"></div>
-
     </div>
+  </div>
+</div>
+
+<!-- ПРИЛОЖЕНИЕ -->
+
+<div id="appScreen" class="hidden">
+  <div class="app">
+
+    <div class="topbar">
+      <div class="brand">
+        <div class="logo">SLX</div>
+        <div>
+          <div class="brand-title">SLX Network</div>
+          <div id="topVersion" class="brand-sub">v1.9.1 • testnet</div>
+        </div>
+      </div>
+      <img id="topAvatar" class="avatar" alt="avatar">
+    </div>
+
+    <!-- ГЛАВНАЯ -->
+
+    <main id="page-home" class="page">
+      <div class="card">
+        <div class="row-between">
+          <span class="badge" id="homeNetworkBadge">TESTNET</span>
+          <span class="small muted" id="homeUsername">—</span>
+        </div>
+        <div class="balance" id="homeBalance">0</div>
+        <div class="token">SLX</div>
+        <div class="wallet-address" id="homeAddress" style="margin-top:12px">—</div>
+        <div class="grid2" style="margin-top:10px">
+          <button id="copyAddressBtn" class="btn" type="button">Копировать</button>
+          <button id="showQrBtn" class="btn" type="button">Мой QR</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <div class="section-title">Активный кошелёк</div>
+          <button id="homeCreateWalletBtn" class="btn smallbtn" type="button">+ Кошелёк</button>
+        </div>
+        <div id="walletListHome" class="stack"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Быстрые действия</div>
+        <div class="grid2">
+          <button id="faucetBtn" class="btn good" type="button">Получить 10 SLX</button>
+          <button id="goSendBtn" class="btn primary" type="button">Отправить</button>
+        </div>
+        <div class="tiny muted" style="margin-top:10px">Faucet: один запрос на кошелёк каждые 24 часа.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Последние операции</div>
+        <div id="homeHistory" class="stack"></div>
+      </div>
+    </main>
+
+    <!-- КОШЕЛЬКИ -->
+
+    <main id="page-wallet" class="page hidden">
+      <div class="card">
+        <div class="section-title">Кошельки</div>
+        <div id="walletListPage" class="stack"></div>
+        <button id="walletCreateBtn" class="btn primary" type="button" style="margin-top:10px">Создать новый кошелёк</button>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Получить SLX</div>
+        <div class="wallet-address" id="walletReceiveAddress">—</div>
+        <div class="grid2" style="margin-top:10px">
+          <button id="walletCopyBtn" class="btn" type="button">Копировать адрес</button>
+          <button id="walletQrBtn" class="btn" type="button">Показать QR</button>
+        </div>
+      </div>
+    </main>
+
+    <!-- ИСТОРИЯ -->
+
+    <main id="page-history" class="page hidden">
+      <div class="card">
+        <div class="row-between">
+          <div class="section-title">История</div>
+          <button id="historyRefreshBtn" class="btn smallbtn" type="button">Обновить</button>
+        </div>
+        <div id="historyList" class="stack"></div>
+      </div>
+    </main>
+
+    <!-- СЕТЬ -->
+
+    <main id="page-network" class="page hidden">
+      <div class="card">
+        <div class="section-title">Сеть</div>
+        <div id="networkInfo" class="kv">
+          <div>Статус</div><div>—</div>
+          <div>Версия</div><div>—</div>
+          <div>Высота</div><div>—</div>
+          <div>Supply</div><div>—</div>
+          <div>Fee</div><div>—</div>
+        </div>
+        <button id="networkRefreshBtn" class="btn" type="button" style="margin-top:12px">Обновить сеть</button>
+        <button id="chainVerifyBtn" class="btn good" type="button" style="margin-top:8px">Проверить цепочку</button>
+        <div id="chainVerifyResult" class="tiny muted" style="margin-top:10px">Проверка ещё не запускалась.</div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Экономика</div>
+        <div id="economyInfo" class="kv"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Последние блоки</div>
+        <div id="blocksList" class="stack"></div>
+      </div>
+    </main>
+
+    <!-- ПРОФИЛЬ -->
+
+    <main id="page-profile" class="page hidden">
+      <div class="card">
+        <div class="section-title">Профиль</div>
+        <div class="row" style="align-items:center">
+          <img id="avatarPreview" class="avatar-preview" alt="avatar">
+          <div class="stack" style="flex:1;min-width:0">
+            <div id="profileUsername" style="font-weight:900">—</div>
+            <div id="profileCreatedAt" class="tiny muted">Аккаунт SLX Network</div>
+            <label class="file-btn">
+              Выбрать фото
+              <input id="avatarInput" type="file" accept="image/*">
+            </label>
+          </div>
+        </div>
+        <button id="removeAvatarBtn" class="btn danger" type="button" style="margin-top:10px">Удалить локальное фото</button>
+        <div class="info" style="margin-top:12px">Аватар хранится только на этом устройстве. Не отправляй кому-либо пароль или код восстановления.</div>
+      </div>
+      <div class="card">
+        <div class="section-title">Состояние сессии</div>
+        <div id="sessionInfo" class="tiny muted">Проверка сессии...</div>
+        <div class="kv" style="margin-top:12px">
+          <div>Пользователь</div><div id="profileUserSummary">—</div>
+          <div>Сеть</div><div>SLX-Testnet</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- НАСТРОЙКИ -->
+
+    <main id="page-settings" class="page hidden">
+      <div class="card">
+        <div class="section-title">Настройки</div>
+        <div class="row-between" style="padding:10px 0;gap:12px">
+          <div style="min-width:0">
+            <div style="font-weight:800">Автообновление</div>
+            <div class="tiny muted" style="margin-top:4px">Обновлять кошельки и статус сети каждые 20 секунд</div>
+          </div>
+          <button id="autoRefreshBtn" class="btn good smallbtn" type="button" aria-pressed="true">Включено</button>
+        </div>
+        <hr>
+        <div class="section-title">Безопасность</div>
+        <button id="changePasswordBtn" class="btn" type="button" style="margin-top:8px">Сменить пароль</button>
+        <button id="logoutBtn" class="btn danger" type="button" style="margin-top:8px">Выйти из аккаунта</button>
+      </div>
+      <div class="card">
+        <div class="section-title">О проекте</div>
+        <div class="info">
+          SLX Network v1.9.1 — тестовая сеть. Балансы SLX здесь являются тестовыми данными и не представляют собой банковские деньги.
+        </div>
+        <div class="kv" style="margin-top:12px">
+          <div>Комиссия перевода</div><div>0.1 SLX</div>
+          <div>Faucet</div><div>10 SLX / 24 ч</div>
+        </div>
+      </div>
+    </main>
 
   </div>
 
+  <!-- НИЖНЯЯ НАВИГАЦИЯ -->
+
+  <div class="bottom-nav">
+    <div class="nav-inner">
+      <button class="nav-btn active" data-page="home" type="button">⌂<br>Главная</button>
+      <button class="nav-btn" data-page="wallet" type="button">◈<br>Кошелёк</button>
+      <button class="nav-btn" data-page="history" type="button">↕<br>История</button>
+      <button class="nav-btn" data-page="network" type="button">◉<br>Сеть</button>
+      <button class="nav-btn" data-page="profile" type="button">●<br>Профиль</button>
+      <button class="nav-btn" data-page="settings" type="button">⚙<br>Настройки</button>
+    </div>
+  </div>
 </div>
 
+<!-- ОТПРАВКА -->
 
-<!-- =========================
-     PASSWORD
-========================= -->
-
-<div class="modal" id="passwordModal">
-
+<div id="sendModal" class="modal hidden">
   <div class="modal-box">
-
     <div class="modal-head">
-
-      <div class="modal-title">
-        Смена пароля
+      <h2 style="margin:0">Отправить SLX</h2>
+      <button class="iconbtn" data-close="sendModal" type="button">✕</button>
+    </div>
+    <form id="sendForm" class="stack">
+      <div class="field">
+        <div class="label">Адрес получателя</div>
+        <input id="sendTo" class="input" placeholder="SLXC..." autocomplete="off" required>
       </div>
-
-      <button
-        class="close"
-        onclick="closePasswordModal()"
-      >
-        ✕
-      </button>
-
-    </div>
-
-    <div class="form">
-
-      <input
-        id="oldPassword"
-        class="input"
-        type="password"
-        placeholder="Старый пароль"
-      >
-
-      <input
-        id="newPassword"
-        class="input"
-        type="password"
-        placeholder="Новый пароль"
-      >
-
-      <button
-        class="primary"
-        onclick="changePassword()"
-      >
-        Сохранить пароль
-      </button>
-
-      <div id="passwordMessage" class="message"></div>
-
-    </div>
-
+      <button id="scanQrBtn" class="btn" type="button">Сканировать QR</button>
+      <div class="field">
+        <div class="label">Количество</div>
+        <input id="sendAmount" class="input" type="number" min="0.00000001" step="0.00000001" placeholder="0.00000000" required>
+      </div>
+      <div class="card" style="margin:0;background:#0a1020">
+        <div class="kv">
+          <div>Комиссия</div><div id="sendFee">0.1 SLX</div>
+          <div>Итого</div><div id="sendTotal">0 SLX</div>
+          <div>Баланс</div><div id="sendBalance">0 SLX</div>
+        </div>
+      </div>
+      <button class="btn primary" type="submit">Подтвердить отправку</button>
+    </form>
   </div>
-
 </div>
 
+<!-- ВОССТАНОВЛЕНИЕ ПАРОЛЯ -->
+
+<div id="recoveryModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 style="margin:0">Восстановление</h2>
+      <button class="iconbtn" data-close="recoveryModal" type="button">✕</button>
+    </div>
+    <form id="recoveryForm" class="stack">
+      <div class="field">
+        <div class="label">Имя пользователя</div>
+        <input id="recoveryUsername" class="input" required>
+      </div>
+      <div class="field">
+        <div class="label">Код восстановления</div>
+        <input id="recoveryCode" class="input" inputmode="text" autocapitalize="characters" required>
+      </div>
+      <div class="field">
+        <div class="label">Новый пароль</div>
+        <input id="recoveryNewPassword" class="input" type="password" autocomplete="new-password" required>
+      </div>
+      <button class="btn primary" type="submit">Сбросить пароль</button>
+    </form>
+  </div>
+</div>
+
+<!-- СМЕНА ПАРОЛЯ -->
+
+<div id="passwordModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 style="margin:0">Смена пароля</h2>
+      <button class="iconbtn" data-close="passwordModal" type="button">✕</button>
+    </div>
+    <form id="passwordForm" class="stack">
+      <div class="field">
+        <div class="label">Текущий пароль</div>
+        <input id="oldPassword" class="input" type="password" autocomplete="current-password" required>
+      </div>
+      <div class="field">
+        <div class="label">Новый пароль</div>
+        <input id="newPassword" class="input" type="password" autocomplete="new-password" required>
+      </div>
+      <button class="btn primary" type="submit">Изменить пароль</button>
+    </form>
+  </div>
+</div>
+
+<!-- УСПЕШНАЯ РЕГИСТРАЦИЯ -->
+
+<div id="registerSuccessModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 style="margin:0">Аккаунт создан</h2>
+      <button class="iconbtn" data-close="registerSuccessModal" type="button">✕</button>
+    </div>
+    <div class="warning">
+      Код восстановления показывается сейчас. Сохрани его в безопасном месте.
+    </div>
+    <div id="recoveryCodeDisplay" class="recovery-code" style="margin-top:12px">—</div>
+    <button id="copyRecoveryBtn" class="btn" type="button" style="margin-top:10px">Копировать код</button>
+    <button id="continueAfterRegisterBtn" class="btn primary" type="button" style="margin-top:8px">Продолжить</button>
+  </div>
+</div>
+
+<!-- QR КОШЕЛЬКА -->
+
+<div id="qrModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 style="margin:0">QR кошелька</h2>
+      <button class="iconbtn" data-close="qrModal" type="button">✕</button>
+    </div>
+    <div class="qr-box"><div id="qrCode"></div></div>
+    <div id="qrAddressText" class="wallet-address" style="margin-top:12px">—</div>
+    <button id="qrCopyBtn" class="btn" type="button" style="margin-top:10px">Копировать адрес</button>
+  </div>
+</div>
+
+<!-- QR-СКАНЕР -->
+
+<div id="scannerModal" class="modal hidden">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h2 style="margin:0">Сканировать QR</h2>
+      <button class="iconbtn" data-close="scannerModal" type="button">✕</button>
+    </div>
+    <div class="scan-frame">
+      <video id="scannerVideo" class="scanner-video" autoplay playsinline muted></video>
+    </div>
+    <canvas id="scannerCanvas" class="hidden"></canvas>
+    <div id="scannerStatus" class="info" style="margin-top:10px">Наведи камеру на QR-код адреса SLX.</div>
+    <button id="stopScannerBtn" class="btn danger" type="button" style="margin-top:10px">Остановить камеру</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
 
 <script>
-'use strict';
+"use strict";
 
-const API = '';
+const API_BASE = "";
+const TOKEN_KEY = "slx_token";
+const ACTIVE_WALLET_KEY = "slx_active_wallet";
+const AVATAR_KEY = "slx_avatar";
+const NETWORK_VERSION_FALLBACK = "1.9.1";
 
+let token = localStorage.getItem(TOKEN_KEY) || "";
+let me = null;
 let wallets = [];
-let selectedWallet = null;
+let activeWallet = null;
+let networkData = null;
+let economyData = null;
 let scannerStream = null;
-let scannerRunning = false;
-let currentQRAddress = '';
-let authModeValue = 'login';
-let autoUpdate = true;
+let scannerTimer = null;
+let qrLibraryReady = false;
+let autoRefreshEnabled = true;
 
+document.addEventListener("DOMContentLoaded", () => {
+  window.addEventListener("error", e => {
+    console.error("SLX UI error:", e.error || e.message);
+  });
 
-/* =========================
-   API
-========================= */
+  setupEvents();
+  setDefaultAvatar();
+  waitForQrLibrary();
 
-async function api(path, options = {}) {
+  if (token) {
+    startApp();
+  } else {
+    showAuth();
+  }
+});
 
-  const config = {
-    credentials:'include',
-    ...options,
-    headers:{
-      ...(options.body ? {
-        'Content-Type':'application/json'
-      } : {}),
-      ...(options.headers || {})
-    }
-  };
-
-  return fetch(API + path, config);
+function $(id){
+  return document.getElementById(id);
 }
 
-
-/* =========================
-   HELPERS
-========================= */
-
-function escapeHTML(value){
-  return String(value ?? '')
-    .replaceAll('&','&amp;')
-    .replaceAll('<','&lt;')
-    .replaceAll('>','&gt;')
-    .replaceAll('"','&quot;')
+function escapeHtml(value){
+  return String(value ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
     .replaceAll("'","&#039;");
 }
 
+function formatNumber(value,max=8){
+  const n=Number(value);
+  if(!Number.isFinite(n)) return "0";
 
-function shortAddress(address){
-
-  if(!address) return '—';
-
-  if(address.length <= 22)
-    return address;
-
-  return address.slice(0,11)
-    +'...'+
-    address.slice(-8);
+  return n.toLocaleString("ru-RU",{
+    maximumFractionDigits:max
+  });
 }
 
+function formatDate(value){
+  if(!value) return "—";
 
-function showMessage(id,text,type='success'){
+  const d=new Date(value);
 
-  const el=document.getElementById(id);
+  if(Number.isNaN(d.getTime())){
+    return String(value);
+  }
 
-  if(!el)return;
-
-  el.textContent=text;
-  el.className='message show '+type;
+  return d.toLocaleString("ru-RU");
 }
 
+function setDefaultAvatar(){
+  const saved=localStorage.getItem(AVATAR_KEY);
+  const src=saved || makeAvatarData("SLX");
 
-function hideMessage(id){
-
-  const el=document.getElementById(id);
-
-  if(!el)return;
-
-  el.textContent='';
-  el.className='message';
+  $("topAvatar").src=src;
+  $("avatarPreview").src=src;
 }
 
+function makeAvatarData(text){
+  const letters=String(text || "SLX")
+    .slice(0,2)
+    .toUpperCase();
 
-/* =========================
-   NAVIGATION
-========================= */
+  const svg=`
+  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+    <rect width="120" height="120" rx="60" fill="#111a2d"/>
+    <text x="60" y="70" text-anchor="middle" font-family="Arial" font-size="42" font-weight="800" fill="#ffffff">${letters}</text>
+  </svg>`;
 
-function showPage(page,button){
+  return "data:image/svg+xml;charset=UTF-8,"+
+    encodeURIComponent(svg);
+}
 
-  [
-    'walletsPage',
-    'historyPage',
-    'networkPage',
-    'profilePage'
-  ].forEach(id=>{
-    document.getElementById(id).style.display =
-      id===page ? 'block' : 'none';
+function toast(message,type=""){
+  const el=$("toast");
+
+  el.textContent=message;
+  el.className="toast show"+(type ? " "+type : "");
+
+  clearTimeout(toast._timer);
+
+  toast._timer=setTimeout(()=>{
+    el.classList.remove("show");
+  },3000);
+}
+
+/* API: токен сохраняется при входе и отправляется защищённым запросам. */
+
+async function api(path,options={}){
+  const headers=new Headers(options.headers || {});
+
+  if(options.body && typeof options.body!=="string"){
+    headers.set("Content-Type","application/json");
+    options.body=JSON.stringify(options.body);
+  }
+
+  if(token){
+    headers.set("Authorization","Bearer "+token);
+  }
+
+  let response;
+
+  try{
+    response=await fetch(API_BASE+path,{
+      ...options,
+      headers
+    });
+  }catch(err){
+    throw new Error("Нет соединения с сервером.");
+  }
+
+  const text=await response.text();
+  let data={};
+
+  try{
+    data=text ? JSON.parse(text) : {};
+  }catch{
+    data={message:text};
+  }
+
+  if(response.status===401){
+    token="";
+    localStorage.removeItem(TOKEN_KEY);
+    showAuth();
+
+    throw new Error(
+      data.message ||
+      "Сессия недействительна. Войди снова."
+    );
+  }
+
+  if(!response.ok){
+    throw new Error(
+      data.message ||
+      data.error ||
+      `Ошибка HTTP ${response.status}`
+    );
+  }
+
+  return data;
+}
+
+function saveToken(newToken){
+  token=newToken || "";
+
+  if(token){
+    localStorage.setItem(TOKEN_KEY,token);
+  }else{
+    localStorage.removeItem(TOKEN_KEY);
+  }
+}
+
+function showAuth(){
+  $("authScreen").classList.remove("hidden");
+  $("appScreen").classList.add("hidden");
+}
+
+function showApp(){
+  $("authScreen").classList.add("hidden");
+  $("appScreen").classList.remove("hidden");
+}
+
+function setAuthTab(mode){
+  const login=mode==="login";
+
+  $("loginTab").classList.toggle("active",login);
+  $("registerTab").classList.toggle("active",!login);
+  $("loginForm").classList.toggle("hidden",!login);
+  $("registerForm").classList.toggle("hidden",login);
+}
+
+function showPage(page){
+  const allowed=[
+    "home","wallet","history","network","profile","settings"
+  ];
+
+  if(!allowed.includes(page)){
+    page="home";
+  }
+
+  allowed.forEach(p=>{
+    $("page-"+p).classList.toggle("hidden",p!==page);
   });
 
-  document
-    .querySelectorAll('.nav button')
-    .forEach(b=>b.classList.remove('active'));
-
-  if(button)
-    button.classList.add('active');
-
-  if(page==='historyPage')
-    loadHistory();
-
-  if(page==='networkPage'){
-    loadNetwork();
-    loadBlocks();
-  }
-
-  if(page==='profilePage')
-    loadProfile();
-
-}
-
-
-/* =========================
-   AUTH
-========================= */
-
-function authMode(mode){
-
-  authModeValue=mode;
-
-  document
-    .getElementById('loginTab')
-    .classList.toggle('active',mode==='login');
-
-  document
-    .getElementById('registerTab')
-    .classList.toggle('active',mode==='register');
-
-  document
-    .getElementById('emailBox')
-    .classList.toggle('auth-hidden',mode==='login');
-
-  hideMessage('authMessage');
-
-}
-
-
-function openAuth(){
-  document
-    .getElementById('authModal')
-    .classList.add('show');
-}
-
-
-function closeAuth(){
-  document
-    .getElementById('authModal')
-    .classList.remove('show');
-}
-
-
-async function submitAuth(){
-
-  hideMessage('authMessage');
-
-  const username=
-    document.getElementById('authUsername').value.trim();
-
-  const password=
-    document.getElementById('authPassword').value;
-
-  const email=
-    document.getElementById('authEmail').value.trim();
-
-  if(!username || !password){
-
-    showMessage(
-      'authMessage',
-      'Заполни имя пользователя и пароль.',
-      'error'
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    btn.classList.toggle(
+      "active",
+      btn.dataset.page===page
     );
+  });
 
-    return;
-  }
+  window.scrollTo({top:0,behavior:"instant"});
+
+  if(page==="history") loadHistory();
+  if(page==="network") loadNetwork();
+  if(page==="profile") loadMe();
+}
+
+async function startApp(){
+  showApp();
 
   try{
+    await loadMe();
+    await loadWallets();
+    await loadNetwork();
+    await loadHistory();
 
-    const endpoint =
-      authModeValue==='login'
-        ? '/api/auth/login'
-        : '/api/auth/register';
+    renderAll();
+    showPage("home");
+  }catch(err){
+    console.error(err);
 
-    const body =
-      authModeValue==='login'
-        ? {username,password}
-        : {username,password,email};
-
-    const response=await api(endpoint,{
-      method:'POST',
-      body:JSON.stringify(body)
-    });
-
-    const data=await response.json().catch(()=>({}));
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        data.message ||
-        'Ошибка авторизации'
+    if(!token){
+      showAuth();
+    }else{
+      toast(
+        err.message || "Не удалось загрузить SLX Network",
+        "bad"
       );
-
     }
+  }
+}
 
-    closeAuth();
+async function loadMe(){
+  const data=await api("/api/auth/me");
 
-    await init();
+  me=data.user || data.me || data;
 
-  }catch(error){
+  $("homeUsername").textContent=
+    me?.username ? "@"+me.username : "—";
 
-    showMessage(
-      'authMessage',
-      error.message,
-      'error'
-    );
+  $("profileUsername").textContent=
+    me?.username || "—";
 
+  if($("profileUserSummary")){
+    $("profileUserSummary").textContent=
+      me?.username || "—";
   }
 
-}
-
-
-/* =========================
-   PROFILE
-========================= */
-
-async function loadProfile(){
-
-  try{
-
-    const response=await api('/api/auth/me');
-
-    if(!response.ok)
-      return;
-
-    const data=await response.json();
-
-    const user=
-      data.user ||
-      data;
-
-    const name=
-      user.username ||
-      user.name ||
-      'Пользователь';
-
-    const email=
-      user.email ||
-      'SLX Network';
-
-    document.getElementById('profileName').textContent=name;
-    document.getElementById('profileEmail').textContent=email;
-
-    document.getElementById('avatar').textContent=
-      name.charAt(0).toUpperCase();
-
-  }catch(error){
-
-    console.log(error);
-
+  if($("profileCreatedAt")){
+    $("profileCreatedAt").textContent=
+      me?.created_at
+        ? "Создан: "+formatDate(me.created_at)
+        : "Аккаунт SLX Network";
   }
 
+  $("sessionInfo").textContent=token
+    ? "Авторизация активна. Токен сохранён на этом устройстве."
+    : "Сессия отсутствует.";
+
+  const saved=localStorage.getItem(AVATAR_KEY);
+  const src=saved || makeAvatarData(me?.username || "SLX");
+
+  $("topAvatar").src=src;
+  $("avatarPreview").src=src;
 }
 
-
-/* =========================
-   LOGOUT
-========================= */
-
-async function logout(){
-
-  try{
-
-    await api('/api/auth/logout',{
-      method:'POST'
-    });
-
-  }catch(error){
-
-    console.log(error);
-
-  }
-
-  wallets=[];
-  selectedWallet=null;
-
-  renderWallets();
-
-  document.getElementById('balance').textContent='0.00';
-  document.getElementById('mainAddress').textContent=
-    'Кошелёк не выбран';
-
-  openAuth();
-
-}
-
-
-/* =========================
-   PASSWORD
-========================= */
-
-function openPasswordModal(){
-
-  document
-    .getElementById('passwordModal')
-    .classList.add('show');
-
-}
-
-
-function closePasswordModal(){
-
-  document
-    .getElementById('passwordModal')
-    .classList.remove('show');
-
-}
-
-
-async function changePassword(){
-
-  hideMessage('passwordMessage');
-
-  const oldPassword=
-    document.getElementById('oldPassword').value;
-
-  const newPassword=
-    document.getElementById('newPassword').value;
-
-  if(!oldPassword || !newPassword){
-
-    showMessage(
-      'passwordMessage',
-      'Заполни оба поля.',
-      'error'
-    );
-
-    return;
-  }
-
-  try{
-
-    const response=await api(
-      '/api/auth/change-password',{
-        method:'POST',
-        body:JSON.stringify({
-          oldPassword,
-          newPassword
-        })
-      }
-    );
-
-    const data=await response.json().catch(()=>({}));
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        data.message ||
-        'Не удалось изменить пароль'
-      );
-
-    }
-
-    showMessage(
-      'passwordMessage',
-      'Пароль изменён ✓',
-      'success'
-    );
-
-    setTimeout(
-      closePasswordModal,
-      800
-    );
-
-  }catch(error){
-
-    showMessage(
-      'passwordMessage',
-      error.message,
-      'error'
-    );
-
-  }
-
-}
-
-
-/* =========================
-   WALLETS
-========================= */
+/* КОШЕЛЬКИ */
 
 async function loadWallets(){
+  const data=await api("/api/wallets");
 
-  try{
+  wallets=Array.isArray(data)
+    ? data
+    : (data.wallets || []);
 
-    const response=await api('/api/wallets');
+  const savedId=localStorage.getItem(ACTIVE_WALLET_KEY);
 
-    if(response.status===401 || response.status===403){
+  activeWallet=
+    wallets.find(w=>String(w.id)===String(savedId)) ||
+    wallets[0] ||
+    null;
 
-      wallets=[];
-      selectedWallet=null;
-      renderWallets();
-      openAuth();
-      return;
-
-    }
-
-    if(!response.ok)
-      throw new Error('Ошибка загрузки кошельков');
-
-    const data=await response.json();
-
-    wallets=
-      Array.isArray(data)
-        ? data
-        : (
-            data.wallets ||
-            data.items ||
-            []
-          );
-
-    if(wallets.length){
-
-      if(!selectedWallet){
-
-        selectedWallet=wallets[0];
-
-      }else{
-
-        const found=wallets.find(w=>
-          String(w.id)===String(selectedWallet.id)
-        );
-
-        selectedWallet=found || wallets[0];
-
-      }
-
-    }
-
-    renderWallets();
-
-  }catch(error){
-
-    console.log('wallets:',error);
-
-    renderWallets();
-
+  if(activeWallet){
+    await refreshActiveWallet();
   }
 
+  renderWalletLists();
 }
 
+async function refreshActiveWallet(){
+  if(!activeWallet?.id) return;
 
-function walletAddress(wallet){
-
-  return wallet.address ||
-    wallet.publicKey ||
-    wallet.walletAddress ||
-    '';
-}
-
-
-function walletBalance(wallet){
-
-  return Number(
-    wallet.balance ??
-    wallet.amount ??
-    0
+  const data=await api(
+    "/api/wallet/"+encodeURIComponent(activeWallet.id)
   );
 
+  const wallet=data.wallet || data;
+
+  activeWallet={
+    ...activeWallet,
+    ...wallet
+  };
+
+  wallets=wallets.map(w=>
+    String(w.id)===String(activeWallet.id)
+      ? activeWallet
+      : w
+  );
+
+  localStorage.setItem(
+    ACTIVE_WALLET_KEY,
+    String(activeWallet.id)
+  );
 }
-
-
-function renderWallets(){
-
-  const list=
-    document.getElementById('walletList');
-
-  if(!wallets.length){
-
-    list.innerHTML=`
-      <div style="
-        text-align:center;
-        color:#687487;
-        padding:22px 5px;
-        font-size:12px
-      ">
-        Кошельки не найдены
-      </div>
-    `;
-
-    document.getElementById('walletCount').textContent=
-      '0 кошельков';
-
-    document.getElementById('balance').textContent=
-      '0.00';
-
-    document.getElementById('mainAddress').textContent=
-      'Кошелёк не выбран';
-
-    return;
-
-  }
-
-
-  document.getElementById('walletCount').textContent=
-    wallets.length+
-    (wallets.length===1
-      ?' кошелёк'
-      :' кошельков');
-
-
-  list.innerHTML=wallets.map((wallet,index)=>{
-
-    const address=walletAddress(wallet);
-
-    const name=
-      wallet.name ||
-      'Wallet '+(index+1);
-
-    const balance=walletBalance(wallet);
-
-    const active=
-      selectedWallet &&
-      String(selectedWallet.id)===String(wallet.id);
-
-    return `
-      <div class="wallet ${active?'active':''}">
-
-        <div class="wallet-icon">
-          ◈
-        </div>
-
-        <div
-          class="wallet-main"
-          onclick="selectWallet('${escapeHTML(wallet.id)}')"
-        >
-
-          <div class="wallet-name">
-            ${escapeHTML(name)}
-          </div>
-
-          <div class="wallet-address">
-            ${escapeHTML(address)}
-          </div>
-
-        </div>
-
-        <div class="wallet-balance">
-          ${balance.toFixed(2)} SLX
-        </div>
-
-        <div class="wallet-actions">
-
-          <button
-            class="icon-btn"
-            onclick="event.stopPropagation();showQR('${escapeHTML(address)}')"
-          >
-            ▣
-          </button>
-
-        </div>
-
-      </div>
-    `;
-
-  }).join('');
-
-  updateBalance();
-
-}
-
 
 async function selectWallet(id){
-
-  const wallet=wallets.find(
-    w=>String(w.id)===String(id)
-  );
-
-  if(!wallet)return;
-
-  selectedWallet=wallet;
-
-  renderWallets();
-
-  try{
-
-    await api('/api/wallet/select',{
-      method:'POST',
-      body:JSON.stringify({
-        walletId:wallet.id
-      })
-    });
-
-  }catch(error){
-
-    console.log(error);
-
-  }
-
-}
-
-
-function updateBalance(){
-
-  if(!selectedWallet)return;
-
-  document.getElementById('balance').textContent=
-    walletBalance(selectedWallet).toFixed(2);
-
-  document.getElementById('mainAddress').textContent=
-    shortAddress(walletAddress(selectedWallet));
-
-}
-
-
-async function createWallet(){
-
-  try{
-
-    const response=await api(
-      '/api/wallet/create',{
-        method:'POST',
-        body:JSON.stringify({})
-      }
-    );
-
-    const data=await response.json().catch(()=>({}));
-
-    if(response.status===401){
-
-      openAuth();
-      return;
-
-    }
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        data.message ||
-        'Ошибка создания кошелька'
-      );
-
-    }
-
-    await loadWallets();
-
-  }catch(error){
-
-    alert(error.message);
-
-  }
-
-}
-
-
-/* =========================
-   SEND
-========================= */
-
-function validAddress(address){
-
-  if(!address)return false;
-
-  if(/^SLXC[a-fA-F0-9]{32}$/.test(address))
-    return true;
-
-  if(/^SLX[A-Za-z0-9]{20,100}$/.test(address))
-    return true;
-
-  return false;
-
-}
-
-
-async function sendSLX(){
-
-  hideMessage('sendMessage');
-
-  const to=
-    document.getElementById('toAddress')
-      .value.trim();
-
-  const amount=
-    Number(
-      document.getElementById('sendAmount').value
-    );
-
-  if(!selectedWallet){
-
-    showMessage(
-      'sendMessage',
-      'Сначала выбери кошелёк.',
-      'error'
-    );
-
-    return;
-
-  }
-
-  if(!validAddress(to)){
-
-    showMessage(
-      'sendMessage',
-      'Неверный адрес SLX.',
-      'error'
-    );
-
-    return;
-
-  }
-
-  if(!amount || amount<=0){
-
-    showMessage(
-      'sendMessage',
-      'Укажи количество SLX.',
-      'error'
-    );
-
-    return;
-
-  }
-
-  try{
-
-    const response=await api('/api/send',{
-      method:'POST',
-      body:JSON.stringify({
-
-        toAddress:to,
-
-        fromWalletId:selectedWallet.id,
-
-        amount:amount
-
-      })
-    });
-
-    const data=await response.json().catch(()=>({}));
-
-    if(!response.ok){
-
-      throw new Error(
-        data.error ||
-        data.message ||
-        'Ошибка отправки'
-      );
-
-    }
-
-    showMessage(
-      'sendMessage',
-      'Транзакция отправлена ✓',
-      'success'
-    );
-
-    document.getElementById('toAddress').value='';
-    document.getElementById('sendAmount').value='';
-
-    await loadWallets();
-
-  }catch(error){
-
-    showMessage(
-      'sendMessage',
-      error.message,
-      'error'
-    );
-
-  }
-
-}
-
-
-/* =========================
-   QR
-========================= */
-
-function showQR(address){
-
-  if(!address)return;
-
-  currentQRAddress=address;
-
-  document.getElementById('qrAddress').textContent=
-    address;
-
-  const box=document.getElementById('qrCode');
-
-  box.innerHTML='';
-
-  document
-    .getElementById('qrModal')
-    .classList.add('show');
-
-  if(typeof QRCode==='undefined'){
-
-    box.innerHTML=
-      '<span style="color:#111">QR недоступен</span>';
-
-    return;
-
-  }
-
-  new QRCode(box,{
-    text:address,
-    width:220,
-    height:220,
-    correctLevel:QRCode.CorrectLevel.M
+  const data=await api("/api/wallet/select",{
+    method:"POST",
+    body:{walletId:id}
   });
 
+  const selected=
+    data.wallet ||
+    wallets.find(w=>String(w.id)===String(id));
+
+  activeWallet=selected ||
+    wallets.find(w=>String(w.id)===String(id)) ||
+    null;
+
+  localStorage.setItem(
+    ACTIVE_WALLET_KEY,
+    String(id)
+  );
+
+  await refreshActiveWallet();
+  renderAll();
+
+  toast("Кошелёк выбран.","good");
 }
 
-
-function closeQR(){
-
-  document
-    .getElementById('qrModal')
-    .classList.remove('show');
-
-}
-
-
-async function copyAddress(){
-
-  if(!currentQRAddress)return;
-
+async function createWallet(){
   try{
+    const data=await api("/api/wallet/create",{
+      method:"POST",
+      body:{}
+    });
 
-    await navigator.clipboard.writeText(
-      currentQRAddress
-    );
+    const created=data.wallet || data;
 
-  }catch{
-
-    const area=document.createElement('textarea');
-
-    area.value=currentQRAddress;
-
-    document.body.appendChild(area);
-
-    area.select();
-
-    document.execCommand('copy');
-
-    area.remove();
-
-  }
-
-  alert('Адрес скопирован');
-
-}
-
-
-/* =========================
-   SCANNER
-========================= */
-
-async function openScanner(){
-
-  hideMessage('scanMessage');
-
-  document
-    .getElementById('scannerModal')
-    .classList.add('show');
-
-  try{
-
-    if(
-      !navigator.mediaDevices ||
-      !navigator.mediaDevices.getUserMedia
-    ){
-
-      throw new Error(
-        'Камера не поддерживается'
-      );
-
+    if(created?.id){
+      wallets.push(created);
+      await selectWallet(created.id);
+    }else{
+      await loadWallets();
+      renderAll();
     }
 
-    scannerStream=
-      await navigator.mediaDevices.getUserMedia({
-        video:{
-          facingMode:{
-            ideal:'environment'
-          },
-          width:{ideal:1280},
-          height:{ideal:720}
-        },
-        audio:false
-      });
+    toast("Новый кошелёк создан.","good");
+  }catch(err){
+    toast(
+      err.message || "Не удалось создать кошелёк.",
+      "bad"
+    );
+  }
+}
 
-    const video=
-      document.getElementById('video');
+function renderWalletLists(){
+  const containers=[
+    $("walletListHome"),
+    $("walletListPage")
+  ];
+
+  containers.forEach(container=>{
+    if(!container) return;
+
+    if(!wallets.length){
+      container.innerHTML=
+        '<div class="empty">Кошельков пока нет.</div>';
+      return;
+    }
+
+    container.innerHTML=wallets.map(w=>{
+      const isActive=
+        activeWallet &&
+        String(activeWallet.id)===String(w.id);
+
+      const address=w.address || "—";
+      const balance=formatNumber(w.balance);
+
+      const shortId=String(w.id || "").length>18
+        ? String(w.id).slice(0,10)+"…"+String(w.id).slice(-6)
+        : String(w.id || "—");
+
+      const shortAddress=address.length>22
+        ? address.slice(0,10)+"…"+address.slice(-8)
+        : address;
+
+      return `
+        <div class="wallet-item ${isActive ? "active" : ""}">
+          <div class="wallet-left">
+            <div class="wallet-name">
+              ${isActive ? "● " : ""}Кошелёк #${escapeHtml(shortId)}
+            </div>
+            <div class="wallet-mini" title="${escapeHtml(address)}">
+              ${escapeHtml(shortAddress)}
+            </div>
+            <div class="wallet-balance">${balance} SLX</div>
+          </div>
+          <div class="wallet-actions">
+            <button class="btn smallbtn" type="button"
+              data-wallet-qr="${escapeHtml(w.id)}">QR</button>
+            <button class="btn smallbtn" type="button"
+              data-select-wallet="${escapeHtml(w.id)}">
+              ${isActive ? "Выбран" : "Выбрать"}
+            </button>
+          </div>
+        </div>
+      `;
+    }).join("");
+  });
+}
+
+function renderHome(){
+  $("homeBalance").textContent=
+    formatNumber(activeWallet?.balance ?? 0);
+
+  $("homeAddress").textContent=
+    activeWallet?.address || "—";
+
+  $("walletReceiveAddress").textContent=
+    activeWallet?.address || "—";
+
+  $("sendBalance").textContent=
+    formatNumber(activeWallet?.balance ?? 0)+" SLX";
+
+  $("homeUsername").textContent=
+    me?.username ? "@"+me.username : "—";
+}
+
+function renderAll(){
+  renderHome();
+  renderWalletLists();
+  renderNetworkSummary();
+  updateSendTotal();
+}
+
+/* ИСТОРИЯ */
+
+async function loadHistory(){
+  const box=$("historyList");
+
+  if(!activeWallet?.id){
+    box.innerHTML='<div class="empty">Выбери кошелёк.</div>';
+    return;
+  }
+
+  box.innerHTML='<div class="empty">Загрузка…</div>';
+
+  try{
+    const data=await api(
+      "/api/wallet/"+encodeURIComponent(activeWallet.id)
+    );
+
+    const txs=
+      data.transactions ||
+      data.history ||
+      data.data?.transactions ||
+      [];
+
+    renderTransactions(box,txs);
+
+    renderTransactions(
+      $("homeHistory"),
+      txs.slice(0,5)
+    );
+  }catch(err){
+    box.innerHTML=
+      `<div class="empty">${escapeHtml(err.message)}</div>`;
+  }
+}
+
+function renderTransactions(box,txs){
+  if(!box) return;
+
+  if(!Array.isArray(txs) || !txs.length){
+    box.innerHTML='<div class="empty">Операций пока нет.</div>';
+    return;
+  }
+
+  box.innerHTML=txs.map(tx=>{
+    const type=String(tx.type || "TX").toUpperCase();
+    const amount=Number(tx.amount || 0);
+
+    const incoming=[
+      "RECEIVE","FAUCET","GENESIS","IN"
+    ].includes(type);
+
+    const sign=incoming ? "+" : "-";
+    const amountClass=incoming ? "plus" : "minus";
+
+    const counterparty=incoming
+      ? (tx.from_wallet || tx.fromAddress || "")
+      : (tx.to_wallet || tx.toAddress || "");
+
+    const fee=Number(tx.fee || 0);
+
+    return `
+      <div class="tx">
+        <div class="tx-head">
+          <div class="tx-type">${escapeHtml(type)}</div>
+          <div class="amount ${amountClass}">
+            ${sign}${formatNumber(amount)} SLX
+          </div>
+        </div>
+        <div class="tiny muted" style="margin-top:6px">
+          ${escapeHtml(formatDate(tx.created_at || tx.timestamp))}
+        </div>
+        ${counterparty ? `
+          <div class="tiny muted" style="margin-top:6px;word-break:break-all">
+            ${incoming ? "Отправитель: " : "Получатель: "}
+            ${escapeHtml(counterparty)}
+          </div>` : ""}
+        ${fee>0 ? `
+          <div class="tiny muted" style="margin-top:6px">
+            Комиссия: ${formatNumber(fee)} SLX
+          </div>` : ""}
+      </div>
+    `;
+  }).join("");
+}
+
+/* СЕТЬ */
+
+async function loadNetwork(){
+  try{
+    const [status,economy,blocks]=await Promise.all([
+      api("/api/status"),
+      api("/api/economy"),
+      api("/api/blocks")
+    ]);
+
+    networkData=status;
+    economyData=economy;
+
+    renderNetworkSummary();
+    renderBlocks(blocks.blocks || blocks);
+  }catch(err){
+    $("chainVerifyResult").textContent=
+      err.message || "Не удалось загрузить сеть.";
+  }
+}
+
+function renderNetworkSummary(){
+  const status=networkData || {};
+  const economy=economyData || {};
+  const network=status.network || status;
+
+  const total=
+    economy.totalSupply ??
+    economy.supply ??
+    economy.total_supply ??
+    "—";
+
+  const max=
+    economy.maxSupply ??
+    economy.max_supply ??
+    "—";
+
+  const fee=
+    network.transferFee ??
+    network.transfer_fee ??
+    economy.transferFee ??
+    economy.transfer_fee ??
+    0.1;
+
+  const version=
+    network.version ??
+    network.networkVersion ??
+    status.version ??
+    NETWORK_VERSION_FALLBACK;
+
+  const height=
+    network.height ??
+    network.blockHeight ??
+    network.latestBlock ??
+    status.height ??
+    status.blockHeight ??
+    "—";
+
+  const online=
+    status.status==="online" ||
+    status.online===true ||
+    network.status==="online";
+
+  $("topVersion").textContent=
+    "v"+version+" • testnet";
+
+  $("homeNetworkBadge").textContent=
+    online ? "TESTNET • ONLINE" : "TESTNET";
+
+  $("homeNetworkBadge").className=
+    "badge "+(online ? "good" : "warn");
+
+  $("networkInfo").innerHTML=`
+    <div>Статус</div>
+    <div><span class="badge ${online ? "good" : "warn"}">${online ? "ONLINE" : "—"}</span></div>
+    <div>Версия</div><div>${escapeHtml(version)}</div>
+    <div>Высота</div><div>${escapeHtml(height)}</div>
+    <div>Supply</div><div>${escapeHtml(formatNumber(total))} / ${escapeHtml(formatNumber(max))}</div>
+    <div>Fee</div><div>${escapeHtml(formatNumber(fee))} SLX</div>
+  `;
+
+  $("economyInfo").innerHTML=`
+    <div>Всего</div><div>${escapeHtml(formatNumber(total))} SLX</div>
+    <div>Максимум</div><div>${escapeHtml(formatNumber(max))} SLX</div>
+    <div>Комиссия</div><div>${escapeHtml(formatNumber(fee))} SLX</div>
+    <div>Faucet</div><div>10 SLX</div>
+  `;
+
+  $("sendFee").textContent=
+    formatNumber(fee)+" SLX";
+
+  updateSendTotal();
+}
+
+function renderBlocks(blocks){
+  const box=$("blocksList");
+
+  if(!Array.isArray(blocks) || !blocks.length){
+    box.innerHTML='<div class="empty">Блоков пока нет.</div>';
+    return;
+  }
+
+  const recent=[...blocks]
+    .sort((a,b)=>
+      Number(b.block_index ?? b.id ?? 0)-
+      Number(a.block_index ?? a.id ?? 0)
+    )
+    .slice(0,8);
+
+  box.innerHTML=recent.map(block=>`
+    <div class="tx">
+      <div class="row-between">
+        <strong>#${escapeHtml(block.block_index ?? block.id ?? "—")}</strong>
+        <span class="badge">${escapeHtml(String(block.transaction_count ?? 0))} tx</span>
+      </div>
+      <div class="tiny muted" style="margin-top:6px">
+        ${escapeHtml(formatDate(block.timestamp))}
+      </div>
+      <div class="tiny muted" style="margin-top:5px;word-break:break-all">
+        hash: ${escapeHtml(block.hash || "—")}
+      </div>
+    </div>
+  `).join("");
+}
+
+/* FAUCET */
+
+async function faucet(){
+  if(!activeWallet?.id){
+    toast("Сначала выбери кошелёк.","bad");
+    return;
+  }
+
+  $("faucetBtn").disabled=true;
+
+  try{
+    const data=await api("/api/faucet",{
+      method:"POST",
+      body:{walletId:activeWallet.id}
+    });
+
+    await loadWallets();
+    await loadHistory();
+
+    toast("Faucet: +10 SLX получено.","good");
+
+    if(data?.cooldown){
+      console.log("Faucet cooldown:",data.cooldown);
+    }
+  }catch(err){
+    toast(err.message || "Faucet сейчас недоступен.","bad");
+  }finally{
+    $("faucetBtn").disabled=false;
+  }
+}
+
+/* МОДАЛЬНЫЕ ОКНА */
+
+function openModal(id){
+  $(id).classList.remove("hidden");
+}
+
+function closeModal(id){
+  $(id).classList.add("hidden");
+
+  if(id==="scannerModal"){
+    stopScanner();
+  }
+}
+
+function openSend(){
+  if(!activeWallet){
+    toast("Сначала выбери кошелёк.","bad");
+    return;
+  }
+
+  $("sendTo").value="";
+  $("sendAmount").value="";
+
+  $("sendBalance").textContent=
+    formatNumber(activeWallet.balance || 0)+" SLX";
+
+  updateSendTotal();
+  openModal("sendModal");
+}
+
+function updateSendTotal(){
+  const amount=Number($("sendAmount")?.value || 0);
+
+  const feeText=$("sendFee")?.textContent || "0.1 SLX";
+
+  const fee=
+    Number(
+      String(feeText)
+        .replace(",",".")
+        .replace(/[^\d.-]/g,"")
+    ) || 0;
+
+  $("sendTotal").textContent=
+    formatNumber(amount+fee)+" SLX";
+}
+
+/* ОТПРАВКА */
+
+async function sendTransaction(e){
+  e.preventDefault();
+
+  if(!activeWallet?.id){
+    toast("Активный кошелёк не выбран.","bad");
+    return;
+  }
+
+  const toAddress=
+    $("sendTo").value.trim().toUpperCase();
+
+  const amount=Number($("sendAmount").value);
+
+  if(!/^SLXC[A-F0-9]{32}$/.test(toAddress)){
+    toast("Неверный адрес SLX. Ожидается SLXC + 32 hex символа.","bad");
+    return;
+  }
+
+  if(!Number.isFinite(amount) || amount<=0){
+    toast("Укажи корректную сумму.","bad");
+    return;
+  }
+
+  const fee=
+    Number(
+      String($("sendFee").textContent)
+        .replace(",",".")
+        .replace(/[^\d.-]/g,"")
+    ) || 0;
+
+  const balance=Number(activeWallet.balance || 0);
+
+  if(amount+fee>balance){
+    toast("Недостаточно SLX с учётом комиссии.","bad");
+    return;
+  }
+
+  try{
+    const data=await api("/api/send",{
+      method:"POST",
+      body:{
+        fromWalletId:activeWallet.id,
+        toAddress,
+        amount
+      }
+    });
+
+    await loadWallets();
+    await loadHistory();
+    await loadNetwork();
+
+    closeModal("sendModal");
+
+    toast(
+      `Отправлено ${formatNumber(amount)} SLX.`,
+      "good"
+    );
+
+    console.log("Send result:",data);
+  }catch(err){
+    toast(err.message || "Не удалось отправить транзакцию.","bad");
+  }
+}
+
+/* QR */
+
+function showQrForActive(){
+  if(!activeWallet?.address){
+    toast("Адрес кошелька пока недоступен.","bad");
+    return;
+  }
+
+  const address=activeWallet.address;
+
+  $("qrAddressText").textContent=address;
+  $("qrCode").innerHTML="";
+
+  openModal("qrModal");
+
+  if(!window.QRCode){
+    $("qrCode").innerHTML=
+      '<div style="color:#111;text-align:center;font-size:13px">QR-библиотека не загрузилась.<br>Используй адрес ниже.</div>';
+    return;
+  }
+
+  try{
+    new QRCode($("qrCode"),{
+      text:address,
+      width:216,
+      height:216,
+      correctLevel:QRCode.CorrectLevel.M
+    });
+  }catch(err){
+    console.error("QR error",err);
+
+    $("qrCode").innerHTML=
+      '<div style="color:#111;text-align:center;font-size:13px">Не удалось создать QR.</div>';
+  }
+}
+
+async function waitForQrLibrary(){
+  for(let i=0;i<50;i++){
+    if(window.QRCode){
+      qrLibraryReady=true;
+      return;
+    }
+
+    await new Promise(r=>setTimeout(r,100));
+  }
+}
+
+async function copyText(value,successMessage="Скопировано."){
+  if(!value) return;
+
+  try{
+    await navigator.clipboard.writeText(value);
+  }catch{
+    const ta=document.createElement("textarea");
+
+    ta.value=value;
+    ta.style.position="fixed";
+    ta.style.opacity="0";
+
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand("copy");
+    ta.remove();
+  }
+
+  toast(successMessage,"good");
+}
+
+/* ПРОВЕРКА ЦЕПОЧКИ */
+
+async function verifyChain(){
+  const box=$("chainVerifyResult");
+  box.textContent="Проверяю цепочку…";
+
+  try{
+    const data=await api("/api/chain/verify");
+
+    const ok=
+      data.valid===true ||
+      data.verified===true ||
+      data.status==="valid";
+
+    box.innerHTML=ok
+      ? '<span class="badge good">CHAIN VALID</span>'
+      : '<span class="badge bad">CHAIN INVALID</span>';
+
+    toast(
+      ok
+        ? "Цепочка проверена: ошибок не найдено."
+        : "Проверка показала проблему в цепочке.",
+      ok ? "good" : "bad"
+    );
+  }catch(err){
+    box.textContent=err.message || "Проверка не удалась.";
+    toast("Не удалось проверить цепочку.","bad");
+  }
+}
+
+/* СМЕНА ПАРОЛЯ */
+
+async function changePassword(e){
+  e.preventDefault();
+
+  const currentPassword=$("oldPassword").value;
+  const newPassword=$("newPassword").value;
+
+  if(newPassword.length<6){
+    toast("Новый пароль слишком короткий.","bad");
+    return;
+  }
+
+  try{
+    const data=await api("/api/auth/password/change",{
+      method:"POST",
+      body:{currentPassword,newPassword}
+    });
+
+    if(data.token){
+      saveToken(data.token);
+    }
+
+    closeModal("passwordModal");
+    $("passwordForm").reset();
+
+    toast("Пароль изменён.","good");
+  }catch(err){
+    toast(err.message || "Не удалось изменить пароль.","bad");
+  }
+}
+
+/* ВОССТАНОВЛЕНИЕ ПАРОЛЯ */
+
+async function recoveryReset(e){
+  e.preventDefault();
+
+  const username=$("recoveryUsername").value.trim();
+  const recoveryCode=$("recoveryCode").value.trim().toUpperCase();
+  const newPassword=$("recoveryNewPassword").value;
+
+  try{
+    const data=await api("/api/auth/recovery/reset",{
+      method:"POST",
+      body:{username,recoveryCode,newPassword}
+    });
+
+    if(data.token){
+      saveToken(data.token);
+    }
+
+    closeModal("recoveryModal");
+    $("recoveryForm").reset();
+
+    toast("Пароль восстановлен.","good");
+
+    startApp();
+  }catch(err){
+    toast(err.message || "Не удалось восстановить пароль.","bad");
+  }
+}
+
+/* ВЫХОД */
+
+async function logout(){
+  stopScanner();
+
+  try{
+    await api("/api/auth/logout",{
+      method:"POST",
+      body:{}
+    });
+  }catch(err){
+    console.warn("Logout request:",err.message);
+  }
+
+  saveToken("");
+
+  me=null;
+  wallets=[];
+  activeWallet=null;
+
+  localStorage.removeItem(ACTIVE_WALLET_KEY);
+
+  showAuth();
+  toast("Ты вышел из аккаунта.","good");
+}
+
+/* ВХОД: сначала получаем и сохраняем JWT, затем проверяем сессию. */
+
+async function login(e){
+  e.preventDefault();
+
+  const username=$("loginUsername").value.trim();
+  const password=$("loginPassword").value;
+
+  const button=$("loginForm").querySelector('button[type="submit"]');
+
+  if(!username || !password){
+    toast("Введи имя пользователя и пароль.","bad");
+    return;
+  }
+
+  if(button){
+    button.disabled=true;
+    button.textContent="Входим…";
+  }
+
+  try{
+    // Публичный endpoint входа: старый токен ему не нужен.
+    const response=await fetch(API_BASE+"/api/auth/login",{
+      method:"POST",
+      headers:new Headers({"Content-Type":"application/json"}),
+      credentials:"include",
+      body:JSON.stringify({username,password})
+    });
+
+    const raw=await response.text();
+    let data={};
+
+    try{
+      data=raw ? JSON.parse(raw) : {};
+    }catch{
+      throw new Error("Сервер вернул некорректный ответ на вход.");
+    }
+
+    if(!response.ok){
+      throw new Error(
+        data.message ||
+        data.error ||
+        `Ошибка входа (HTTP ${response.status}).`
+      );
+    }
+
+    const newToken=
+      data.token ||
+      data.accessToken ||
+      data.jwt;
+
+    if(!newToken){
+      throw new Error("Сервер не вернул токен авторизации.");
+    }
+
+    saveToken(String(newToken));
+
+    if(data.user){
+      me=data.user;
+    }
+
+    // Проверяем, что сервер принимает выданный токен.
+    await api("/api/auth/me");
+
+    $("loginForm").reset();
+
+    await startApp();
+
+    toast("С возвращением.","good");
+  }catch(err){
+    console.error("SLX login error:",err);
+
+    toast(
+      err.message || "Не удалось войти.",
+      "bad"
+    );
+  }finally{
+    if(button){
+      button.disabled=false;
+      button.textContent="Войти";
+    }
+  }
+}
+
+/* РЕГИСТРАЦИЯ */
+
+async function register(e){
+  e.preventDefault();
+
+  const username=$("registerUsername").value.trim();
+  const password=$("registerPassword").value;
+  const password2=$("registerPassword2").value;
+
+  if(password!==password2){
+    toast("Пароли не совпадают.","bad");
+    return;
+  }
+
+  if(password.length<6){
+    toast("Пароль должен содержать минимум 6 символов.","bad");
+    return;
+  }
+
+  try{
+    const data=await api("/api/auth/register",{
+      method:"POST",
+      body:{username,password}
+    });
+
+    const newToken=data.token || data.accessToken;
+    const recoveryCode=data.recoveryCode || data.recovery_code || "";
+
+    if(newToken){
+      saveToken(newToken);
+    }
+
+    $("recoveryCodeDisplay").textContent=
+      recoveryCode || "Код не получен";
+
+    openModal("registerSuccessModal");
+
+    if(!newToken){
+      toast("Аккаунт создан. Войди через форму входа.","good");
+    }else{
+      await startApp();
+    }
+  }catch(err){
+    toast(err.message || "Не удалось создать аккаунт.","bad");
+  }
+}
+
+/* НАСТРОЙКИ */
+
+function toggleAutoRefresh(){
+  autoRefreshEnabled=!autoRefreshEnabled;
+
+  const button=$("autoRefreshBtn");
+
+  button.textContent=
+    autoRefreshEnabled ? "Включено" : "Выключено";
+
+  button.classList.toggle("good",autoRefreshEnabled);
+
+  button.setAttribute(
+    "aria-pressed",
+    String(autoRefreshEnabled)
+  );
+
+  toast(
+    autoRefreshEnabled
+      ? "Автообновление включено."
+      : "Автообновление выключено.",
+    "good"
+  );
+}
+
+/* АВАТАР */
+
+function handleAvatar(file){
+  if(!file) return;
+
+  if(!file.type.startsWith("image/")){
+    toast("Выбери изображение.","bad");
+    return;
+  }
+
+  if(file.size>3*1024*1024){
+    toast("Фото должно быть не больше 3 МБ.","bad");
+    return;
+  }
+
+  const reader=new FileReader();
+
+  reader.onload=()=>{
+    localStorage.setItem(AVATAR_KEY,reader.result);
+
+    $("topAvatar").src=reader.result;
+    $("avatarPreview").src=reader.result;
+
+    toast("Фото сохранено на этом устройстве.","good");
+  };
+
+  reader.onerror=()=>{
+    toast("Не удалось прочитать фото.","bad");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+/* ПОДКЛЮЧЕНИЕ КНОПОК */
+
+function setupEvents(){
+  $("loginTab").addEventListener(
+    "click",
+    ()=>setAuthTab("login")
+  );
+
+  $("registerTab").addEventListener(
+    "click",
+    ()=>setAuthTab("register")
+  );
+
+  $("loginForm").addEventListener("submit",login);
+  $("registerForm").addEventListener("submit",register);
+
+  $("showRecoveryBtn").addEventListener(
+    "click",
+    ()=>openModal("recoveryModal")
+  );
+
+  document.querySelectorAll(".nav-btn").forEach(btn=>{
+    btn.addEventListener(
+      "click",
+      ()=>showPage(btn.dataset.page)
+    );
+  });
+
+  $("copyAddressBtn").addEventListener(
+    "click",
+    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
+  );
+
+  $("walletCopyBtn").addEventListener(
+    "click",
+    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
+  );
+
+  $("showQrBtn").addEventListener("click",showQrForActive);
+  $("walletQrBtn").addEventListener("click",showQrForActive);
+
+  $("homeCreateWalletBtn").addEventListener("click",createWallet);
+  $("walletCreateBtn").addEventListener("click",createWallet);
+  $("faucetBtn").addEventListener("click",faucet);
+  $("goSendBtn").addEventListener("click",openSend);
+
+  $("sendForm").addEventListener("submit",sendTransaction);
+  $("sendAmount").addEventListener("input",updateSendTotal);
+
+  $("historyRefreshBtn").addEventListener("click",loadHistory);
+  $("networkRefreshBtn").addEventListener("click",loadNetwork);
+  $("chainVerifyBtn").addEventListener("click",verifyChain);
+
+  $("changePasswordBtn").addEventListener(
+    "click",
+    ()=>openModal("passwordModal")
+  );
+
+  $("passwordForm").addEventListener("submit",changePassword);
+  $("recoveryForm").addEventListener("submit",recoveryReset);
+  $("logoutBtn").addEventListener("click",logout);
+  $("autoRefreshBtn").addEventListener("click",toggleAutoRefresh);
+
+  $("avatarInput").addEventListener(
+    "change",
+    e=>handleAvatar(e.target.files?.[0])
+  );
+
+  $("removeAvatarBtn").addEventListener("click",()=>{
+    localStorage.removeItem(AVATAR_KEY);
+    setDefaultAvatar();
+    toast("Локальное фото удалено.","good");
+  });
+
+  $("qrCopyBtn").addEventListener(
+    "click",
+    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
+  );
+
+  $("copyRecoveryBtn").addEventListener(
+    "click",
+    ()=>copyText(
+      $("recoveryCodeDisplay").textContent,
+      "Код восстановления скопирован."
+    )
+  );
+
+  $("continueAfterRegisterBtn").addEventListener("click",()=>{
+    closeModal("registerSuccessModal");
+
+    if(token){
+      startApp();
+    }else{
+      setAuthTab("login");
+    }
+  });
+
+  $("scanQrBtn").addEventListener("click",startScanner);
+
+  $("stopScannerBtn").addEventListener("click",()=>{
+    stopScanner();
+    closeModal("scannerModal");
+  });
+
+  document.querySelectorAll("[data-close]").forEach(btn=>{
+    btn.addEventListener(
+      "click",
+      ()=>closeModal(btn.dataset.close)
+    );
+  });
+
+  document.querySelectorAll(".modal").forEach(modal=>{
+    modal.addEventListener("click",e=>{
+      if(e.target===modal){
+        closeModal(modal.id);
+      }
+    });
+  });
+
+  document.addEventListener("click",async e=>{
+    const qrBtn=e.target.closest("[data-wallet-qr]");
+
+    if(qrBtn){
+      const wallet=wallets.find(
+        w=>String(w.id)===String(qrBtn.dataset.walletQr)
+      );
+
+      if(!wallet?.address){
+        toast("Адрес кошелька недоступен.","bad");
+        return;
+      }
+
+      $("qrAddressText").textContent=wallet.address;
+      $("qrCode").innerHTML="";
+
+      openModal("qrModal");
+
+      if(window.QRCode){
+        try{
+          new QRCode($("qrCode"),{
+            text:wallet.address,
+            width:216,
+            height:216,
+            correctLevel:QRCode.CorrectLevel.M
+          });
+        }catch(err){
+          console.error("Wallet QR error:",err);
+        }
+      }
+
+      return;
+    }
+
+    const btn=e.target.closest("[data-select-wallet]");
+
+    if(!btn) return;
+
+    await selectWallet(btn.dataset.selectWallet);
+  });
+}
+
+/* СКАНЕР QR ДЛЯ IPHONE/SAFARI */
+
+async function startScanner(){
+  if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
+    toast(
+      "Камера доступна через HTTPS и при разрешении браузера.",
+      "bad"
+    );
+    return;
+  }
+
+  stopScanner();
+
+  openModal("scannerModal");
+
+  $("scannerStatus").textContent=
+    "Запрашиваю доступ к камере…";
+
+  try{
+    scannerStream=await navigator.mediaDevices.getUserMedia({
+      video:{
+        facingMode:{ideal:"environment"},
+        width:{ideal:1280},
+        height:{ideal:720}
+      },
+      audio:false
+    });
+
+    const video=$("scannerVideo");
 
     video.srcObject=scannerStream;
 
     await video.play();
 
-    scannerRunning=true;
+    $("scannerStatus").textContent=
+      "Наведи камеру на QR-код адреса SLX…";
 
-    requestAnimationFrame(scanFrame);
-
-  }catch(error){
-
-    showMessage(
-      'scanMessage',
-      'Разреши доступ к камере в Safari.',
-      'error'
+    const canvas=$("scannerCanvas");
+    const ctx=canvas.getContext(
+      "2d",
+      {willReadFrequently:true}
     );
 
-  }
+    let detector=null;
 
-}
+    if("BarcodeDetector" in window){
+      try{
+        const supported=await BarcodeDetector
+          .getSupportedFormats()
+          .catch(()=>[]);
 
+        if(supported.includes("qr_code")){
+          detector=new BarcodeDetector({
+            formats:["qr_code"]
+          });
+        }
+      }catch(err){
+        console.debug("BarcodeDetector unavailable:",err);
+      }
+    }
 
-function scanFrame(){
+    const extractAddress=raw=>{
+      const text=String(raw || "").trim();
+      const match=text.match(/SLXC[A-Fa-f0-9]{32}/);
 
-  if(!scannerRunning)return;
+      return match
+        ? match[0].toUpperCase()
+        : null;
+    };
 
-  const video=
-    document.getElementById('video');
+    const found=address=>{
+      if(!address) return false;
 
-  const canvas=
-    document.getElementById('scanCanvas');
+      $("sendTo").value=address;
 
-  if(
-    video.readyState>=2 &&
-    video.videoWidth>0
-  ){
+      stopScanner();
+      closeModal("scannerModal");
 
-    canvas.width=video.videoWidth;
-    canvas.height=video.videoHeight;
+      toast("Адрес найден в QR.","good");
 
-    const ctx=
-      canvas.getContext('2d',{
-        willReadFrequently:true
-      });
+      return true;
+    };
 
-    ctx.drawImage(
-      video,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    const scan=async()=>{
+      if(!scannerStream) return;
 
-    const image=
-      ctx.getImageData(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
+      try{
+        if(detector){
+          const results=await detector.detect(video);
 
-    if(typeof jsQR==='function'){
-
-      const result=
-        jsQR(
-          image.data,
-          image.width,
-          image.height,
-          {
-            inversionAttempts:'attemptBoth'
+          if(
+            results?.length &&
+            found(extractAddress(results[0].rawValue))
+          ){
+            return;
           }
-        );
+        }
 
-      if(result && result.data){
+        // Запасной QR-декодер для Safari/iPhone.
+        if(
+          window.jsQR &&
+          video.readyState>=2 &&
+          video.videoWidth>0
+        ){
+          const width=Math.min(video.videoWidth,1000);
 
-        handleQR(result.data);
-        return;
+          const height=Math.round(
+            width*video.videoHeight/video.videoWidth
+          );
 
+          canvas.width=width;
+          canvas.height=height;
+
+          ctx.drawImage(
+            video,
+            0,
+            0,
+            width,
+            height
+          );
+
+          const image=ctx.getImageData(
+            0,
+            0,
+            width,
+            height
+          );
+
+          const code=window.jsQR(
+            image.data,
+            width,
+            height,
+            {inversionAttempts:"attemptBoth"}
+          );
+
+          if(
+            code?.data &&
+            found(extractAddress(code.data))
+          ){
+            return;
+          }
+        }
+      }catch(err){
+        console.debug("QR scan frame:",err);
       }
 
+      scannerTimer=requestAnimationFrame(scan);
+    };
+
+    if(!detector && !window.jsQR){
+      $("scannerStatus").textContent=
+        "QR-библиотека не загрузилась. Обнови страницу и попробуй снова.";
+      return;
     }
 
+    scannerTimer=requestAnimationFrame(scan);
+
+  }catch(err){
+    console.error("Camera error:",err);
+
+    stopScanner();
+
+    $("scannerStatus").textContent=
+      "Не удалось открыть камеру. Разреши доступ в Safari/Chrome.";
+
+    toast("Камера не запустилась.","bad");
   }
-
-  requestAnimationFrame(scanFrame);
-
 }
 
-
-function handleQR(value){
-
-  let address=String(value).trim();
-
-  if(address.toLowerCase().startsWith('slx:'))
-    address=address.slice(4);
-
-  try{
-
-    if(
-      address.startsWith('{') &&
-      address.endsWith('}')
-    ){
-
-      const obj=JSON.parse(address);
-
-      address=
-        obj.address ||
-        obj.to ||
-        obj.wallet ||
-        address;
-
-    }
-
-  }catch{}
-
-  if(!validAddress(address)){
-
-    showMessage(
-      'scanMessage',
-      'QR не содержит корректный SLX-адрес.',
-      'error'
-    );
-
-    setTimeout(()=>{
-      if(scannerRunning)
-        requestAnimationFrame(scanFrame);
-    },1000);
-
-    return;
-
+function stopScanner(){
+  if(scannerTimer){
+    cancelAnimationFrame(scannerTimer);
+    scannerTimer=null;
   }
-
-  document.getElementById('toAddress').value=
-    address;
-
-  showMessage(
-    'scanMessage',
-    'Адрес успешно отсканирован ✓',
-    'success'
-  );
-
-  setTimeout(
-    closeScanner,
-    500
-  );
-
-}
-
-
-function closeScanner(){
-
-  scannerRunning=false;
 
   if(scannerStream){
-
-    scannerStream
-      .getTracks()
-      .forEach(track=>track.stop());
-
+    scannerStream.getTracks().forEach(t=>t.stop());
     scannerStream=null;
-
   }
 
-  document.getElementById('video').srcObject=null;
+  const video=$("scannerVideo");
 
-  document
-    .getElementById('scannerModal')
-    .classList.remove('show');
-
-}
-
-
-/* =========================
-   HISTORY
-========================= */
-
-async function loadHistory(){
-
-  const box=
-    document.getElementById('historyList');
-
-  box.innerHTML=
-    '<div style="color:#687487;padding:15px;text-align:center">Загрузка...</div>';
-
-  try{
-
-    let response=
-      await api('/api/history');
-
-    if(!response.ok)
-      response=await api('/api/transactions');
-
-    if(!response.ok)
-      throw new Error('История недоступна');
-
-    const data=await response.json();
-
-    const items=
-      Array.isArray(data)
-        ? data
-        : (
-            data.transactions ||
-            data.history ||
-            data.items ||
-            []
-          );
-
-    if(!items.length){
-
-      box.innerHTML=
-        '<div style="color:#687487;padding:20px;text-align:center">История пока пуста</div>';
-
-      return;
-
-    }
-
-    box.innerHTML=items
-      .slice(0,50)
-      .map(tx=>{
-
-        const amount=
-          Number(
-            tx.amount ??
-            tx.value ??
-            0
-          );
-
-        const hash=
-          tx.hash ||
-          tx.id ||
-          tx.txId ||
-          '—';
-
-        const to=
-          tx.toAddress ||
-          tx.to ||
-          '';
-
-        return `
-          <div class="list-item">
-
-            <div class="list-top">
-
-              <div class="list-title">
-                Транзакция
-              </div>
-
-              <div class="list-value">
-                ${amount.toFixed(2)} SLX
-              </div>
-
-            </div>
-
-            <div class="list-sub">
-              ${escapeHTML(shortAddress(to))}
-            </div>
-
-            <div class="list-sub">
-              ${escapeHTML(String(hash))}
-            </div>
-
-          </div>
-        `;
-
-      }).join('');
-
-  }catch(error){
-
-    box.innerHTML=
-      `<div style="color:#ff9ca8;padding:20px;text-align:center">
-        ${escapeHTML(error.message)}
-      </div>`;
-
+  if(video){
+    video.pause();
+    video.srcObject=null;
   }
-
 }
 
+window.addEventListener("beforeunload",stopScanner);
 
-/* =========================
-   NETWORK
-========================= */
-
-async function loadNetwork(){
-
-  try{
-
-    const response=
-      await api('/api/status');
-
-    if(!response.ok)return;
-
-    const data=await response.json();
-
-    document.getElementById('networkName').textContent=
-      data.name ||
-      data.network ||
-      'SLX-Testnet';
-
-    document.getElementById('networkVersion').textContent=
-      data.version ||
-      '1.9.1';
-
-    document.getElementById('blockHeight').textContent=
-      data.height ??
-      data.blockHeight ??
-      0;
-
-    document.getElementById('totalSupply').textContent=
-      Number(
-        data.totalSupply ??
-        data.supply ??
-        0
-      ).toLocaleString('ru-RU')
-      +' SLX';
-
-  }catch(error){
-
-    console.log(error);
-
-  }
-
-}
-
-
-async function loadBlocks(){
-
-  const box=
-    document.getElementById('blocksList');
-
-  try{
-
-    const response=
-      await api('/api/blocks');
-
-    if(!response.ok)
-      throw new Error('Не удалось получить блоки');
-
-    const data=await response.json();
-
-    const blocks=
-      Array.isArray(data)
-        ? data
-        : (
-            data.blocks ||
-            data.items ||
-            []
-          );
-
-    if(!blocks.length){
-
-      box.innerHTML=
-        '<div style="color:#687487;padding:15px;text-align:center">Блоков пока нет</div>';
-
-      return;
-
-    }
-
-    box.innerHTML=blocks
-      .slice(-10)
-      .reverse()
-      .map(block=>{
-
-        return `
-          <div class="list-item">
-
-            <div class="list-top">
-
-              <div class="list-title">
-                Block #${escapeHTML(
-                  block.height ??
-                  block.index ??
-                  '—'
-                )}
-              </div>
-
-              <div class="list-value">
-                ✓
-              </div>
-
-            </div>
-
-            <div class="list-sub">
-              Hash:
-              ${escapeHTML(
-                shortAddress(
-                  block.hash || '—'
-                )
-              )}
-            </div>
-
-          </div>
-        `;
-
-      }).join('');
-
-  }catch(error){
-
-    box.innerHTML=
-      `<div style="color:#687487;padding:15px;text-align:center">
-        ${escapeHTML(error.message)}
-      </div>`;
-
-  }
-
-}
-
-
-/* =========================
-   SETTINGS
-========================= */
-
-function toggleAutoUpdate(){
-
-  autoUpdate=!autoUpdate;
-
-  const el=
-    document.getElementById('autoSwitch');
-
-  el.classList.toggle(
-    'on',
-    autoUpdate
-  );
-
-}
-
-
-/* =========================
-   INIT
-========================= */
-
-async function init(){
-
-  await loadWallets();
-
-  await loadProfile();
-
-  await loadNetwork();
-
-}
-
-
-init();
-
-
-/* =========================
-   AUTO UPDATE
-========================= */
+/* Автообновление не запускается в скрытой вкладке или без сессии. */
 
 setInterval(()=>{
-
   if(
-    autoUpdate &&
-    !document.hidden
+    !autoRefreshEnabled ||
+    document.hidden ||
+    !token ||
+    $("appScreen").classList.contains("hidden")
   ){
-
-    loadWallets();
-
+    return;
   }
 
-},15000);
+  loadWallets()
+    .then(()=>renderAll())
+    .catch(err=>console.debug("Auto-refresh wallets:",err));
 
-
-/* =========================
-   MODALS
-========================= */
-
-document
-  .getElementById('qrModal')
-  .addEventListener('click',e=>{
-
-    if(e.target===e.currentTarget)
-      closeQR();
-
-  });
-
-
-document
-  .getElementById('scannerModal')
-  .addEventListener('click',e=>{
-
-    if(e.target===e.currentTarget)
-      closeScanner();
-
-  });
-
-
-document
-  .getElementById('passwordModal')
-  .addEventListener('click',e=>{
-
-    if(e.target===e.currentTarget)
-      closePasswordModal();
-
-  });
-
-
-document.addEventListener(
-  'visibilitychange',
-  ()=>{
-
-    if(
-      document.hidden &&
-      scannerRunning
-    ){
-
-      closeScanner();
-
-    }
-
-  }
-);
-
+  loadNetwork()
+    .catch(err=>console.debug("Auto-refresh network:",err));
+},20000);
 </script>
-
 </body>
 </html>
