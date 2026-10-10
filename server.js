@@ -1,1380 +1,1810 @@
-import os
-import json
-import time
-import uuid
-import hmac
-import hashlib
-import secrets
-import sqlite3
-from datetime import datetime, timezone
-
-from flask import Flask, request, jsonify, send_from_directory
-from werkzeug.security import generate_password_hash, check_password_hash
-from functools import wraps
-
-
-# =========================================================
-# SLX NETWORK v1.8.2
-# Backend / Testnet
-# =========================================================
-
-VERSION = "1.8.2"
-NETWORK = "SLX-Testnet"
-
-TRANSFER_FEE = 0.1
-FAUCET_AMOUNT = 10.0
-FAUCET_COOLDOWN = 24 * 60 * 60
-
-MAX_SUPPLY = 1_000_000_000.0
-
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DB_PATH = os.path.join(BASE_DIR, "slx_network.db")
-
-SECRET_KEY = os.environ.get(
-    "SLX_SECRET_KEY",
-    "slx-v1.8.2-change-this-secret-key"
-)
-
-app = Flask(__name__, static_folder=None)
-
-
-# =========================================================
-# DATABASE
-# =========================================================
-
-def db():
-    connection = sqlite3.connect(DB_PATH)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA foreign_keys = ON")
-    return connection
-
-
-def init_db():
-    connection = db()
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            recovery_code TEXT NOT NULL,
-            created_at TEXT NOT NULL
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS wallets (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            address TEXT UNIQUE NOT NULL,
-            balance REAL NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL,
-            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tx_hash TEXT UNIQUE NOT NULL,
-            type TEXT NOT NULL,
-            from_wallet TEXT,
-            to_wallet TEXT,
-            amount REAL NOT NULL,
-            fee REAL NOT NULL DEFAULT 0,
-            created_at TEXT NOT NULL,
-            block_id INTEGER
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS blocks (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            block_index INTEGER UNIQUE NOT NULL,
-            timestamp TEXT NOT NULL,
-            previous_hash TEXT NOT NULL,
-            hash TEXT UNIQUE NOT NULL,
-            transaction_count INTEGER NOT NULL DEFAULT 0
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS sessions (
-            token TEXT PRIMARY KEY,
-            user_id INTEGER NOT NULL,
-            created_at INTEGER NOT NULL,
-            FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
-        )
-    """)
-
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS faucet_claims (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            wallet_id INTEGER NOT NULL,
-            claimed_at INTEGER NOT NULL,
-            FOREIGN KEY(wallet_id) REFERENCES wallets(id) ON DELETE CASCADE
-        )
-    """)
-
-    connection.commit()
-
-    # Genesis block
-    existing = cursor.execute(
-        "SELECT id FROM blocks WHERE block_index = 0"
-    ).fetchone()
-
-    if not existing:
-        timestamp = now_iso()
-        previous_hash = "0" * 64
-
-        block_hash = calculate_block_hash(
-            0,
-            timestamp,
-            previous_hash,
-            0
-        )
-
-        cursor.execute("""
-            INSERT INTO blocks
-            (block_index, timestamp, previous_hash, hash, transaction_count)
-            VALUES (?, ?, ?, ?, ?)
-        """, (
-            0,
-            timestamp,
-            previous_hash,
-            block_hash,
-            0
-        ))
-
-        connection.commit()
-
-    connection.close()
-
-
-# =========================================================
-# HELPERS
-# =========================================================
-
-def now_iso():
-    return datetime.now(timezone.utc).isoformat()
-
-
-def json_error(message, status=400):
-    return jsonify({
-        "error": message,
-        "message": message
-    }), status
-
-
-def clean_username(username):
-    return str(username or "").strip()
-
-
-def valid_username(username):
-    if not username:
-        return False
-
-    if len(username) < 3 or len(username) > 32:
-        return False
-
-    allowed = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
-
-    return all(char in allowed for char in username)
-
-
-def valid_password(password):
-    return isinstance(password, str) and len(password) >= 6
-
-
-def generate_recovery_code():
-    return secrets.token_hex(4).upper()
-
-
-def generate_wallet_address():
-    random_part = secrets.token_hex(16).upper()
-    return "SLXC" + random_part
-
-
-def generate_tx_hash(data):
-    raw = json.dumps(
-        data,
-        sort_keys=True,
-        separators=(",", ":")
-    ).encode()
-
-    return hashlib.sha256(raw).hexdigest()
-
-
-def calculate_block_hash(
-    block_index,
-    timestamp,
-    previous_hash,
-    transaction_count
-):
-    raw = (
-        f"{block_index}|"
-        f"{timestamp}|"
-        f"{previous_hash}|"
-        f"{transaction_count}"
-    ).encode()
-
-    return hashlib.sha256(raw).hexdigest()
-
-
-def create_token(user_id):
-    random_part = secrets.token_urlsafe(32)
-
-    raw = f"{user_id}:{random_part}:{time.time()}".encode()
-
-    signature = hmac.new(
-        SECRET_KEY.encode(),
-        raw,
-        hashlib.sha256
-    ).hexdigest()
-
-    token = secrets.token_urlsafe(32) + "." + signature
-
-    connection = db()
-
-    connection.execute("""
-        INSERT INTO sessions(token, user_id, created_at)
-        VALUES (?, ?, ?)
-    """, (
-        token,
-        user_id,
-        int(time.time())
-    ))
-
-    connection.commit()
-    connection.close()
-
-    return token
-
-
-def get_user_from_token(token):
-    if not token:
-        return None
-
-    connection = db()
-
-    row = connection.execute("""
-        SELECT users.*
-        FROM sessions
-        JOIN users ON users.id = sessions.user_id
-        WHERE sessions.token = ?
-    """, (token,)).fetchone()
-
-    connection.close()
-
-    return row
-
-
-def get_bearer_token():
-    header = request.headers.get("Authorization", "")
-
-    if not header.startswith("Bearer "):
-        return None
-
-    return header[7:].strip()
-
-
-def auth_required(function):
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-
-        token = get_bearer_token()
-
-        user = get_user_from_token(token)
-
-        if not user:
-            return json_error(
-                "Требуется авторизация.",
-                401
-            )
-
-        request.current_user = user
-        request.current_token = token
-
-        return function(*args, **kwargs)
-
-    return wrapper
-
-
-def user_json(user):
-    return {
-        "id": user["id"],
-        "username": user["username"],
-        "created_at": user["created_at"]
+// ============================================================
+// SLX NETWORK v1.8.2
+// Testnet Backend
+// Node.js 22+ / Express 5 / PostgreSQL
+// ============================================================
+
+const express = require("express");
+const cors = require("cors");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const crypto = require("crypto");
+const path = require("path");
+const { Pool } = require("pg");
+
+const app = express();
+
+// ============================================================
+// CONFIG
+// ============================================================
+
+const PORT = process.env.PORT || 3000;
+
+const VERSION = "1.8.2";
+const NETWORK_NAME = "SLX-Testnet";
+
+const JWT_SECRET =
+  process.env.JWT_SECRET ||
+  "SLX_TESTNET_DEV_SECRET_CHANGE_ME_182";
+
+const TRANSFER_FEE = 0.1;
+const FAUCET_AMOUNT = 10;
+const FAUCET_COOLDOWN_HOURS = 24;
+
+const DATABASE_URL = process.env.DATABASE_URL;
+
+if (!DATABASE_URL) {
+  console.error("ERROR: DATABASE_URL is not configured.");
+  console.error("Add PostgreSQL DATABASE_URL to Render Environment.");
+}
+
+// ============================================================
+// DATABASE
+// ============================================================
+
+const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
+
+// ============================================================
+// EXPRESS
+// ============================================================
+
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
+
+// Serve frontend
+app.use(express.static(path.join(__dirname)));
+
+// ============================================================
+// HELPERS
+// ============================================================
+
+function generateWalletAddress() {
+  return (
+    "SLXC" +
+    crypto.randomBytes(16).toString("hex").toUpperCase()
+  );
+}
+
+function generateRecoveryCode() {
+  return crypto
+    .randomBytes(6)
+    .toString("hex")
+    .toUpperCase();
+}
+
+function generateTxHash() {
+  return (
+    "SLX" +
+    crypto.randomBytes(24).toString("hex").toUpperCase()
+  );
+}
+
+function generateBlockHash() {
+  return (
+    "SLXB" +
+    crypto.randomBytes(28).toString("hex").toUpperCase()
+  );
+}
+
+function isValidWalletAddress(address) {
+  return /^SLXC[A-F0-9]{32}$/.test(
+    String(address || "").trim().toUpperCase()
+  );
+}
+
+function normalizeUsername(username) {
+  return String(username || "").trim();
+}
+
+function normalizeAddress(address) {
+  return String(address || "").trim().toUpperCase();
+}
+
+function signToken(user) {
+  return jwt.sign(
+    {
+      userId: user.id,
+      username: user.username,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: "30d",
+    }
+  );
+}
+
+function getBearerToken(req) {
+  const header = req.headers.authorization || "";
+
+  if (!header.startsWith("Bearer ")) {
+    return null;
+  }
+
+  return header.substring(7).trim();
+}
+
+function roundAmount(value) {
+  return Math.round(Number(value) * 100000000) / 100000000;
+}
+
+function publicUser(user) {
+  return {
+    id: user.id,
+    username: user.username,
+    created_at: user.created_at,
+  };
+}
+
+// ============================================================
+// AUTH MIDDLEWARE
+// ============================================================
+
+async function authRequired(req, res, next) {
+  try {
+    const token = getBearerToken(req);
+
+    if (!token) {
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "Bearer token required",
+      });
     }
 
+    const decoded = jwt.verify(token, JWT_SECRET);
 
-def wallet_json(wallet):
-    return {
-        "id": wallet["id"],
-        "user_id": wallet["user_id"],
-        "address": wallet["address"],
-        "balance": round(float(wallet["balance"]), 8),
-        "created_at": wallet["created_at"]
+    const result = await pool.query(
+      `
+      SELECT id, username, created_at
+      FROM users
+      WHERE id = $1
+      LIMIT 1
+      `,
+      [decoded.userId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        error: "Unauthorized",
+        message: "User not found",
+      });
     }
 
+    req.user = result.rows[0];
 
-def find_wallet_for_user(wallet_id, user_id):
-    connection = db()
+    next();
+  } catch (error) {
+    console.error("AUTH ERROR:", error.message);
 
-    wallet = connection.execute("""
-        SELECT *
-        FROM wallets
-        WHERE id = ? AND user_id = ?
-    """, (
-        wallet_id,
-        user_id
-    )).fetchone()
+    return res.status(401).json({
+      error: "Unauthorized",
+      message: "Invalid or expired token",
+    });
+  }
+}
 
-    connection.close()
+// ============================================================
+// DATABASE INIT
+// ============================================================
 
-    return wallet
+async function initDatabase() {
+  if (!DATABASE_URL) {
+    throw new Error("DATABASE_URL is missing.");
+  }
 
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      username VARCHAR(64) UNIQUE NOT NULL,
+      password_hash TEXT NOT NULL,
+      recovery_code_hash TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 
-def get_total_supply():
-    connection = db()
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS wallets (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      address VARCHAR(36) UNIQUE NOT NULL,
+      name VARCHAR(100) NOT NULL DEFAULT 'SLX Wallet',
+      balance NUMERIC(30,8) NOT NULL DEFAULT 0,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 
-    row = connection.execute("""
-        SELECT COALESCE(SUM(balance), 0) AS total
-        FROM wallets
-    """).fetchone()
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS transactions (
+      id SERIAL PRIMARY KEY,
+      tx_hash VARCHAR(100) UNIQUE NOT NULL,
+      type VARCHAR(30) NOT NULL,
+      from_wallet INTEGER REFERENCES wallets(id) ON DELETE SET NULL,
+      to_wallet INTEGER REFERENCES wallets(id) ON DELETE SET NULL,
+      amount NUMERIC(30,8) NOT NULL DEFAULT 0,
+      fee NUMERIC(30,8) NOT NULL DEFAULT 0,
+      block_id INTEGER,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 
-    connection.close()
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS blocks (
+      id SERIAL PRIMARY KEY,
+      block_index INTEGER UNIQUE NOT NULL,
+      timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      hash VARCHAR(120) UNIQUE NOT NULL,
+      previous_hash VARCHAR(120),
+      transaction_count INTEGER NOT NULL DEFAULT 0
+    );
+  `);
 
-    return float(row["total"] or 0)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS faucet_claims (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      wallet_id INTEGER NOT NULL REFERENCES wallets(id) ON DELETE CASCADE,
+      claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
 
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_wallets_user_id
+    ON wallets(user_id);
+  `);
 
-# =========================================================
-# BLOCKCHAIN
-# =========================================================
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_transactions_from_wallet
+    ON transactions(from_wallet);
+  `);
 
-def add_block(transaction_count=0):
-    connection = db()
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_transactions_to_wallet
+    ON transactions(to_wallet);
+  `);
 
-    previous = connection.execute("""
-        SELECT *
-        FROM blocks
-        ORDER BY block_index DESC
-        LIMIT 1
-    """).fetchone()
+  await pool.query(`
+    CREATE INDEX IF NOT EXISTS idx_blocks_index
+    ON blocks(block_index);
+  `);
 
-    block_index = int(previous["block_index"]) + 1
-    timestamp = now_iso()
-    previous_hash = previous["hash"]
+  // Genesis block
+  const genesis = await pool.query(`
+    SELECT id
+    FROM blocks
+    WHERE block_index = 0
+    LIMIT 1
+  `);
 
-    block_hash = calculate_block_hash(
+  if (genesis.rows.length === 0) {
+    await pool.query(
+      `
+      INSERT INTO blocks (
         block_index,
         timestamp,
+        hash,
         previous_hash,
         transaction_count
+      )
+      VALUES (
+        0,
+        NOW(),
+        $1,
+        NULL,
+        0
+      )
+      `,
+      ["SLX_GENESIS_1.8.2"]
+    );
+  }
+
+  console.log("Database initialized.");
+}
+
+// ============================================================
+// BLOCK CREATION
+// ============================================================
+
+async function createBlock(client, transactionCount = 1) {
+  const lastBlock = await client.query(`
+    SELECT
+      block_index,
+      hash
+    FROM blocks
+    ORDER BY block_index DESC
+    LIMIT 1
+  `);
+
+  let nextIndex = 1;
+  let previousHash = null;
+
+  if (lastBlock.rows.length > 0) {
+    nextIndex = Number(lastBlock.rows[0].block_index) + 1;
+    previousHash = lastBlock.rows[0].hash;
+  }
+
+  const hash = generateBlockHash();
+
+  const result = await client.query(
+    `
+    INSERT INTO blocks (
+      block_index,
+      timestamp,
+      hash,
+      previous_hash,
+      transaction_count
     )
+    VALUES ($1, NOW(), $2, $3, $4)
+    RETURNING *
+    `,
+    [
+      nextIndex,
+      hash,
+      previousHash,
+      transactionCount,
+    ]
+  );
 
-    connection.execute("""
-        INSERT INTO blocks
-        (
-            block_index,
-            timestamp,
-            previous_hash,
-            hash,
-            transaction_count
+  return result.rows[0];
+}
+
+// ============================================================
+// HEALTH
+// ============================================================
+
+app.get("/health", async (req, res) => {
+  try {
+    await pool.query("SELECT 1");
+
+    res.json({
+      status: "ok",
+      version: VERSION,
+      network: NETWORK_NAME,
+      database: "connected",
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: "error",
+      version: VERSION,
+      network: NETWORK_NAME,
+      database: "disconnected",
+      message: error.message,
+    });
+  }
+});
+
+// ============================================================
+// STATUS
+// ============================================================
+
+app.get("/api/status", async (req, res) => {
+  try {
+    const blockResult = await pool.query(`
+      SELECT block_index
+      FROM blocks
+      ORDER BY block_index DESC
+      LIMIT 1
+    `);
+
+    const height =
+      blockResult.rows.length > 0
+        ? Number(blockResult.rows[0].block_index)
+        : 0;
+
+    res.json({
+      name: "SLX Network",
+      version: VERSION,
+      network: NETWORK_NAME,
+      status: "online",
+      message: "SLX Network server is running",
+      networkInfo: {
+        version: VERSION,
+        height,
+        transferFee: TRANSFER_FEE,
+      },
+      network_info: {
+        version: VERSION,
+        height,
+        transferFee: TRANSFER_FEE,
+      },
+    });
+  } catch (error) {
+    console.error("STATUS ERROR:", error);
+
+    res.status(500).json({
+      error: "Failed to get status",
+    });
+  }
+});
+
+// ============================================================
+// REGISTER
+// ============================================================
+
+app.post("/api/auth/register", async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body.username);
+    const password = String(req.body.password || "");
+
+    if (!username) {
+      return res.status(400).json({
+        error: "Username is required",
+      });
+    }
+
+    if (username.length < 3 || username.length > 64) {
+      return res.status(400).json({
+        error: "Username must contain 3-64 characters",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        error: "Password must contain at least 6 characters",
+      });
+    }
+
+    const existing = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE LOWER(username) = LOWER($1)
+      LIMIT 1
+      `,
+      [username]
+    );
+
+    if (existing.rows.length > 0) {
+      return res.status(409).json({
+        error: "Username already exists",
+      });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    const recoveryCode = generateRecoveryCode();
+
+    const recoveryHash = await bcrypt.hash(
+      recoveryCode,
+      12
+    );
+
+    const client = await pool.connect();
+
+    try {
+      await client.query("BEGIN");
+
+      const userResult = await client.query(
+        `
+        INSERT INTO users (
+          username,
+          password_hash,
+          recovery_code_hash
         )
-        VALUES (?, ?, ?, ?, ?)
-    """, (
-        block_index,
-        timestamp,
-        previous_hash,
-        block_hash,
-        transaction_count
-    ))
+        VALUES ($1, $2, $3)
+        RETURNING id, username, created_at
+        `,
+        [
+          username,
+          passwordHash,
+          recoveryHash,
+        ]
+      );
 
-    connection.commit()
-    connection.close()
+      const user = userResult.rows[0];
 
-    return block_hash
+      const address = generateWalletAddress();
 
-
-def verify_chain():
-    connection = db()
-
-    blocks = connection.execute("""
-        SELECT *
-        FROM blocks
-        ORDER BY block_index ASC
-    """).fetchall()
-
-    connection.close()
-
-    if not blocks:
-        return False
-
-    previous_hash = "0" * 64
-
-    for block in blocks:
-
-        expected = calculate_block_hash(
-            block["block_index"],
-            block["timestamp"],
-            previous_hash,
-            block["transaction_count"]
+      const walletResult = await client.query(
+        `
+        INSERT INTO wallets (
+          user_id,
+          address,
+          name,
+          balance
         )
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+        `,
+        [
+          user.id,
+          address,
+          "Main Wallet",
+          0,
+        ]
+      );
 
-        if block["previous_hash"] != previous_hash:
-            return False
+      await client.query("COMMIT");
 
-        if block["hash"] != expected:
-            return False
+      const token = signToken(user);
 
-        previous_hash = block["hash"]
+      return res.status(201).json({
+        success: true,
+        message: "Account created successfully",
 
-    return True
+        token,
+        accessToken: token,
 
+        recoveryCode,
+        recovery_code: recoveryCode,
 
-# =========================================================
-# ROOT
-# =========================================================
+        user: publicUser(user),
 
-@app.route("/")
-def index():
-    return send_from_directory(BASE_DIR, "index.html")
+        wallet: walletResult.rows[0],
+      });
+    } catch (error) {
+      await client.query("ROLLBACK");
+      throw error;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error("REGISTER ERROR:", error);
 
+    res.status(500).json({
+      error: "Registration failed",
+      message: error.message,
+    });
+  }
+});
 
-@app.route("/health")
-def health():
-    return jsonify({
-        "status": "online",
-        "version": VERSION,
-        "network": NETWORK
-    })
+// ============================================================
+// LOGIN
+// ============================================================
 
+app.post("/api/auth/login", async (req, res) => {
+  try {
+    const username = normalizeUsername(req.body.username);
+    const password = String(req.body.password || "");
 
-# =========================================================
-# AUTH
-# =========================================================
-
-@app.post("/api/auth/register")
-def register():
-
-    data = request.get_json(silent=True) or {}
-
-    username = clean_username(data.get("username"))
-    password = data.get("password", "")
-
-    if not valid_username(username):
-        return json_error(
-            "Имя пользователя должно содержать 3–32 символа."
-        )
-
-    if not valid_password(password):
-        return json_error(
-            "Пароль должен содержать минимум 6 символов."
-        )
-
-    connection = db()
-
-    exists = connection.execute("""
-        SELECT id
-        FROM users
-        WHERE LOWER(username) = LOWER(?)
-    """, (username,)).fetchone()
-
-    if exists:
-        connection.close()
-        return json_error(
-            "Такой пользователь уже существует.",
-            409
-        )
-
-    recovery_code = generate_recovery_code()
-
-    password_hash = generate_password_hash(password)
-
-    created_at = now_iso()
-
-    cursor = connection.cursor()
-
-    cursor.execute("""
-        INSERT INTO users
-        (
-            username,
-            password_hash,
-            recovery_code,
-            created_at
-        )
-        VALUES (?, ?, ?, ?)
-    """, (
+    const result = await pool.query(
+      `
+      SELECT
+        id,
         username,
         password_hash,
-        recovery_code,
         created_at
-    ))
+      FROM users
+      WHERE LOWER(username) = LOWER($1)
+      LIMIT 1
+      `,
+      [username]
+    );
 
-    user_id = cursor.lastrowid
+    if (result.rows.length === 0) {
+      return res.status(401).json({
+        error: "Invalid username or password",
+      });
+    }
 
-    # Первый кошелек
-    address = generate_wallet_address()
+    const user = result.rows[0];
 
-    cursor.execute("""
-        INSERT INTO wallets
-        (
-            user_id,
-            address,
-            balance,
-            created_at
-        )
-        VALUES (?, ?, ?, ?)
-    """, (
-        user_id,
-        address,
-        0,
-        created_at
-    ))
+    const validPassword = await bcrypt.compare(
+      password,
+      user.password_hash
+    );
 
-    connection.commit()
+    if (!validPassword) {
+      return res.status(401).json({
+        error: "Invalid username or password",
+      });
+    }
 
-    user = connection.execute("""
-        SELECT *
-        FROM users
-        WHERE id = ?
-    """, (user_id,)).fetchone()
+    const token = signToken(user);
 
-    connection.close()
+    res.json({
+      success: true,
+      token,
+      accessToken: token,
+      user: publicUser(user),
+    });
+  } catch (error) {
+    console.error("LOGIN ERROR:", error);
 
-    token = create_token(user_id)
+    res.status(500).json({
+      error: "Login failed",
+      message: error.message,
+    });
+  }
+});
 
-    return jsonify({
-        "ok": True,
-        "token": token,
-        "accessToken": token,
-        "recoveryCode": recovery_code,
-        "recovery_code": recovery_code,
-        "user": user_json(user)
-    })
+// ============================================================
+// ME
+// ============================================================
 
-
-@app.post("/api/auth/login")
-def login():
-
-    data = request.get_json(silent=True) or {}
-
-    username = clean_username(data.get("username"))
-    password = data.get("password", "")
-
-    connection = db()
-
-    user = connection.execute("""
-        SELECT *
-        FROM users
-        WHERE LOWER(username) = LOWER(?)
-    """, (username,)).fetchone()
-
-    connection.close()
-
-    if not user:
-        return json_error(
-            "Неверный логин или пароль.",
-            401
-        )
-
-    if not check_password_hash(
-        user["password_hash"],
-        password
-    ):
-        return json_error(
-            "Неверный логин или пароль.",
-            401
-        )
-
-    token = create_token(user["id"])
-
-    return jsonify({
-        "ok": True,
-        "token": token,
-        "accessToken": token,
-        "user": user_json(user)
-    })
-
-
-@app.get("/api/auth/me")
-@auth_required
-def me():
-
-    return jsonify({
-        "user": user_json(request.current_user)
-    })
-
-
-@app.post("/api/auth/logout")
-@auth_required
-def logout():
-
-    connection = db()
-
-    connection.execute("""
-        DELETE FROM sessions
-        WHERE token = ?
-    """, (
-        request.current_token,
-    ))
-
-    connection.commit()
-    connection.close()
-
-    return jsonify({
-        "ok": True
-    })
-
-
-@app.post("/api/auth/password/change")
-@auth_required
-def change_password():
-
-    data = request.get_json(silent=True) or {}
-
-    current_password = data.get("currentPassword", "")
-    new_password = data.get("newPassword", "")
-
-    user = request.current_user
-
-    if not check_password_hash(
-        user["password_hash"],
-        current_password
-    ):
-        return json_error(
-            "Текущий пароль неверный.",
-            400
-        )
-
-    if not valid_password(new_password):
-        return json_error(
-            "Новый пароль должен содержать минимум 6 символов."
-        )
-
-    password_hash = generate_password_hash(new_password)
-
-    connection = db()
-
-    connection.execute("""
-        UPDATE users
-        SET password_hash = ?
-        WHERE id = ?
-    """, (
-        password_hash,
-        user["id"]
-    ))
-
-    connection.commit()
-    connection.close()
-
-    # Новый токен
-    new_token = create_token(user["id"])
-
-    return jsonify({
-        "ok": True,
-        "token": new_token,
-        "accessToken": new_token
-    })
-
-
-@app.post("/api/auth/recovery/reset")
-def recovery_reset():
-
-    data = request.get_json(silent=True) or {}
-
-    username = clean_username(data.get("username"))
-    recovery_code = str(
-        data.get("recoveryCode", "")
-    ).strip().upper()
-
-    new_password = data.get(
-        "newPassword",
-        ""
-    )
-
-    if not valid_password(new_password):
-        return json_error(
-            "Новый пароль должен содержать минимум 6 символов."
-        )
-
-    connection = db()
-
-    user = connection.execute("""
-        SELECT *
-        FROM users
-        WHERE LOWER(username) = LOWER(?)
-    """, (username,)).fetchone()
-
-    if not user:
-        connection.close()
-        return json_error(
-            "Пользователь не найден.",
-            404
-        )
-
-    if not hmac.compare_digest(
-        user["recovery_code"],
-        recovery_code
-    ):
-        connection.close()
-        return json_error(
-            "Неверный код восстановления.",
-            400
-        )
-
-    password_hash = generate_password_hash(
-        new_password
-    )
-
-    connection.execute("""
-        UPDATE users
-        SET password_hash = ?
-        WHERE id = ?
-    """, (
-        password_hash,
-        user["id"]
-    ))
-
-    connection.commit()
-    connection.close()
-
-    token = create_token(user["id"])
-
-    return jsonify({
-        "ok": True,
-        "token": token,
-        "accessToken": token
-    })
-
-
-# =========================================================
-# WALLETS
-# =========================================================
-
-@app.get("/api/wallets")
-@auth_required
-def wallets():
-
-    connection = db()
-
-    rows = connection.execute("""
-        SELECT *
+app.get(
+  "/api/auth/me",
+  authRequired,
+  async (req, res) => {
+    try {
+      const wallets = await pool.query(
+        `
+        SELECT
+          id,
+          user_id,
+          address,
+          name,
+          balance,
+          created_at
         FROM wallets
-        WHERE user_id = ?
+        WHERE user_id = $1
         ORDER BY id ASC
-    """, (
-        request.current_user["id"],
-    )).fetchall()
+        `,
+        [req.user.id]
+      );
 
-    connection.close()
+      res.json({
+        success: true,
+        user: publicUser(req.user),
+        wallets: wallets.rows,
+      });
+    } catch (error) {
+      console.error("ME ERROR:", error);
 
-    return jsonify({
-        "wallets": [
-            wallet_json(wallet)
-            for wallet in rows
-        ]
-    })
+      res.status(500).json({
+        error: "Failed to load profile",
+      });
+    }
+  }
+);
 
+// ============================================================
+// RECOVERY RESET
+// ============================================================
 
-@app.post("/api/wallet/create")
-@auth_required
-def create_wallet():
+app.post(
+  "/api/auth/recovery/reset",
+  async (req, res) => {
+    try {
+      const username = normalizeUsername(
+        req.body.username
+      );
 
-    address = generate_wallet_address()
+      const recoveryCode = String(
+        req.body.recoveryCode ||
+          req.body.recovery_code ||
+          ""
+      )
+        .trim()
+        .toUpperCase();
 
-    connection = db()
+      const newPassword = String(
+        req.body.newPassword || ""
+      );
 
-    cursor = connection.cursor()
+      if (!username || !recoveryCode) {
+        return res.status(400).json({
+          error: "Username and recovery code are required",
+        });
+      }
 
-    cursor.execute("""
-        INSERT INTO wallets
-        (
-            user_id,
-            address,
-            balance,
-            created_at
-        )
-        VALUES (?, ?, ?, ?)
-    """, (
-        request.current_user["id"],
-        address,
-        0,
-        now_iso()
-    ))
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          error:
+            "New password must contain at least 6 characters",
+        });
+      }
 
-    wallet_id = cursor.lastrowid
-
-    connection.commit()
-
-    wallet = connection.execute("""
+      const result = await pool.query(
+        `
         SELECT *
+        FROM users
+        WHERE LOWER(username) = LOWER($1)
+        LIMIT 1
+        `,
+        [username]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(400).json({
+          error: "Invalid recovery data",
+        });
+      }
+
+      const user = result.rows[0];
+
+      const validRecovery = await bcrypt.compare(
+        recoveryCode,
+        user.recovery_code_hash || ""
+      );
+
+      if (!validRecovery) {
+        return res.status(400).json({
+          error: "Invalid recovery data",
+        });
+      }
+
+      const newHash = await bcrypt.hash(
+        newPassword,
+        12
+      );
+
+      await pool.query(
+        `
+        UPDATE users
+        SET password_hash = $1
+        WHERE id = $2
+        `,
+        [newHash, user.id]
+      );
+
+      const token = signToken(user);
+
+      res.json({
+        success: true,
+        message: "Password reset successfully",
+        token,
+        accessToken: token,
+        user: publicUser(user),
+      });
+    } catch (error) {
+      console.error("RECOVERY ERROR:", error);
+
+      res.status(500).json({
+        error: "Recovery failed",
+      });
+    }
+  }
+);
+
+// ============================================================
+// CHANGE PASSWORD
+// ============================================================
+
+app.post(
+  "/api/auth/password/change",
+  authRequired,
+  async (req, res) => {
+    try {
+      const currentPassword = String(
+        req.body.currentPassword || ""
+      );
+
+      const newPassword = String(
+        req.body.newPassword || ""
+      );
+
+      if (newPassword.length < 6) {
+        return res.status(400).json({
+          error:
+            "New password must contain at least 6 characters",
+        });
+      }
+
+      const result = await pool.query(
+        `
+        SELECT password_hash
+        FROM users
+        WHERE id = $1
+        `,
+        [req.user.id]
+      );
+
+      const valid = await bcrypt.compare(
+        currentPassword,
+        result.rows[0].password_hash
+      );
+
+      if (!valid) {
+        return res.status(400).json({
+          error: "Current password is incorrect",
+        });
+      }
+
+      const newHash = await bcrypt.hash(
+        newPassword,
+        12
+      );
+
+      await pool.query(
+        `
+        UPDATE users
+        SET password_hash = $1
+        WHERE id = $2
+        `,
+        [newHash, req.user.id]
+      );
+
+      const token = signToken(req.user);
+
+      res.json({
+        success: true,
+        message: "Password changed successfully",
+        token,
+        accessToken: token,
+      });
+    } catch (error) {
+      console.error("CHANGE PASSWORD ERROR:", error);
+
+      res.status(500).json({
+        error: "Password change failed",
+      });
+    }
+  }
+);
+
+// ============================================================
+// LOGOUT
+// ============================================================
+
+app.post(
+  "/api/auth/logout",
+  authRequired,
+  async (req, res) => {
+    res.json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  }
+);
+
+// ============================================================
+// GET WALLETS
+// ============================================================
+
+app.get(
+  "/api/wallets",
+  authRequired,
+  async (req, res) => {
+    try {
+      const result = await pool.query(
+        `
+        SELECT
+          id,
+          user_id,
+          address,
+          name,
+          balance,
+          created_at
         FROM wallets
-        WHERE id = ?
-    """, (
-        wallet_id,
-    )).fetchone()
+        WHERE user_id = $1
+        ORDER BY id ASC
+        `,
+        [req.user.id]
+      );
 
-    connection.close()
+      res.json({
+        success: true,
+        wallets: result.rows,
+      });
+    } catch (error) {
+      console.error("WALLETS ERROR:", error);
 
-    return jsonify({
-        "ok": True,
-        "wallet": wallet_json(wallet)
-    })
+      res.status(500).json({
+        error: "Failed to load wallets",
+      });
+    }
+  }
+);
 
+// ============================================================
+// CREATE WALLET
+// ============================================================
 
-@app.post("/api/wallet/select")
-@auth_required
-def select_wallet():
+app.post(
+  "/api/wallet/create",
+  authRequired,
+  async (req, res) => {
+    try {
+      let address;
 
-    data = request.get_json(silent=True) or {}
+      // Protect against an extremely unlikely duplicate.
+      for (let i = 0; i < 5; i++) {
+        address = generateWalletAddress();
 
-    wallet_id = data.get("walletId")
+        const exists = await pool.query(
+          `
+          SELECT id
+          FROM wallets
+          WHERE address = $1
+          `,
+          [address]
+        );
 
-    if not wallet_id:
-        return json_error(
-            "Не указан кошелёк."
-        )
-
-    wallet = find_wallet_for_user(
-        wallet_id,
-        request.current_user["id"]
-    )
-
-    if not wallet:
-        return json_error(
-            "Кошелёк не найден.",
-            404
-        )
-
-    return jsonify({
-        "ok": True,
-        "wallet": wallet_json(wallet)
-    })
-
-
-@app.get("/api/wallet/<int:wallet_id>")
-@auth_required
-def wallet_details(wallet_id):
-
-    wallet = find_wallet_for_user(
-        wallet_id,
-        request.current_user["id"]
-    )
-
-    if not wallet:
-        return json_error(
-            "Кошелёк не найден.",
-            404
-        )
-
-    connection = db()
-
-    transactions = connection.execute("""
-        SELECT *
-        FROM transactions
-        WHERE from_wallet = ?
-           OR to_wallet = ?
-        ORDER BY id DESC
-        LIMIT 100
-    """, (
-        wallet["address"],
-        wallet["address"]
-    )).fetchall()
-
-    connection.close()
-
-    return jsonify({
-        **wallet_json(wallet),
-        "wallet": wallet_json(wallet),
-        "transactions": [
-            dict(tx)
-            for tx in transactions
-        ],
-        "history": [
-            dict(tx)
-            for tx in transactions
-        ]
-    })
-
-
-# =========================================================
-# SEND
-# =========================================================
-
-@app.post("/api/send")
-@auth_required
-def send():
-
-    data = request.get_json(silent=True) or {}
-
-    from_wallet_id = data.get("fromWalletId")
-    to_address = str(
-        data.get("toAddress", "")
-    ).strip().upper()
-
-    try:
-        amount = float(data.get("amount"))
-    except:
-        return json_error(
-            "Некорректная сумма."
-        )
-
-    if not from_wallet_id:
-        return json_error(
-            "Не указан отправляющий кошелёк."
-        )
-
-    if amount <= 0:
-        return json_error(
-            "Сумма должна быть больше 0."
-        )
-
-    if amount > 1_000_000_000:
-        return json_error(
-            "Слишком большая сумма."
-        )
-
-    # SLX address
-    if len(to_address) != 36 or not to_address.startswith("SLXC"):
-        return json_error(
-            "Некорректный адрес SLX."
-        )
-
-    try:
-        int(to_address[4:], 16)
-    except:
-        return json_error(
-            "Некорректный адрес SLX."
-        )
-
-    from_wallet = find_wallet_for_user(
-        from_wallet_id,
-        request.current_user["id"]
-    )
-
-    if not from_wallet:
-        return json_error(
-            "Кошелёк отправителя не найден.",
-            404
-        )
-
-    if to_address == from_wallet["address"]:
-        return json_error(
-            "Нельзя отправить самому себе."
-        )
-
-    connection = db()
-
-    to_wallet = connection.execute("""
-        SELECT *
-        FROM wallets
-        WHERE address = ?
-    """, (
-        to_address,
-    )).fetchone()
-
-    if not to_wallet:
-        connection.close()
-        return json_error(
-            "Кошелёк получателя не найден.",
-            404
-        )
-
-    balance = float(from_wallet["balance"])
-
-    if amount + TRANSFER_FEE > balance:
-        connection.close()
-        return json_error(
-            "Недостаточно SLX с учётом комиссии."
-        )
-
-    timestamp = now_iso()
-
-    tx_hash = generate_tx_hash({
-        "type": "TRANSFER",
-        "from": from_wallet["address"],
-        "to": to_address,
-        "amount": amount,
-        "fee": TRANSFER_FEE,
-        "timestamp": timestamp,
-        "nonce": secrets.token_hex(8)
-    })
-
-    connection.execute("""
-        UPDATE wallets
-        SET balance = balance - ?
-        WHERE id = ?
-    """, (
-        amount + TRANSFER_FEE,
-        from_wallet["id"]
-    ))
-
-    connection.execute("""
-        UPDATE wallets
-        SET balance = balance + ?
-        WHERE id = ?
-    """, (
-        amount,
-        to_wallet["id"]
-    ))
-
-    connection.execute("""
-        INSERT INTO transactions
-        (
-            tx_hash,
-            type,
-            from_wallet,
-            to_wallet,
-            amount,
-            fee,
-            created_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        tx_hash,
-        "TRANSFER",
-        from_wallet["address"],
-        to_address,
-        amount,
-        TRANSFER_FEE,
-        timestamp
-    ))
-
-    connection.commit()
-
-    tx_id = connection.execute(
-        "SELECT last_insert_rowid()"
-    ).fetchone()[0]
-
-    connection.close()
-
-    block_hash = add_block(1)
-
-    connection = db()
-
-    connection.execute("""
-        UPDATE transactions
-        SET block_id = (
-            SELECT id
-            FROM blocks
-            WHERE hash = ?
-        )
-        WHERE id = ?
-    """, (
-        block_hash,
-        tx_id
-    ))
-
-    connection.commit()
-    connection.close()
-
-    return jsonify({
-        "ok": True,
-        "tx": {
-            "id": tx_id,
-            "hash": tx_hash,
-            "type": "TRANSFER",
-            "from_wallet": from_wallet["address"],
-            "to_wallet": to_address,
-            "amount": amount,
-            "fee": TRANSFER_FEE,
-            "created_at": timestamp
+        if (exists.rows.length === 0) {
+          break;
         }
-    })
+      }
 
-
-# =========================================================
-# FAUCET
-# =========================================================
-
-@app.post("/api/faucet")
-@auth_required
-def faucet():
-
-    data = request.get_json(silent=True) or {}
-
-    wallet_id = data.get("walletId")
-
-    wallet = find_wallet_for_user(
-        wallet_id,
-        request.current_user["id"]
-    )
-
-    if not wallet:
-        return json_error(
-            "Кошелёк не найден.",
-            404
+      const result = await pool.query(
+        `
+        INSERT INTO wallets (
+          user_id,
+          address,
+          name,
+          balance
         )
+        VALUES ($1, $2, $3, $4)
+        RETURNING *
+        `,
+        [
+          req.user.id,
+          address,
+          "SLX Wallet",
+          0,
+        ]
+      );
 
-    connection = db()
+      res.status(201).json({
+        success: true,
+        wallet: result.rows[0],
+      });
+    } catch (error) {
+      console.error("CREATE WALLET ERROR:", error);
 
-    last_claim = connection.execute("""
+      res.status(500).json({
+        error: "Failed to create wallet",
+      });
+    }
+  }
+);
+
+// ============================================================
+// SELECT WALLET
+// ============================================================
+
+app.post(
+  "/api/wallet/select",
+  authRequired,
+  async (req, res) => {
+    try {
+      const walletId = Number(
+        req.body.walletId ||
+          req.body.wallet_id
+      );
+
+      if (!Number.isInteger(walletId)) {
+        return res.status(400).json({
+          error: "Invalid wallet ID",
+        });
+      }
+
+      const result = await pool.query(
+        `
+        SELECT *
+        FROM wallets
+        WHERE id = $1
+          AND user_id = $2
+        LIMIT 1
+        `,
+        [
+          walletId,
+          req.user.id,
+        ]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({
+          error: "Wallet not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        wallet: result.rows[0],
+      });
+    } catch (error) {
+      console.error("SELECT WALLET ERROR:", error);
+
+      res.status(500).json({
+        error: "Failed to select wallet",
+      });
+    }
+  }
+);
+
+// ============================================================
+// WALLET DETAILS + HISTORY
+// ============================================================
+
+app.get(
+  "/api/wallet/:id",
+  authRequired,
+  async (req, res) => {
+    try {
+      const walletId = Number(req.params.id);
+
+      if (!Number.isInteger(walletId)) {
+        return res.status(400).json({
+          error: "Invalid wallet ID",
+        });
+      }
+
+      const walletResult = await pool.query(
+        `
+        SELECT
+          id,
+          user_id,
+          address,
+          name,
+          balance,
+          created_at
+        FROM wallets
+        WHERE id = $1
+          AND user_id = $2
+        LIMIT 1
+        `,
+        [
+          walletId,
+          req.user.id,
+        ]
+      );
+
+      if (walletResult.rows.length === 0) {
+        return res.status(404).json({
+          error: "Wallet not found",
+        });
+      }
+
+      const wallet = walletResult.rows[0];
+
+      const txResult = await pool.query(
+        `
+        SELECT
+          t.id,
+          t.tx_hash,
+          t.type,
+          t.from_wallet,
+          t.to_wallet,
+          t.amount,
+          t.fee,
+          t.created_at,
+          t.block_id,
+
+          fw.address AS from_address,
+          tw.address AS to_address
+
+        FROM transactions t
+
+        LEFT JOIN wallets fw
+          ON fw.id = t.from_wallet
+
+        LEFT JOIN wallets tw
+          ON tw.id = t.to_wallet
+
+        WHERE
+          t.from_wallet = $1
+          OR
+          t.to_wallet = $1
+
+        ORDER BY t.created_at DESC
+
+        LIMIT 100
+        `,
+        [walletId]
+      );
+
+      res.json({
+        ...wallet,
+        transactions: txResult.rows,
+      });
+    } catch (error) {
+      console.error("WALLET DETAILS ERROR:", error);
+
+      res.status(500).json({
+        error: "Failed to load wallet",
+      });
+    }
+  }
+);
+
+// ============================================================
+// SEND SLX
+// ============================================================
+
+app.post(
+  "/api/send",
+  authRequired,
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const fromWalletId = Number(
+        req.body.fromWalletId ||
+          req.body.from_wallet_id
+      );
+
+      const toAddress = normalizeAddress(
+        req.body.toAddress ||
+          req.body.to_address
+      );
+
+      const amount = Number(req.body.amount);
+
+      if (!Number.isInteger(fromWalletId)) {
+        return res.status(400).json({
+          error: "Invalid sender wallet",
+        });
+      }
+
+      if (!isValidWalletAddress(toAddress)) {
+        return res.status(400).json({
+          error: "Invalid SLX address",
+        });
+      }
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        return res.status(400).json({
+          error: "Amount must be greater than 0",
+        });
+      }
+
+      const cleanAmount = roundAmount(amount);
+      const fee = TRANSFER_FEE;
+      const total = roundAmount(
+        cleanAmount + fee
+      );
+
+      await client.query("BEGIN");
+
+      // Lock sender wallet.
+      const senderResult = await client.query(
+        `
+        SELECT *
+        FROM wallets
+        WHERE id = $1
+          AND user_id = $2
+        FOR UPDATE
+        `,
+        [
+          fromWalletId,
+          req.user.id,
+        ]
+      );
+
+      if (senderResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+
+        return res.status(404).json({
+          error: "Sender wallet not found",
+        });
+      }
+
+      const sender = senderResult.rows[0];
+
+      const senderBalance = Number(
+        sender.balance
+      );
+
+      if (senderBalance < total) {
+        await client.query("ROLLBACK");
+
+        return res.status(400).json({
+          error: "Insufficient balance",
+          balance: senderBalance,
+          required: total,
+        });
+      }
+
+      // Find recipient.
+      const recipientResult = await client.query(
+        `
+        SELECT *
+        FROM wallets
+        WHERE address = $1
+        FOR UPDATE
+        `,
+        [toAddress]
+      );
+
+      if (recipientResult.rows.length === 0) {
+        await client.query("ROLLBACK");
+
+        return res.status(404).json({
+          error: "Recipient wallet not found",
+        });
+      }
+
+      const recipient = recipientResult.rows[0];
+
+      if (recipient.id === sender.id) {
+        await client.query("ROLLBACK");
+
+        return res.status(400).json({
+          error: "Cannot send to the same wallet",
+        });
+      }
+
+      // Debit sender.
+      await client.query(
+        `
+        UPDATE wallets
+        SET balance = balance - $1
+        WHERE id = $2
+        `,
+        [
+          total,
+          sender.id,
+        ]
+      );
+
+      // Credit recipient.
+      await client.query(
+        `
+        UPDATE wallets
+        SET balance = balance + $1
+        WHERE id = $2
+        `,
+        [
+          cleanAmount,
+          recipient.id,
+        ]
+      );
+
+      const txHash = generateTxHash();
+
+      const txResult = await client.query(
+        `
+        INSERT INTO transactions (
+          tx_hash,
+          type,
+          from_wallet,
+          to_wallet,
+          amount,
+          fee
+        )
+        VALUES (
+          $1,
+          $2,
+          $3,
+          $4,
+          $5,
+          $6
+        )
+        RETURNING *
+        `,
+        [
+          txHash,
+          "TRANSFER",
+          sender.id,
+          recipient.id,
+          cleanAmount,
+          fee,
+        ]
+      );
+
+      const block = await createBlock(
+        client,
+        1
+      );
+
+      await client.query(
+        `
+        UPDATE transactions
+        SET block_id = $1
+        WHERE id = $2
+        `,
+        [
+          block.id,
+          txResult.rows[0].id,
+        ]
+      );
+
+      await client.query("COMMIT");
+
+      res.json({
+        success: true,
+        message: "Transaction completed",
+        transaction: {
+          ...txResult.rows[0],
+          block_id: block.id,
+          block_index: block.block_index,
+        },
+        tx_hash: txHash,
+        fee,
+        amount: cleanAmount,
+      });
+    } catch (error) {
+      await client.query("ROLLBACK");
+
+      console.error("SEND ERROR:", error);
+
+      res.status(500).json({
+        error: "Transaction failed",
+        message: error.message,
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// ============================================================
+// FAUCET
+// ============================================================
+
+app.post(
+  "/api/faucet",
+  authRequired,
+  async (req, res) => {
+    const client = await pool.connect();
+
+    try {
+      const walletId = Number(
+        req.body.walletId ||
+          req.body.wallet_id
+      );
+
+      if (!Number.isInteger(walletId)) {
+        return res.status(400).json({
+          error: "Invalid wallet ID",
+        });
+      }
+
+      const walletResult = await client.query(
+        `
+        SELECT *
+        FROM wallets
+        WHERE id = $1
+          AND user_id = $2
+        FOR UPDATE
+        `,
+        [
+          walletId,
+          req.user.id,
+        ]
+      );
+
+      if (walletResult.rows.length === 0) {
+        return res.status(404).json({
+          error: "Wallet not found",
+        });
+      }
+
+      // Check cooldown.
+      const claimResult = await client.query(
+        `
         SELECT claimed_at
         FROM faucet_claims
-        WHERE wallet_id = ?
+        WHERE user_id = $1
         ORDER BY claimed_at DESC
         LIMIT 1
-    """, (
-        wallet["id"],
-    )).fetchone()
+        `,
+        [req.user.id]
+      );
 
-    now = int(time.time())
+      if (claimResult.rows.length > 0) {
+        const lastClaim = new Date(
+          claimResult.rows[0].claimed_at
+        );
 
-    if last_claim:
+        const cooldownMs =
+          FAUCET_COOLDOWN_HOURS *
+          60 *
+          60 *
+          1000;
 
-        elapsed = now - int(
-            last_claim["claimed_at"]
-        )
+        const remaining =
+          cooldownMs -
+          (Date.now() - lastClaim.getTime());
 
-        if elapsed < FAUCET_COOLDOWN:
+        if (remaining > 0) {
+          const hours = Math.ceil(
+            remaining / (60 * 60 * 1000)
+          );
 
-            remaining = FAUCET_COOLDOWN - elapsed
-
-            connection.close()
-
-            return json_error(
-                f"Faucet будет доступен через {remaining} секунд.",
-                429
-            )
-
-    current_supply = get_total_supply()
-
-    if current_supply + FAUCET_AMOUNT > MAX_SUPPLY:
-        connection.close()
-
-        return json_error(
-            "Достигнут максимальный Supply.",
-            400
-        )
-
-    timestamp = now_iso()
-
-    tx_hash = generate_tx_hash({
-        "type": "FAUCET",
-        "wallet": wallet["address"],
-        "amount": FAUCET_AMOUNT,
-        "timestamp": timestamp,
-        "nonce": secrets.token_hex(8)
-    })
-
-    connection.execute("""
-        UPDATE wallets
-        SET balance = balance + ?
-        WHERE id = ?
-    """, (
-        FAUCET_AMOUNT,
-        wallet["id"]
-    ))
-
-    connection.execute("""
-        INSERT INTO faucet_claims
-        (
-            wallet_id,
-            claimed_at
-        )
-        VALUES (?, ?)
-    """, (
-        wallet["id"],
-        now
-    ))
-
-    connection.execute("""
-        INSERT INTO transactions
-        (
-            tx_hash,
-            type,
-            from_wallet,
-            to_wallet,
-            amount,
-            fee,
-            created_at
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-    """, (
-        tx_hash,
-        "FAUCET",
-        "FAUCET",
-        wallet["address"],
-        FAUCET_AMOUNT,
-        0,
-        timestamp
-    ))
-
-    connection.commit()
-
-    tx_id = connection.execute(
-        "SELECT last_insert_rowid()"
-    ).fetchone()[0]
-
-    connection.close()
-
-    block_hash = add_block(1)
-
-    connection = db()
-
-    connection.execute("""
-        UPDATE transactions
-        SET block_id = (
-            SELECT id
-            FROM blocks
-            WHERE hash = ?
-        )
-        WHERE id = ?
-    """, (
-        block_hash,
-        tx_id
-    ))
-
-    connection.commit()
-    connection.close()
-
-    return jsonify({
-        "ok": True,
-        "amount": FAUCET_AMOUNT,
-        "cooldown": FAUCET_COOLDOWN,
-        "txHash": tx_hash
-    })
-
-
-# =========================================================
-# NETWORK STATUS
-# =========================================================
-
-@app.get("/api/status")
-def status():
-
-    connection = db()
-
-    latest = connection.execute("""
-        SELECT *
-        FROM blocks
-        ORDER BY block_index DESC
-        LIMIT 1
-    """).fetchone()
-
-    connection.close()
-
-    height = latest["block_index"] if latest else 0
-
-    return jsonify({
-        "status": "online",
-        "online": True,
-        "version": VERSION,
-        "network": {
-            "name": NETWORK,
-            "version": VERSION,
-            "status": "online",
-            "height": height,
-            "blockHeight": height,
-            "latestBlock": height,
-            "transferFee": TRANSFER_FEE,
-            "transfer_fee": TRANSFER_FEE
+          return res.status(429).json({
+            error: "Faucet cooldown active",
+            message:
+              `Try again in approximately ${hours} hour(s).`,
+            retryAfterSeconds: Math.ceil(
+              remaining / 1000
+            ),
+          });
         }
-    })
+      }
 
+      await client.query("BEGIN");
 
-@app.get("/api/economy")
-def economy():
+      await client.query(
+        `
+        UPDATE wallets
+        SET balance = balance + $1
+        WHERE id = $2
+        `,
+        [
+          FAUCET_AMOUNT,
+          walletId,
+        ]
+      );
 
-    total = get_total_supply()
+      const txHash = generateTxHash();
 
-    return jsonify({
-        "totalSupply": round(total, 8),
-        "total_supply": round(total, 8),
-        "supply": round(total, 8),
-        "maxSupply": MAX_SUPPLY,
-        "max_supply": MAX_SUPPLY,
-        "transferFee": TRANSFER_FEE,
-        "transfer_fee": TRANSFER_FEE,
-        "faucetAmount": FAUCET_AMOUNT
-    })
+      const txResult = await client.query(
+        `
+        INSERT INTO transactions (
+          tx_hash,
+          type,
+          from_wallet,
+          to_wallet,
+          amount,
+          fee
+        )
+        VALUES (
+          $1,
+          $2,
+          NULL,
+          $3,
+          $4,
+          0
+        )
+        RETURNING *
+        `,
+        [
+          txHash,
+          "FAUCET",
+          walletId,
+          FAUCET_AMOUNT,
+        ]
+      );
 
+      const block = await createBlock(
+        client,
+        1
+      );
 
-# =========================================================
-# BLOCKS
-# =========================================================
+      await client.query(
+        `
+        UPDATE transactions
+        SET block_id = $1
+        WHERE id = $2
+        `,
+        [
+          block.id,
+          txResult.rows[0].id,
+        ]
+      );
 
-@app.get("/api/blocks")
-def blocks():
+      await client.query(
+        `
+        INSERT INTO faucet_claims (
+          user_id,
+          wallet_id
+        )
+        VALUES ($1, $2)
+        `,
+        [
+          req.user.id,
+          walletId,
+        ]
+      );
 
-    connection = db()
+      await client.query("COMMIT");
 
-    rows = connection.execute("""
+      const updatedWallet = await pool.query(
+        `
         SELECT *
+        FROM wallets
+        WHERE id = $1
+        `,
+        [walletId]
+      );
+
+      res.json({
+        success: true,
+        message: `Faucet sent ${FAUCET_AMOUNT} SLX`,
+        amount: FAUCET_AMOUNT,
+        transaction: {
+          ...txResult.rows[0],
+          block_id: block.id,
+          block_index: block.block_index,
+        },
+        wallet: updatedWallet.rows[0],
+      });
+    } catch (error) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (_) {}
+
+      console.error("FAUCET ERROR:", error);
+
+      res.status(500).json({
+        error: "Faucet failed",
+        message: error.message,
+      });
+    } finally {
+      client.release();
+    }
+  }
+);
+
+// ============================================================
+// BLOCKS
+// ============================================================
+
+app.get(
+  "/api/blocks",
+  authRequired,
+  async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT
+          id,
+          block_index,
+          timestamp,
+          hash,
+          previous_hash,
+          transaction_count
         FROM blocks
         ORDER BY block_index DESC
-        LIMIT 100
-    """).fetchall()
+        LIMIT 50
+      `);
 
-    connection.close()
+      res.json({
+        success: true,
+        blocks: result.rows,
+      });
+    } catch (error) {
+      console.error("BLOCKS ERROR:", error);
 
-    return jsonify({
-        "blocks": [
-            dict(row)
-            for row in rows
-        ]
-    })
+      res.status(500).json({
+        error: "Failed to load blocks",
+      });
+    }
+  }
+);
 
+// ============================================================
+// ECONOMY
+// ============================================================
 
-@app.post("/api/chain/verify")
-@app.get("/api/chain/verify")
-def chain_verify():
+app.get(
+  "/api/economy",
+  authRequired,
+  async (req, res) => {
+    try {
+      const result = await pool.query(`
+        SELECT
+          COALESCE(
+            SUM(balance),
+            0
+          ) AS total_supply
+        FROM wallets
+      `);
 
-    valid = verify_chain()
+      const totalSupply = Number(
+        result.rows[0].total_supply || 0
+      );
 
-    return jsonify({
-        "valid": valid,
-        "verified": valid,
-        "status": "valid" if valid else "invalid"
-    })
+      res.json({
+        success: true,
 
+        totalSupply,
+        total_supply: totalSupply,
 
-# =========================================================
-# CATCH ERRORS
-# =========================================================
+        supply: totalSupply,
 
-@app.errorhandler(404)
-def not_found(error):
+        maxSupply: 1000000000,
+        max_supply: 1000000000,
 
-    if request.path.startswith("/api/"):
-        return json_error(
-            "API endpoint не найден.",
-            404
-        )
+        transferFee: TRANSFER_FEE,
+        transfer_fee: TRANSFER_FEE,
 
-    return error
+        faucetAmount: FAUCET_AMOUNT,
+        faucet_amount: FAUCET_AMOUNT,
 
+        network: NETWORK_NAME,
+        version: VERSION,
+      });
+    } catch (error) {
+      console.error("ECONOMY ERROR:", error);
 
-@app.errorhandler(500)
-def server_error(error):
+      res.status(500).json({
+        error: "Failed to load economy",
+      });
+    }
+  }
+);
 
-    return jsonify({
-        "error": "Internal server error",
-        "message": "Ошибка сервера SLX Network."
-    }), 500
+// ============================================================
+// CHAIN VERIFY
+// ============================================================
 
+async function verifyChain() {
+  const result = await pool.query(`
+    SELECT
+      block_index,
+      hash,
+      previous_hash
+    FROM blocks
+    ORDER BY block_index ASC
+  `);
 
-# =========================================================
-# START
-# =========================================================
+  const blocks = result.rows;
 
-init_db()
+  if (blocks.length === 0) {
+    return false;
+  }
 
+  // Genesis.
+  if (blocks[0].block_index !== 0) {
+    return false;
+  }
 
-if __name__ == "__main__":
+  for (let i = 1; i < blocks.length; i++) {
+    const current = blocks[i];
+    const previous = blocks[i - 1];
 
-    port = int(
-        os.environ.get(
-            "PORT",
-            5000
-        )
-    )
+    if (
+      current.previous_hash !==
+      previous.hash
+    ) {
+      return false;
+    }
 
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=False
-    )
+    if (
+      Number(current.block_index) !==
+      Number(previous.block_index) + 1
+    ) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+app.post(
+  "/api/chain/verify",
+  authRequired,
+  async (req, res) => {
+    try {
+      const valid = await verifyChain();
+
+      res.json({
+        success: true,
+        valid,
+        verified: valid,
+        status: valid
+          ? "valid"
+          : "invalid",
+        version: VERSION,
+      });
+    } catch (error) {
+      console.error("VERIFY ERROR:", error);
+
+      res.status(500).json({
+        error: "Chain verification failed",
+        valid: false,
+        verified: false,
+        status: "invalid",
+      });
+    }
+  }
+);
+
+app.get(
+  "/api/chain/verify",
+  authRequired,
+  async (req, res) => {
+    try {
+      const valid = await verifyChain();
+
+      res.json({
+        success: true,
+        valid,
+        verified: valid,
+        status: valid
+          ? "valid"
+          : "invalid",
+        version: VERSION,
+      });
+    } catch (error) {
+      console.error("VERIFY ERROR:", error);
+
+      res.status(500).json({
+        error: "Chain verification failed",
+        valid: false,
+        verified: false,
+        status: "invalid",
+      });
+    }
+  }
+);
+
+// ============================================================
+// 404 API
+// ============================================================
+
+app.use("/api", (req, res) => {
+  res.status(404).json({
+    error: "API endpoint not found",
+    version: VERSION,
+  });
+});
+
+// ============================================================
+// FRONTEND FALLBACK
+// ============================================================
+
+app.get("*", (req, res) => {
+  res.sendFile(
+    path.join(__dirname, "index.html")
+  );
+});
+
+// ============================================================
+// ERROR HANDLER
+// ============================================================
+
+app.use(
+  (err, req, res, next) => {
+    console.error("SERVER ERROR:", err);
+
+    if (res.headersSent) {
+      return next(err);
+    }
+
+    res.status(500).json({
+      error: "Internal server error",
+      message:
+        process.env.NODE_ENV === "production"
+          ? "Server error"
+          : err.message,
+    });
+  }
+);
+
+// ============================================================
+// START
+// ============================================================
+
+async function startServer() {
+  try {
+    await initDatabase();
+
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log("");
+      console.log("==========================================");
+      console.log("       SLX NETWORK v1.8.2");
+      console.log("==========================================");
+      console.log(`Network: ${NETWORK_NAME}`);
+      console.log(`Port: ${PORT}`);
+      console.log(`Node: ${process.version}`);
+      console.log("Status: ONLINE");
+      console.log("==========================================");
+      console.log("");
+    });
+  } catch (error) {
+    console.error("");
+    console.error("==========================================");
+    console.error("SLX NETWORK STARTUP FAILED");
+    console.error("==========================================");
+    console.error(error);
+    console.error("==========================================");
+    console.error("");
+
+    process.exit(1);
+  }
+}
+
+process.on("SIGTERM", async () => {
+  console.log("SIGTERM received.");
+
+  await pool.end();
+
+  process.exit(0);
+});
+
+process.on("SIGINT", async () => {
+  console.log("SIGINT received.");
+
+  await pool.end();
+
+  process.exit(0);
+});
+
+startServer();
