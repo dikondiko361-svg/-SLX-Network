@@ -1,7 +1,6 @@
 // ============================================================
 // SLX NETWORK v1.8.2
-// TESTNET BACKEND
-// Node.js 22+ / Express 5 / PostgreSQL
+// Node.js 22+ / Express 5
 // ============================================================
 
 const express = require("express");
@@ -14,116 +13,107 @@ const { Pool } = require("pg");
 
 const app = express();
 
-// ============================================================
-// CONFIG
-// ============================================================
-
 const PORT = process.env.PORT || 3000;
-
 const VERSION = "1.8.2";
-const NETWORK_NAME = "SLX-Testnet";
-
-const TRANSFER_FEE = 0.1;
+const NETWORK = "SLX-Testnet";
+const FEE = 0.1;
 const FAUCET_AMOUNT = 10;
-const FAUCET_COOLDOWN_HOURS = 24;
 
 const JWT_SECRET =
   process.env.JWT_SECRET ||
-  "SLX_TESTNET_SECRET_1_8_2_CHANGE_ME";
+  "SLX_NETWORK_TESTNET_1_8_2_SECRET";
 
-const DATABASE_URL = process.env.DATABASE_URL;
+app.use(cors());
+app.use(express.json({ limit: "2mb" }));
+app.use(express.urlencoded({ extended: true }));
 
 // ============================================================
 // DATABASE
 // ============================================================
 
-if (!DATABASE_URL) {
-  console.error("ERROR: DATABASE_URL is missing.");
+let pool = null;
+let useDatabase = false;
+
+if (process.env.DATABASE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl:
+      process.env.NODE_ENV === "production"
+        ? { rejectUnauthorized: false }
+        : false,
+  });
+
+  useDatabase = true;
 }
 
-const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
-  max: 10,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 10000,
-});
-
 // ============================================================
-// EXPRESS
+// MEMORY DATABASE FALLBACK
 // ============================================================
 
-app.use(
-  cors({
-    origin: true,
-    credentials: true,
-  })
-);
-
-app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({ extended: true }));
-
-// Frontend
-app.use(express.static(__dirname));
+const memory = {
+  users: [],
+  wallets: [],
+  transactions: [],
+  blocks: [
+    {
+      id: 1,
+      block_index: 0,
+      timestamp: new Date().toISOString(),
+      hash: "SLX_GENESIS_1_8_2",
+      previous_hash: null,
+      transaction_count: 0,
+    },
+  ],
+  faucetClaims: [],
+  nextUser: 1,
+  nextWallet: 1,
+  nextTransaction: 1,
+  nextBlock: 2,
+};
 
 // ============================================================
 // HELPERS
 // ============================================================
 
-function generateWalletAddress() {
+function walletAddress() {
   return (
     "SLXC" +
     crypto.randomBytes(16).toString("hex").toUpperCase()
   );
 }
 
-function generateRecoveryCode() {
-  return crypto.randomBytes(6).toString("hex").toUpperCase();
-}
-
-function generateTxHash() {
+function txHash() {
   return (
     "SLX" +
     crypto.randomBytes(24).toString("hex").toUpperCase()
   );
 }
 
-function generateBlockHash() {
+function blockHash() {
   return (
     "SLXB" +
     crypto.randomBytes(28).toString("hex").toUpperCase()
   );
 }
 
-function normalizeUsername(value) {
-  return String(value || "").trim();
+function recoveryCode() {
+  return crypto.randomBytes(6).toString("hex").toUpperCase();
 }
 
-function normalizeAddress(value) {
-  return String(value || "").trim().toUpperCase();
+function validAddress(address) {
+  return /^SLXC[A-F0-9]{32}$/.test(
+    String(address || "").trim().toUpperCase()
+  );
 }
 
-function isValidWalletAddress(address) {
-  return /^SLXC[A-F0-9]{32}$/.test(address);
-}
-
-function roundAmount(value) {
-  return Math.round(Number(value) * 100000000) / 100000000;
-}
-
-function signToken(user) {
+function tokenFor(user) {
   return jwt.sign(
     {
       userId: user.id,
       username: user.username,
     },
     JWT_SECRET,
-    {
-      expiresIn: "30d",
-    }
+    { expiresIn: "30d" }
   );
 }
 
@@ -135,59 +125,71 @@ function publicUser(user) {
   };
 }
 
-function getBearerToken(req) {
+function authToken(req) {
   const header = req.headers.authorization || "";
 
   if (!header.startsWith("Bearer ")) {
     return null;
   }
 
-  return header.substring(7).trim();
+  return header.slice(7);
 }
 
 // ============================================================
-// AUTH MIDDLEWARE
+// AUTH
 // ============================================================
 
-async function authRequired(req, res, next) {
+async function auth(req, res, next) {
   try {
-    const token = getBearerToken(req);
+    const token = authToken(req);
 
     if (!token) {
       return res.status(401).json({
         error: "Unauthorized",
-        message: "Bearer token required",
       });
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET);
-
-    const result = await pool.query(
-      `
-      SELECT id, username, created_at
-      FROM users
-      WHERE id = $1
-      LIMIT 1
-      `,
-      [decoded.userId]
+    const decoded = jwt.verify(
+      token,
+      JWT_SECRET
     );
 
-    if (result.rows.length === 0) {
-      return res.status(401).json({
-        error: "Unauthorized",
-        message: "User not found",
-      });
-    }
+    if (useDatabase) {
+      const result = await pool.query(
+        `
+        SELECT id, username, created_at
+        FROM users
+        WHERE id = $1
+        LIMIT 1
+        `,
+        [decoded.userId]
+      );
 
-    req.user = result.rows[0];
+      if (!result.rows.length) {
+        return res.status(401).json({
+          error: "User not found",
+        });
+      }
+
+      req.user = result.rows[0];
+    } else {
+      const user = memory.users.find(
+        (u) => u.id === Number(decoded.userId)
+      );
+
+      if (!user) {
+        return res.status(401).json({
+          error: "User not found",
+        });
+      }
+
+      req.user = user;
+    }
 
     next();
   } catch (error) {
-    console.error("AUTH ERROR:", error.message);
-
     return res.status(401).json({
-      error: "Unauthorized",
-      message: "Invalid or expired token",
+      error: "Invalid or expired token",
     });
   }
 }
@@ -197,8 +199,14 @@ async function authRequired(req, res, next) {
 // ============================================================
 
 async function initDatabase() {
-  if (!DATABASE_URL) {
-    throw new Error("DATABASE_URL is missing.");
+  if (!useDatabase) {
+    console.log(
+      "DATABASE_URL not found."
+    );
+    console.log(
+      "SLX Network will use temporary memory storage."
+    );
+    return;
   }
 
   await pool.query(`
@@ -207,21 +215,19 @@ async function initDatabase() {
       username VARCHAR(64) UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       recovery_code_hash TEXT,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS wallets (
       id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL
-        REFERENCES users(id)
-        ON DELETE CASCADE,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
       address VARCHAR(36) UNIQUE NOT NULL,
-      name VARCHAR(100) NOT NULL DEFAULT 'SLX Wallet',
-      balance NUMERIC(30,8) NOT NULL DEFAULT 0,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
+      name VARCHAR(100) DEFAULT 'SLX Wallet',
+      balance NUMERIC(30,8) DEFAULT 0,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
 
   await pool.query(`
@@ -229,61 +235,33 @@ async function initDatabase() {
       id SERIAL PRIMARY KEY,
       tx_hash VARCHAR(100) UNIQUE NOT NULL,
       type VARCHAR(30) NOT NULL,
-      from_wallet INTEGER
-        REFERENCES wallets(id)
-        ON DELETE SET NULL,
-      to_wallet INTEGER
-        REFERENCES wallets(id)
-        ON DELETE SET NULL,
-      amount NUMERIC(30,8) NOT NULL DEFAULT 0,
-      fee NUMERIC(30,8) NOT NULL DEFAULT 0,
+      from_wallet INTEGER,
+      to_wallet INTEGER,
+      amount NUMERIC(30,8) DEFAULT 0,
+      fee NUMERIC(30,8) DEFAULT 0,
       block_id INTEGER,
-      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS blocks (
       id SERIAL PRIMARY KEY,
       block_index INTEGER UNIQUE NOT NULL,
-      timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      timestamp TIMESTAMPTZ DEFAULT NOW(),
       hash VARCHAR(120) UNIQUE NOT NULL,
       previous_hash VARCHAR(120),
-      transaction_count INTEGER NOT NULL DEFAULT 0
-    );
+      transaction_count INTEGER DEFAULT 0
+    )
   `);
 
   await pool.query(`
     CREATE TABLE IF NOT EXISTS faucet_claims (
       id SERIAL PRIMARY KEY,
-      user_id INTEGER NOT NULL
-        REFERENCES users(id)
-        ON DELETE CASCADE,
-      wallet_id INTEGER NOT NULL
-        REFERENCES wallets(id)
-        ON DELETE CASCADE,
-      claimed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-    );
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_wallets_user_id
-    ON wallets(user_id);
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_transactions_from_wallet
-    ON transactions(from_wallet);
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_transactions_to_wallet
-    ON transactions(to_wallet);
-  `);
-
-  await pool.query(`
-    CREATE INDEX IF NOT EXISTS idx_blocks_index
-    ON blocks(block_index);
+      user_id INTEGER NOT NULL,
+      wallet_id INTEGER NOT NULL,
+      claimed_at TIMESTAMPTZ DEFAULT NOW()
+    )
   `);
 
   const genesis = await pool.query(`
@@ -293,74 +271,88 @@ async function initDatabase() {
     LIMIT 1
   `);
 
-  if (genesis.rows.length === 0) {
+  if (!genesis.rows.length) {
     await pool.query(
       `
-      INSERT INTO blocks (
+      INSERT INTO blocks
+      (block_index, hash, previous_hash, transaction_count)
+      VALUES (0, $1, NULL, 0)
+      `,
+      ["SLX_GENESIS_1_8_2"]
+    );
+  }
+
+  console.log(
+    "PostgreSQL database initialized."
+  );
+}
+
+// ============================================================
+// CREATE BLOCK
+// ============================================================
+
+async function createMemoryBlock(
+  transactionCount
+) {
+  const previous =
+    memory.blocks[memory.blocks.length - 1];
+
+  const block = {
+    id: memory.nextBlock++,
+    block_index:
+      previous.block_index + 1,
+    timestamp:
+      new Date().toISOString(),
+    hash: blockHash(),
+    previous_hash:
+      previous.hash,
+    transaction_count:
+      transactionCount,
+  };
+
+  memory.blocks.push(block);
+
+  return block;
+}
+
+async function createDbBlock(
+  client,
+  transactionCount
+) {
+  const previous =
+    await client.query(`
+      SELECT block_index, hash
+      FROM blocks
+      ORDER BY block_index DESC
+      LIMIT 1
+    `);
+
+  const last =
+    previous.rows[0];
+
+  const index =
+    Number(last.block_index) + 1;
+
+  const result =
+    await client.query(
+      `
+      INSERT INTO blocks
+      (
         block_index,
-        timestamp,
         hash,
         previous_hash,
         transaction_count
       )
-      VALUES (
-        0,
-        NOW(),
-        $1,
-        NULL,
-        0
-      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING *
       `,
-      ["SLX_GENESIS_1.8.2"]
+      [
+        index,
+        blockHash(),
+        last.hash,
+        transactionCount,
+      ]
     );
-  }
-
-  console.log("Database initialized.");
-}
-
-// ============================================================
-// BLOCK
-// ============================================================
-
-async function createBlock(client, transactionCount = 1) {
-  const lastBlock = await client.query(`
-    SELECT block_index, hash
-    FROM blocks
-    ORDER BY block_index DESC
-    LIMIT 1
-  `);
-
-  let nextIndex = 1;
-  let previousHash = null;
-
-  if (lastBlock.rows.length > 0) {
-    nextIndex =
-      Number(lastBlock.rows[0].block_index) + 1;
-
-    previousHash = lastBlock.rows[0].hash;
-  }
-
-  const hash = generateBlockHash();
-
-  const result = await client.query(
-    `
-    INSERT INTO blocks (
-      block_index,
-      timestamp,
-      hash,
-      previous_hash,
-      transaction_count
-    )
-    VALUES ($1, NOW(), $2, $3, $4)
-    RETURNING *
-    `,
-    [
-      nextIndex,
-      hash,
-      previousHash,
-      transactionCount,
-    ]
-  );
 
   return result.rows[0];
 }
@@ -380,24 +372,14 @@ app.get("/", (req, res) => {
 // ============================================================
 
 app.get("/health", async (req, res) => {
-  try {
-    await pool.query("SELECT 1");
-
-    res.json({
-      status: "ok",
-      version: VERSION,
-      network: NETWORK_NAME,
-      database: "connected",
-    });
-  } catch (error) {
-    res.status(503).json({
-      status: "error",
-      version: VERSION,
-      network: NETWORK_NAME,
-      database: "disconnected",
-      message: error.message,
-    });
-  }
+  res.json({
+    status: "ok",
+    version: VERSION,
+    network: NETWORK,
+    database: useDatabase
+      ? "postgresql"
+      : "memory",
+  });
 });
 
 // ============================================================
@@ -406,44 +388,50 @@ app.get("/health", async (req, res) => {
 
 app.get("/api/status", async (req, res) => {
   try {
-    const result = await pool.query(`
-      SELECT block_index
-      FROM blocks
-      ORDER BY block_index DESC
-      LIMIT 1
-    `);
+    let height = 0;
 
-    const height =
-      result.rows.length > 0
-        ? Number(result.rows[0].block_index)
-        : 0;
+    if (useDatabase) {
+      const result = await pool.query(`
+        SELECT block_index
+        FROM blocks
+        ORDER BY block_index DESC
+        LIMIT 1
+      `);
+
+      if (result.rows.length) {
+        height =
+          Number(result.rows[0].block_index);
+      }
+    } else {
+      height =
+        memory.blocks[
+          memory.blocks.length - 1
+        ].block_index;
+    }
 
     res.json({
       name: "SLX Network",
       version: VERSION,
-      network: NETWORK_NAME,
+      network: NETWORK,
       status: "online",
-      message: "SLX Network server is running",
-
-      network: NETWORK_NAME,
+      message:
+        "SLX Network server is running",
 
       networkInfo: {
         version: VERSION,
         height,
-        transferFee: TRANSFER_FEE,
+        transferFee: FEE,
       },
 
       network_info: {
         version: VERSION,
         height,
-        transferFee: TRANSFER_FEE,
+        transferFee: FEE,
       },
     });
   } catch (error) {
-    console.error("STATUS ERROR:", error);
-
     res.status(500).json({
-      error: "Failed to get status",
+      error: error.message,
     });
   }
 });
@@ -456,27 +444,17 @@ app.post(
   "/api/auth/register",
   async (req, res) => {
     try {
-      const username = normalizeUsername(
-        req.body.username
-      );
+      const username =
+        String(req.body.username || "")
+          .trim();
 
-      const password = String(
-        req.body.password || ""
-      );
+      const password =
+        String(req.body.password || "");
 
-      if (!username) {
-        return res.status(400).json({
-          error: "Username is required",
-        });
-      }
-
-      if (
-        username.length < 3 ||
-        username.length > 64
-      ) {
+      if (username.length < 3) {
         return res.status(400).json({
           error:
-            "Username must contain 3-64 characters",
+            "Username must contain at least 3 characters",
         });
       }
 
@@ -487,43 +465,39 @@ app.post(
         });
       }
 
-      const existing = await pool.query(
-        `
-        SELECT id
-        FROM users
-        WHERE LOWER(username) = LOWER($1)
-        LIMIT 1
-        `,
-        [username]
-      );
-
-      if (existing.rows.length > 0) {
-        return res.status(409).json({
-          error: "Username already exists",
-        });
-      }
+      const recovery =
+        recoveryCode();
 
       const passwordHash =
-        await bcrypt.hash(password, 12);
-
-      const recoveryCode =
-        generateRecoveryCode();
+        await bcrypt.hash(password, 10);
 
       const recoveryHash =
-        await bcrypt.hash(
-          recoveryCode,
-          12
-        );
+        await bcrypt.hash(recovery, 10);
 
-      const client = await pool.connect();
+      if (useDatabase) {
+        const exists =
+          await pool.query(
+            `
+            SELECT id
+            FROM users
+            WHERE LOWER(username) =
+                  LOWER($1)
+            `,
+            [username]
+          );
 
-      try {
-        await client.query("BEGIN");
+        if (exists.rows.length) {
+          return res.status(409).json({
+            error:
+              "Username already exists",
+          });
+        }
 
         const userResult =
-          await client.query(
+          await pool.query(
             `
-            INSERT INTO users (
+            INSERT INTO users
+            (
               username,
               password_hash,
               recovery_code_hash
@@ -538,56 +512,98 @@ app.post(
             ]
           );
 
-        const user = userResult.rows[0];
-
-        const address =
-          generateWalletAddress();
+        const user =
+          userResult.rows[0];
 
         const walletResult =
-          await client.query(
+          await pool.query(
             `
-            INSERT INTO wallets (
+            INSERT INTO wallets
+            (
               user_id,
               address,
               name,
               balance
             )
-            VALUES ($1, $2, $3, $4)
+            VALUES
+            ($1, $2, 'Main Wallet', 0)
             RETURNING *
             `,
             [
               user.id,
-              address,
-              "Main Wallet",
-              0,
+              walletAddress(),
             ]
           );
 
-        await client.query("COMMIT");
+        const token =
+          tokenFor(user);
 
-        const token = signToken(user);
-
-        res.status(201).json({
+        return res.status(201).json({
           success: true,
-          message:
-            "Account created successfully",
-
           token,
           accessToken: token,
-
-          recoveryCode,
-          recovery_code: recoveryCode,
-
-          user: publicUser(user),
-
-          wallet: walletResult.rows[0],
+          recoveryCode: recovery,
+          recovery_code: recovery,
+          user:
+            publicUser(user),
+          wallet:
+            walletResult.rows[0],
         });
-      } catch (error) {
-        await client.query("ROLLBACK");
-        throw error;
-      } finally {
-        client.release();
       }
+
+      const exists =
+        memory.users.find(
+          (u) =>
+            u.username.toLowerCase() ===
+            username.toLowerCase()
+        );
+
+      if (exists) {
+        return res.status(409).json({
+          error:
+            "Username already exists",
+        });
+      }
+
+      const user = {
+        id: memory.nextUser++,
+        username,
+        password_hash:
+          passwordHash,
+        recovery_code_hash:
+          recoveryHash,
+        created_at:
+          new Date().toISOString(),
+      };
+
+      memory.users.push(user);
+
+      const wallet = {
+        id: memory.nextWallet++,
+        user_id: user.id,
+        address:
+          walletAddress(),
+        name: "Main Wallet",
+        balance: 0,
+        created_at:
+          new Date().toISOString(),
+      };
+
+      memory.wallets.push(wallet);
+
+      const token =
+        tokenFor(user);
+
+      res.status(201).json({
+        success: true,
+        token,
+        accessToken: token,
+        recoveryCode: recovery,
+        recovery_code: recovery,
+        user:
+          publicUser(user),
+        wallet,
+      });
     } catch (error) {
       console.error(
         "REGISTER ERROR:",
@@ -595,8 +611,10 @@ app.post(
       );
 
       res.status(500).json({
-        error: "Registration failed",
-        message: error.message,
+        error:
+          "Registration failed",
+        message:
+          error.message,
       });
     }
   }
@@ -610,67 +628,83 @@ app.post(
   "/api/auth/login",
   async (req, res) => {
     try {
-      const username = normalizeUsername(
-        req.body.username
-      );
+      const username =
+        String(
+          req.body.username || ""
+        ).trim();
 
-      const password = String(
-        req.body.password || ""
-      );
+      const password =
+        String(
+          req.body.password || ""
+        );
 
-      const result = await pool.query(
-        `
-        SELECT
-          id,
-          username,
-          password_hash,
-          created_at
-        FROM users
-        WHERE LOWER(username) = LOWER($1)
-        LIMIT 1
-        `,
-        [username]
-      );
+      let user;
 
-      if (result.rows.length === 0) {
-        return res.status(401).json({
-          error:
-            "Invalid username or password",
-        });
+      if (useDatabase) {
+        const result =
+          await pool.query(
+            `
+            SELECT *
+            FROM users
+            WHERE LOWER(username) =
+                  LOWER($1)
+            LIMIT 1
+            `,
+            [username]
+          );
+
+        if (!result.rows.length) {
+          return res.status(401).json({
+            error:
+              "Invalid username or password",
+          });
+        }
+
+        user =
+          result.rows[0];
+      } else {
+        user =
+          memory.users.find(
+            (u) =>
+              u.username.toLowerCase() ===
+              username.toLowerCase()
+          );
+
+        if (!user) {
+          return res.status(401).json({
+            error:
+              "Invalid username or password",
+          });
+        }
       }
 
-      const user = result.rows[0];
-
-      const validPassword =
+      const valid =
         await bcrypt.compare(
           password,
           user.password_hash
         );
 
-      if (!validPassword) {
+      if (!valid) {
         return res.status(401).json({
           error:
             "Invalid username or password",
         });
       }
 
-      const token = signToken(user);
+      const token =
+        tokenFor(user);
 
       res.json({
         success: true,
         token,
         accessToken: token,
-        user: publicUser(user),
+        user:
+          publicUser(user),
       });
     } catch (error) {
-      console.error(
-        "LOGIN ERROR:",
-        error
-      );
-
       res.status(500).json({
-        error: "Login failed",
-        message: error.message,
+        error:
+          "Login failed",
       });
     }
   }
@@ -682,268 +716,38 @@ app.post(
 
 app.get(
   "/api/auth/me",
-  authRequired,
+  auth,
   async (req, res) => {
-    try {
-      const result = await pool.query(
-        `
-        SELECT
-          id,
-          user_id,
-          address,
-          name,
-          balance,
-          created_at
-        FROM wallets
-        WHERE user_id = $1
-        ORDER BY id ASC
-        `,
-        [req.user.id]
-      );
+    let wallets;
 
-      res.json({
-        success: true,
-        user: publicUser(req.user),
-        wallets: result.rows,
-      });
-    } catch (error) {
-      console.error(
-        "ME ERROR:",
-        error
-      );
+    if (useDatabase) {
+      const result =
+        await pool.query(
+          `
+          SELECT *
+          FROM wallets
+          WHERE user_id = $1
+          ORDER BY id
+          `,
+          [req.user.id]
+        );
 
-      res.status(500).json({
-        error:
-          "Failed to load profile",
-      });
+      wallets =
+        result.rows;
+    } else {
+      wallets =
+        memory.wallets.filter(
+          (w) =>
+            w.user_id ===
+            req.user.id
+        );
     }
-  }
-);
 
-// ============================================================
-// RECOVERY RESET
-// ============================================================
-
-app.post(
-  "/api/auth/recovery/reset",
-  async (req, res) => {
-    try {
-      const username =
-        normalizeUsername(
-          req.body.username
-        );
-
-      const recoveryCode =
-        String(
-          req.body.recoveryCode ||
-            req.body.recovery_code ||
-            ""
-        )
-          .trim()
-          .toUpperCase();
-
-      const newPassword =
-        String(
-          req.body.newPassword || ""
-        );
-
-      if (
-        !username ||
-        !recoveryCode
-      ) {
-        return res.status(400).json({
-          error:
-            "Username and recovery code are required",
-        });
-      }
-
-      if (newPassword.length < 6) {
-        return res.status(400).json({
-          error:
-            "New password must contain at least 6 characters",
-        });
-      }
-
-      const result = await pool.query(
-        `
-        SELECT *
-        FROM users
-        WHERE LOWER(username) = LOWER($1)
-        LIMIT 1
-        `,
-        [username]
-      );
-
-      if (result.rows.length === 0) {
-        return res.status(400).json({
-          error:
-            "Invalid recovery data",
-        });
-      }
-
-      const user = result.rows[0];
-
-      const validRecovery =
-        await bcrypt.compare(
-          recoveryCode,
-          user.recovery_code_hash || ""
-        );
-
-      if (!validRecovery) {
-        return res.status(400).json({
-          error:
-            "Invalid recovery data",
-        });
-      }
-
-      const newHash =
-        await bcrypt.hash(
-          newPassword,
-          12
-        );
-
-      await pool.query(
-        `
-        UPDATE users
-        SET password_hash = $1
-        WHERE id = $2
-        `,
-        [
-          newHash,
-          user.id,
-        ]
-      );
-
-      const token =
-        signToken(user);
-
-      res.json({
-        success: true,
-        message:
-          "Password reset successfully",
-        token,
-        accessToken: token,
-        user: publicUser(user),
-      });
-    } catch (error) {
-      console.error(
-        "RECOVERY ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Recovery failed",
-      });
-    }
-  }
-);
-
-// ============================================================
-// CHANGE PASSWORD
-// ============================================================
-
-app.post(
-  "/api/auth/password/change",
-  authRequired,
-  async (req, res) => {
-    try {
-      const currentPassword =
-        String(
-          req.body.currentPassword ||
-            ""
-        );
-
-      const newPassword =
-        String(
-          req.body.newPassword ||
-            ""
-        );
-
-      if (newPassword.length < 6) {
-        return res.status(400).json({
-          error:
-            "New password must contain at least 6 characters",
-        });
-      }
-
-      const result = await pool.query(
-        `
-        SELECT password_hash
-        FROM users
-        WHERE id = $1
-        `,
-        [req.user.id]
-      );
-
-      const valid =
-        await bcrypt.compare(
-          currentPassword,
-          result.rows[0]
-            .password_hash
-        );
-
-      if (!valid) {
-        return res.status(400).json({
-          error:
-            "Current password is incorrect",
-        });
-      }
-
-      const newHash =
-        await bcrypt.hash(
-          newPassword,
-          12
-        );
-
-      await pool.query(
-        `
-        UPDATE users
-        SET password_hash = $1
-        WHERE id = $2
-        `,
-        [
-          newHash,
-          req.user.id,
-        ]
-      );
-
-      const token =
-        signToken(req.user);
-
-      res.json({
-        success: true,
-        message:
-          "Password changed successfully",
-        token,
-        accessToken: token,
-      });
-    } catch (error) {
-      console.error(
-        "CHANGE PASSWORD ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Password change failed",
-      });
-    }
-  }
-);
-
-// ============================================================
-// LOGOUT
-// ============================================================
-
-app.post(
-  "/api/auth/logout",
-  authRequired,
-  async (req, res) => {
     res.json({
       success: true,
-      message:
-        "Logged out successfully",
+      user:
+        publicUser(req.user),
+      wallets,
     });
   }
 );
@@ -954,36 +758,39 @@ app.post(
 
 app.get(
   "/api/wallets",
-  authRequired,
+  auth,
   async (req, res) => {
     try {
-      const result =
-        await pool.query(
-          `
-          SELECT
-            id,
-            user_id,
-            address,
-            name,
-            balance,
-            created_at
-          FROM wallets
-          WHERE user_id = $1
-          ORDER BY id ASC
-          `,
-          [req.user.id]
-        );
+      let wallets;
+
+      if (useDatabase) {
+        const result =
+          await pool.query(
+            `
+            SELECT *
+            FROM wallets
+            WHERE user_id = $1
+            ORDER BY id
+            `,
+            [req.user.id]
+          );
+
+        wallets =
+          result.rows;
+      } else {
+        wallets =
+          memory.wallets.filter(
+            (w) =>
+              w.user_id ===
+              req.user.id
+          );
+      }
 
       res.json({
         success: true,
-        wallets: result.rows,
+        wallets,
       });
     } catch (error) {
-      console.error(
-        "WALLETS ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
           "Failed to load wallets",
@@ -998,60 +805,61 @@ app.get(
 
 app.post(
   "/api/wallet/create",
-  authRequired,
+  auth,
   async (req, res) => {
     try {
-      let address;
-      let exists = true;
+      const address =
+        walletAddress();
 
-      while (exists) {
-        address =
-          generateWalletAddress();
-
-        const check =
+      if (useDatabase) {
+        const result =
           await pool.query(
             `
-            SELECT id
-            FROM wallets
-            WHERE address = $1
+            INSERT INTO wallets
+            (
+              user_id,
+              address,
+              name,
+              balance
+            )
+            VALUES
+            ($1, $2, 'SLX Wallet', 0)
+            RETURNING *
             `,
-            [address]
+            [
+              req.user.id,
+              address,
+            ]
           );
 
-        exists =
-          check.rows.length > 0;
+        return res.status(201).json({
+          success: true,
+          wallet:
+            result.rows[0],
+        });
       }
 
-      const result =
-        await pool.query(
-          `
-          INSERT INTO wallets (
-            user_id,
-            address,
-            name,
-            balance
-          )
-          VALUES ($1, $2, $3, $4)
-          RETURNING *
-          `,
-          [
-            req.user.id,
-            address,
-            "SLX Wallet",
-            0,
-          ]
-        );
+      const wallet = {
+        id: memory.nextWallet++,
+        user_id:
+          req.user.id,
+        address,
+        name:
+          "SLX Wallet",
+        balance: 0,
+        created_at:
+          new Date().toISOString(),
+      };
+
+      memory.wallets.push(
+        wallet
+      );
 
       res.status(201).json({
         success: true,
-        wallet: result.rows[0],
+        wallet,
       });
     } catch (error) {
-      console.error(
-        "CREATE WALLET ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
           "Failed to create wallet",
@@ -1066,23 +874,17 @@ app.post(
 
 app.post(
   "/api/wallet/select",
-  authRequired,
+  auth,
   async (req, res) => {
-    try {
-      const walletId = Number(
+    const walletId =
+      Number(
         req.body.walletId ||
           req.body.wallet_id
       );
 
-      if (
-        !Number.isInteger(walletId)
-      ) {
-        return res.status(400).json({
-          error:
-            "Invalid wallet ID",
-        });
-      }
+    let wallet;
 
+    if (useDatabase) {
       const result =
         await pool.query(
           `
@@ -1098,28 +900,29 @@ app.post(
           ]
         );
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({
-          error:
-            "Wallet not found",
-        });
-      }
+      wallet =
+        result.rows[0];
+    } else {
+      wallet =
+        memory.wallets.find(
+          (w) =>
+            w.id === walletId &&
+            w.user_id ===
+              req.user.id
+        );
+    }
 
-      res.json({
-        success: true,
-        wallet: result.rows[0],
-      });
-    } catch (error) {
-      console.error(
-        "SELECT WALLET ERROR:",
-        error
-      );
-
-      res.status(500).json({
+    if (!wallet) {
+      return res.status(404).json({
         error:
-          "Failed to select wallet",
+          "Wallet not found",
       });
     }
+
+    res.json({
+      success: true,
+      wallet,
+    });
   }
 );
 
@@ -1129,31 +932,19 @@ app.post(
 
 app.get(
   "/api/wallet/:id",
-  authRequired,
+  auth,
   async (req, res) => {
-    try {
-      const walletId =
-        Number(req.params.id);
+    const walletId =
+      Number(req.params.id);
 
-      if (
-        !Number.isInteger(walletId)
-      ) {
-        return res.status(400).json({
-          error:
-            "Invalid wallet ID",
-        });
-      }
+    let wallet;
+    let transactions;
 
+    if (useDatabase) {
       const walletResult =
         await pool.query(
           `
-          SELECT
-            id,
-            user_id,
-            address,
-            name,
-            balance,
-            created_at
+          SELECT *
           FROM wallets
           WHERE id = $1
             AND user_id = $2
@@ -1165,63 +956,341 @@ app.get(
           ]
         );
 
-      if (
-        walletResult.rows.length === 0
-      ) {
+      wallet =
+        walletResult.rows[0];
+
+      if (!wallet) {
         return res.status(404).json({
           error:
             "Wallet not found",
         });
       }
 
-      const wallet =
-        walletResult.rows[0];
-
       const txResult =
         await pool.query(
           `
-          SELECT
-            t.id,
-            t.tx_hash,
-            t.type,
-            t.from_wallet,
-            t.to_wallet,
-            t.amount,
-            t.fee,
-            t.created_at,
-            t.block_id,
-            fw.address AS from_address,
-            tw.address AS to_address
-          FROM transactions t
-          LEFT JOIN wallets fw
-            ON fw.id = t.from_wallet
-          LEFT JOIN wallets tw
-            ON tw.id = t.to_wallet
-          WHERE
-            t.from_wallet = $1
-            OR
-            t.to_wallet = $1
-          ORDER BY
-            t.created_at DESC
+          SELECT *
+          FROM transactions
+          WHERE from_wallet = $1
+             OR to_wallet = $1
+          ORDER BY created_at DESC
           LIMIT 100
           `,
           [walletId]
         );
 
+      transactions =
+        txResult.rows;
+    } else {
+      wallet =
+        memory.wallets.find(
+          (w) =>
+            w.id === walletId &&
+            w.user_id ===
+              req.user.id
+        );
+
+      if (!wallet) {
+        return res.status(404).json({
+          error:
+            "Wallet not found",
+        });
+      }
+
+      transactions =
+        memory.transactions.filter(
+          (t) =>
+            t.from_wallet ===
+              walletId ||
+            t.to_wallet ===
+              walletId
+        );
+    }
+
+    res.json({
+      ...wallet,
+      transactions,
+    });
+  }
+);
+
+// ============================================================
+// FAUCET
+// ============================================================
+
+app.post(
+  "/api/faucet",
+  auth,
+  async (req, res) => {
+    const walletId =
+      Number(
+        req.body.walletId ||
+          req.body.wallet_id
+      );
+
+    try {
+      if (useDatabase) {
+        const walletResult =
+          await pool.query(
+            `
+            SELECT *
+            FROM wallets
+            WHERE id = $1
+              AND user_id = $2
+            LIMIT 1
+            `,
+            [
+              walletId,
+              req.user.id,
+            ]
+          );
+
+        if (
+          !walletResult.rows.length
+        ) {
+          return res.status(404).json({
+            error:
+              "Wallet not found",
+          });
+        }
+
+        const recent =
+          await pool.query(
+            `
+            SELECT claimed_at
+            FROM faucet_claims
+            WHERE user_id = $1
+            ORDER BY claimed_at DESC
+            LIMIT 1
+            `,
+            [req.user.id]
+          );
+
+        if (recent.rows.length) {
+          const last =
+            new Date(
+              recent.rows[0]
+                .claimed_at
+            );
+
+          if (
+            Date.now() -
+              last.getTime() <
+              24 * 60 * 60 * 1000
+          ) {
+            return res.status(429).json({
+              error:
+                "Faucet cooldown active",
+            });
+          }
+        }
+
+        const client =
+          await pool.connect();
+
+        try {
+          await client.query(
+            "BEGIN"
+          );
+
+          await client.query(
+            `
+            UPDATE wallets
+            SET balance =
+              balance + $1
+            WHERE id = $2
+            `,
+            [
+              FAUCET_AMOUNT,
+              walletId,
+            ]
+          );
+
+          const hash =
+            txHash();
+
+          const tx =
+            await client.query(
+              `
+              INSERT INTO transactions
+              (
+                tx_hash,
+                type,
+                from_wallet,
+                to_wallet,
+                amount,
+                fee
+              )
+              VALUES
+              ($1, 'FAUCET', NULL, $2, $3, 0)
+              RETURNING *
+              `,
+              [
+                hash,
+                walletId,
+                FAUCET_AMOUNT,
+              ]
+            );
+
+          const block =
+            await createDbBlock(
+              client,
+              1
+            );
+
+          await client.query(
+            `
+            UPDATE transactions
+            SET block_id = $1
+            WHERE id = $2
+            `,
+            [
+              block.id,
+              tx.rows[0].id,
+            ]
+          );
+
+          await client.query(
+            `
+            INSERT INTO faucet_claims
+            (user_id, wallet_id)
+            VALUES ($1, $2)
+            `,
+            [
+              req.user.id,
+              walletId,
+            ]
+          );
+
+          await client.query(
+            "COMMIT"
+          );
+
+          return res.json({
+            success: true,
+            amount:
+              FAUCET_AMOUNT,
+            transaction:
+              tx.rows[0],
+            block,
+          });
+        } catch (e) {
+          await client.query(
+            "ROLLBACK"
+          );
+          throw e;
+        } finally {
+          client.release();
+        }
+      }
+
+      const wallet =
+        memory.wallets.find(
+          (w) =>
+            w.id === walletId &&
+            w.user_id ===
+              req.user.id
+        );
+
+      if (!wallet) {
+        return res.status(404).json({
+          error:
+            "Wallet not found",
+        });
+      }
+
+      const lastClaim =
+        memory.faucetClaims
+          .filter(
+            (x) =>
+              x.user_id ===
+              req.user.id
+          )
+          .sort(
+            (a, b) =>
+              new Date(b.claimed_at) -
+              new Date(a.claimed_at)
+          )[0];
+
+      if (lastClaim) {
+        if (
+          Date.now() -
+            new Date(
+              lastClaim.claimed_at
+            ).getTime() <
+            24 *
+              60 *
+              60 *
+              1000
+        ) {
+          return res.status(429).json({
+            error:
+              "Faucet cooldown active",
+          });
+        }
+      }
+
+      wallet.balance =
+        Number(wallet.balance) +
+        FAUCET_AMOUNT;
+
+      const tx = {
+        id:
+          memory.nextTransaction++,
+        tx_hash:
+          txHash(),
+        type:
+          "FAUCET",
+        from_wallet:
+          null,
+        to_wallet:
+          wallet.id,
+        amount:
+          FAUCET_AMOUNT,
+        fee: 0,
+        block_id:
+          null,
+        created_at:
+          new Date().toISOString(),
+      };
+
+      memory.transactions.push(
+        tx
+      );
+
+      const block =
+        await createMemoryBlock(1);
+
+      tx.block_id =
+        block.id;
+
+      memory.faucetClaims.push({
+        user_id:
+          req.user.id,
+        wallet_id:
+          wallet.id,
+        claimed_at:
+          new Date().toISOString(),
+      });
+
       res.json({
-        ...wallet,
-        transactions:
-          txResult.rows,
+        success: true,
+        amount:
+          FAUCET_AMOUNT,
+        transaction:
+          tx,
+        block,
+        wallet,
       });
     } catch (error) {
       console.error(
-        "WALLET DETAILS ERROR:",
+        "FAUCET ERROR:",
         error
       );
 
       res.status(500).json({
         error:
-          "Failed to load wallet",
+          "Faucet failed",
       });
     }
   }
@@ -1233,275 +1302,342 @@ app.get(
 
 app.post(
   "/api/send",
-  authRequired,
+  auth,
   async (req, res) => {
-    const client =
-      await pool.connect();
-
-    try {
-      const fromWalletId =
-        Number(
-          req.body.fromWalletId ||
-            req.body.from_wallet_id
-        );
-
-      const toAddress =
-        normalizeAddress(
-          req.body.toAddress ||
-            req.body.to_address
-        );
-
-      const amount =
-        Number(req.body.amount);
-
-      if (
-        !Number.isInteger(
-          fromWalletId
-        )
-      ) {
-        return res.status(400).json({
-          error:
-            "Invalid sender wallet",
-        });
-      }
-
-      if (
-        !isValidWalletAddress(
-          toAddress
-        )
-      ) {
-        return res.status(400).json({
-          error:
-            "Invalid SLX address",
-        });
-      }
-
-      if (
-        !Number.isFinite(amount) ||
-        amount <= 0
-      ) {
-        return res.status(400).json({
-          error:
-            "Amount must be greater than 0",
-        });
-      }
-
-      const cleanAmount =
-        roundAmount(amount);
-
-      const fee =
-        TRANSFER_FEE;
-
-      const total =
-        roundAmount(
-          cleanAmount + fee
-        );
-
-      await client.query(
-        "BEGIN"
+    const fromWalletId =
+      Number(
+        req.body.fromWalletId ||
+          req.body.from_wallet_id
       );
 
-      const senderResult =
-        await client.query(
-          `
-          SELECT *
-          FROM wallets
-          WHERE id = $1
-            AND user_id = $2
-          FOR UPDATE
-          `,
-          [
-            fromWalletId,
-            req.user.id,
-          ]
+    const toAddress =
+      String(
+        req.body.toAddress ||
+          req.body.to_address ||
+          ""
+      )
+        .trim()
+        .toUpperCase();
+
+    const amount =
+      Number(req.body.amount);
+
+    if (
+      !Number.isFinite(amount) ||
+      amount <= 0
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid amount",
+      });
+    }
+
+    if (
+      !validAddress(toAddress)
+    ) {
+      return res.status(400).json({
+        error:
+          "Invalid SLX address",
+      });
+    }
+
+    try {
+      if (useDatabase) {
+        const client =
+          await pool.connect();
+
+        try {
+          await client.query(
+            "BEGIN"
+          );
+
+          const senderResult =
+            await client.query(
+              `
+              SELECT *
+              FROM wallets
+              WHERE id = $1
+                AND user_id = $2
+              FOR UPDATE
+              `,
+              [
+                fromWalletId,
+                req.user.id,
+              ]
+            );
+
+          if (
+            !senderResult.rows.length
+          ) {
+            await client.query(
+              "ROLLBACK"
+            );
+
+            return res.status(404).json({
+              error:
+                "Sender wallet not found",
+            });
+          }
+
+          const sender =
+            senderResult.rows[0];
+
+          const recipientResult =
+            await client.query(
+              `
+              SELECT *
+              FROM wallets
+              WHERE address = $1
+              FOR UPDATE
+              `,
+              [toAddress]
+            );
+
+          if (
+            !recipientResult.rows.length
+          ) {
+            await client.query(
+              "ROLLBACK"
+            );
+
+            return res.status(404).json({
+              error:
+                "Recipient wallet not found",
+            });
+          }
+
+          const recipient =
+            recipientResult.rows[0];
+
+          if (
+            sender.id ===
+            recipient.id
+          ) {
+            await client.query(
+              "ROLLBACK"
+            );
+
+            return res.status(400).json({
+              error:
+                "Cannot send to same wallet",
+            });
+          }
+
+          const total =
+            amount + FEE;
+
+          if (
+            Number(sender.balance) <
+            total
+          ) {
+            await client.query(
+              "ROLLBACK"
+            );
+
+            return res.status(400).json({
+              error:
+                "Insufficient balance",
+            });
+          }
+
+          await client.query(
+            `
+            UPDATE wallets
+            SET balance =
+              balance - $1
+            WHERE id = $2
+            `,
+            [
+              total,
+              sender.id,
+            ]
+          );
+
+          await client.query(
+            `
+            UPDATE wallets
+            SET balance =
+              balance + $1
+            WHERE id = $2
+            `,
+            [
+              amount,
+              recipient.id,
+            ]
+          );
+
+          const hash =
+            txHash();
+
+          const tx =
+            await client.query(
+              `
+              INSERT INTO transactions
+              (
+                tx_hash,
+                type,
+                from_wallet,
+                to_wallet,
+                amount,
+                fee
+              )
+              VALUES
+              (
+                $1,
+                'TRANSFER',
+                $2,
+                $3,
+                $4,
+                $5
+              )
+              RETURNING *
+              `,
+              [
+                hash,
+                sender.id,
+                recipient.id,
+                amount,
+                FEE,
+              ]
+            );
+
+          const block =
+            await createDbBlock(
+              client,
+              1
+            );
+
+          await client.query(
+            `
+            UPDATE transactions
+            SET block_id = $1
+            WHERE id = $2
+            `,
+            [
+              block.id,
+              tx.rows[0].id,
+            ]
+          );
+
+          await client.query(
+            "COMMIT"
+          );
+
+          return res.json({
+            success: true,
+            transaction:
+              tx.rows[0],
+            block,
+            fee: FEE,
+          });
+        } catch (e) {
+          await client.query(
+            "ROLLBACK"
+          );
+          throw e;
+        } finally {
+          client.release();
+        }
+      }
+
+      const sender =
+        memory.wallets.find(
+          (w) =>
+            w.id ===
+              fromWalletId &&
+            w.user_id ===
+              req.user.id
         );
 
-      if (
-        senderResult.rows.length === 0
-      ) {
-        await client.query(
-          "ROLLBACK"
+      const recipient =
+        memory.wallets.find(
+          (w) =>
+            w.address ===
+            toAddress
         );
 
+      if (!sender) {
         return res.status(404).json({
           error:
             "Sender wallet not found",
         });
       }
 
-      const sender =
-        senderResult.rows[0];
-
-      const senderBalance =
-        Number(sender.balance);
-
-      if (
-        senderBalance < total
-      ) {
-        await client.query(
-          "ROLLBACK"
-        );
-
-        return res.status(400).json({
-          error:
-            "Insufficient balance",
-          balance:
-            senderBalance,
-          required:
-            total,
-        });
-      }
-
-      const recipientResult =
-        await client.query(
-          `
-          SELECT *
-          FROM wallets
-          WHERE address = $1
-          FOR UPDATE
-          `,
-          [toAddress]
-        );
-
-      if (
-        recipientResult.rows.length ===
-        0
-      ) {
-        await client.query(
-          "ROLLBACK"
-        );
-
+      if (!recipient) {
         return res.status(404).json({
           error:
             "Recipient wallet not found",
         });
       }
 
-      const recipient =
-        recipientResult.rows[0];
-
       if (
-        recipient.id ===
-        sender.id
+        sender.id ===
+        recipient.id
       ) {
-        await client.query(
-          "ROLLBACK"
-        );
-
         return res.status(400).json({
           error:
-            "Cannot send to the same wallet",
+            "Cannot send to same wallet",
         });
       }
 
-      await client.query(
-        `
-        UPDATE wallets
-        SET balance =
-          balance - $1
-        WHERE id = $2
-        `,
-        [
-          total,
+      const total =
+        amount + FEE;
+
+      if (
+        Number(sender.balance) <
+        total
+      ) {
+        return res.status(400).json({
+          error:
+            "Insufficient balance",
+        });
+      }
+
+      sender.balance =
+        Number(sender.balance) -
+        total;
+
+      recipient.balance =
+        Number(recipient.balance) +
+        amount;
+
+      const tx = {
+        id:
+          memory.nextTransaction++,
+        tx_hash:
+          txHash(),
+        type:
+          "TRANSFER",
+        from_wallet:
           sender.id,
-        ]
-      );
-
-      await client.query(
-        `
-        UPDATE wallets
-        SET balance =
-          balance + $1
-        WHERE id = $2
-        `,
-        [
-          cleanAmount,
+        to_wallet:
           recipient.id,
-        ]
+        amount,
+        fee: FEE,
+        block_id:
+          null,
+        created_at:
+          new Date().toISOString(),
+      };
+
+      memory.transactions.push(
+        tx
       );
-
-      const txHash =
-        generateTxHash();
-
-      const txResult =
-        await client.query(
-          `
-          INSERT INTO transactions (
-            tx_hash,
-            type,
-            from_wallet,
-            to_wallet,
-            amount,
-            fee
-          )
-          VALUES (
-            $1,
-            'TRANSFER',
-            $2,
-            $3,
-            $4,
-            $5
-          )
-          RETURNING *
-          `,
-          [
-            txHash,
-            sender.id,
-            recipient.id,
-            cleanAmount,
-            fee,
-          ]
-        );
 
       const block =
-        await createBlock(
-          client,
-          1
-        );
+        await createMemoryBlock(1);
 
-      await client.query(
-        `
-        UPDATE transactions
-        SET block_id = $1
-        WHERE id = $2
-        `,
-        [
-          block.id,
-          txResult.rows[0].id,
-        ]
-      );
-
-      await client.query(
-        "COMMIT"
-      );
+      tx.block_id =
+        block.id;
 
       res.json({
         success: true,
-        message:
-          "Transaction completed",
-
-        transaction: {
-          ...txResult.rows[0],
-          block_id:
-            block.id,
-          block_index:
-            block.block_index,
-        },
-
-        tx_hash:
-          txHash,
-
-        fee,
-        amount:
-          cleanAmount,
+        transaction:
+          tx,
+        block,
+        fee: FEE,
       });
     } catch (error) {
-      try {
-        await client.query(
-          "ROLLBACK"
-        );
-      } catch (_) {}
-
       console.error(
         "SEND ERROR:",
         error
@@ -1510,260 +1646,7 @@ app.post(
       res.status(500).json({
         error:
           "Transaction failed",
-        message:
-          error.message,
       });
-    } finally {
-      client.release();
-    }
-  }
-);
-
-// ============================================================
-// FAUCET
-// ============================================================
-
-app.post(
-  "/api/faucet",
-  authRequired,
-  async (req, res) => {
-    const client =
-      await pool.connect();
-
-    try {
-      const walletId =
-        Number(
-          req.body.walletId ||
-            req.body.wallet_id
-        );
-
-      if (
-        !Number.isInteger(
-          walletId
-        )
-      ) {
-        return res.status(400).json({
-          error:
-            "Invalid wallet ID",
-        });
-      }
-
-      const walletResult =
-        await client.query(
-          `
-          SELECT *
-          FROM wallets
-          WHERE id = $1
-            AND user_id = $2
-          FOR UPDATE
-          `,
-          [
-            walletId,
-            req.user.id,
-          ]
-        );
-
-      if (
-        walletResult.rows.length ===
-        0
-      ) {
-        return res.status(404).json({
-          error:
-            "Wallet not found",
-        });
-      }
-
-      const claimResult =
-        await client.query(
-          `
-          SELECT claimed_at
-          FROM faucet_claims
-          WHERE user_id = $1
-          ORDER BY claimed_at DESC
-          LIMIT 1
-          `,
-          [req.user.id]
-        );
-
-      if (
-        claimResult.rows.length >
-        0
-      ) {
-        const lastClaim =
-          new Date(
-            claimResult.rows[0]
-              .claimed_at
-          );
-
-        const cooldown =
-          FAUCET_COOLDOWN_HOURS *
-          60 *
-          60 *
-          1000;
-
-        const remaining =
-          cooldown -
-          (
-            Date.now() -
-            lastClaim.getTime()
-          );
-
-        if (remaining > 0) {
-          const hours =
-            Math.ceil(
-              remaining /
-                (
-                  60 *
-                  60 *
-                  1000
-                )
-            );
-
-          return res.status(429).json({
-            error:
-              "Faucet cooldown active",
-            message:
-              `Try again in approximately ${hours} hour(s).`,
-            retryAfterSeconds:
-              Math.ceil(
-                remaining / 1000
-              ),
-          });
-        }
-      }
-
-      await client.query(
-        "BEGIN"
-      );
-
-      await client.query(
-        `
-        UPDATE wallets
-        SET balance =
-          balance + $1
-        WHERE id = $2
-        `,
-        [
-          FAUCET_AMOUNT,
-          walletId,
-        ]
-      );
-
-      const txHash =
-        generateTxHash();
-
-      const txResult =
-        await client.query(
-          `
-          INSERT INTO transactions (
-            tx_hash,
-            type,
-            from_wallet,
-            to_wallet,
-            amount,
-            fee
-          )
-          VALUES (
-            $1,
-            'FAUCET',
-            NULL,
-            $2,
-            $3,
-            0
-          )
-          RETURNING *
-          `,
-          [
-            txHash,
-            walletId,
-            FAUCET_AMOUNT,
-          ]
-        );
-
-      const block =
-        await createBlock(
-          client,
-          1
-        );
-
-      await client.query(
-        `
-        UPDATE transactions
-        SET block_id = $1
-        WHERE id = $2
-        `,
-        [
-          block.id,
-          txResult.rows[0].id,
-        ]
-      );
-
-      await client.query(
-        `
-        INSERT INTO faucet_claims (
-          user_id,
-          wallet_id
-        )
-        VALUES ($1, $2)
-        `,
-        [
-          req.user.id,
-          walletId,
-        ]
-      );
-
-      await client.query(
-        "COMMIT"
-      );
-
-      const updated =
-        await pool.query(
-          `
-          SELECT *
-          FROM wallets
-          WHERE id = $1
-          `,
-          [walletId]
-        );
-
-      res.json({
-        success: true,
-        message:
-          `Faucet sent ${FAUCET_AMOUNT} SLX`,
-        amount:
-          FAUCET_AMOUNT,
-
-        transaction: {
-          ...txResult.rows[0],
-          block_id:
-            block.id,
-          block_index:
-            block.block_index,
-        },
-
-        wallet:
-          updated.rows[0],
-      });
-    } catch (error) {
-      try {
-        await client.query(
-          "ROLLBACK"
-        );
-      } catch (_) {}
-
-      console.error(
-        "FAUCET ERROR:",
-        error
-      );
-
-      res.status(500).json({
-        error:
-          "Faucet failed",
-        message:
-          error.message,
-      });
-    } finally {
-      client.release();
     }
   }
 );
@@ -1774,35 +1657,34 @@ app.post(
 
 app.get(
   "/api/blocks",
-  authRequired,
+  auth,
   async (req, res) => {
     try {
-      const result =
-        await pool.query(`
-          SELECT
-            id,
-            block_index,
-            timestamp,
-            hash,
-            previous_hash,
-            transaction_count
-          FROM blocks
-          ORDER BY
-            block_index DESC
-          LIMIT 50
-        `);
+      let blocks;
+
+      if (useDatabase) {
+        const result =
+          await pool.query(`
+            SELECT *
+            FROM blocks
+            ORDER BY block_index DESC
+            LIMIT 50
+          `);
+
+        blocks =
+          result.rows;
+      } else {
+        blocks =
+          [...memory.blocks]
+            .reverse()
+            .slice(0, 50);
+      }
 
       res.json({
         success: true,
-        blocks:
-          result.rows,
+        blocks,
       });
     } catch (error) {
-      console.error(
-        "BLOCKS ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
           "Failed to load blocks",
@@ -1817,65 +1699,52 @@ app.get(
 
 app.get(
   "/api/economy",
-  authRequired,
+  auth,
   async (req, res) => {
     try {
-      const result =
-        await pool.query(`
-          SELECT
-            COALESCE(
-              SUM(balance),
-              0
-            ) AS total_supply
-          FROM wallets
-        `);
+      let supply = 0;
 
-      const totalSupply =
-        Number(
-          result.rows[0]
-            .total_supply || 0
-        );
+      if (useDatabase) {
+        const result =
+          await pool.query(`
+            SELECT
+              COALESCE(
+                SUM(balance),
+                0
+              ) AS supply
+            FROM wallets
+          `);
+
+        supply =
+          Number(
+            result.rows[0].supply
+          );
+      } else {
+        supply =
+          memory.wallets.reduce(
+            (sum, w) =>
+              sum +
+              Number(w.balance),
+            0
+          );
+      }
 
       res.json({
         success: true,
-
-        totalSupply,
-        total_supply:
-          totalSupply,
-
-        supply:
-          totalSupply,
-
-        maxSupply:
-          1000000000,
-
-        max_supply:
-          1000000000,
-
-        transferFee:
-          TRANSFER_FEE,
-
-        transfer_fee:
-          TRANSFER_FEE,
-
+        totalSupply: supply,
+        total_supply: supply,
+        supply,
+        maxSupply: 1000000000,
+        max_supply: 1000000000,
+        transferFee: FEE,
+        transfer_fee: FEE,
         faucetAmount:
           FAUCET_AMOUNT,
-
         faucet_amount:
           FAUCET_AMOUNT,
-
-        network:
-          NETWORK_NAME,
-
-        version:
-          VERSION,
+        version: VERSION,
       });
     } catch (error) {
-      console.error(
-        "ECONOMY ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
           "Failed to load economy",
@@ -1888,139 +1757,306 @@ app.get(
 // CHAIN VERIFY
 // ============================================================
 
-async function verifyChain() {
-  const result =
-    await pool.query(`
-      SELECT
-        block_index,
-        hash,
-        previous_hash
-      FROM blocks
-      ORDER BY
-        block_index ASC
-    `);
-
-  const blocks =
-    result.rows;
-
-  if (
-    blocks.length === 0
-  ) {
-    return false;
-  }
-
-  if (
-    Number(
-      blocks[0].block_index
-    ) !== 0
-  ) {
-    return false;
-  }
-
-  for (
-    let i = 1;
-    i < blocks.length;
-    i++
-  ) {
-    const current =
-      blocks[i];
-
-    const previous =
-      blocks[i - 1];
-
-    if (
-      current.previous_hash !==
-      previous.hash
-    ) {
-      return false;
-    }
-
-    if (
-      Number(
-        current.block_index
-      ) !==
-      Number(
-        previous.block_index
-      ) + 1
-    ) {
-      return false;
-    }
-  }
-
-  return true;
-}
-
 app.post(
   "/api/chain/verify",
-  authRequired,
+  auth,
   async (req, res) => {
     try {
-      const valid =
-        await verifyChain();
+      let valid = true;
+
+      if (useDatabase) {
+        const result =
+          await pool.query(`
+            SELECT *
+            FROM blocks
+            ORDER BY block_index ASC
+          `);
+
+        const blocks =
+          result.rows;
+
+        for (
+          let i = 1;
+          i < blocks.length;
+          i++
+        ) {
+          if (
+            blocks[i]
+              .previous_hash !==
+            blocks[i - 1].hash
+          ) {
+            valid = false;
+            break;
+          }
+        }
+      } else {
+        for (
+          let i = 1;
+          i < memory.blocks.length;
+          i++
+        ) {
+          if (
+            memory.blocks[i]
+              .previous_hash !==
+            memory.blocks[i - 1].hash
+          ) {
+            valid = false;
+            break;
+          }
+        }
+      }
 
       res.json({
         success: true,
         valid,
-        verified:
-          valid,
+        verified: valid,
         status:
           valid
             ? "valid"
             : "invalid",
-        version:
-          VERSION,
+        version: VERSION,
       });
     } catch (error) {
-      console.error(
-        "VERIFY ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
           "Chain verification failed",
         valid: false,
         verified: false,
-        status:
-          "invalid",
+        status: "invalid",
       });
     }
   }
 );
 
-app.get(
-  "/api/chain/verify",
-  authRequired,
+// ============================================================
+// PASSWORD CHANGE
+// ============================================================
+
+app.post(
+  "/api/auth/password/change",
+  auth,
+  async (req, res) => {
+    const currentPassword =
+      String(
+        req.body.currentPassword ||
+          ""
+      );
+
+    const newPassword =
+      String(
+        req.body.newPassword ||
+          ""
+      );
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        error:
+          "Password must contain at least 6 characters",
+      });
+    }
+
+    let valid;
+
+    if (useDatabase) {
+      const result =
+        await pool.query(
+          `
+          SELECT password_hash
+          FROM users
+          WHERE id = $1
+          `,
+          [req.user.id]
+        );
+
+      valid =
+        await bcrypt.compare(
+          currentPassword,
+          result.rows[0]
+            .password_hash
+        );
+
+      if (!valid) {
+        return res.status(400).json({
+          error:
+            "Current password is incorrect",
+        });
+      }
+
+      const hash =
+        await bcrypt.hash(
+          newPassword,
+          10
+        );
+
+      await pool.query(
+        `
+        UPDATE users
+        SET password_hash = $1
+        WHERE id = $2
+        `,
+        [
+          hash,
+          req.user.id,
+        ]
+      );
+    } else {
+      valid =
+        await bcrypt.compare(
+          currentPassword,
+          req.user.password_hash
+        );
+
+      if (!valid) {
+        return res.status(400).json({
+          error:
+            "Current password is incorrect",
+        });
+      }
+
+      req.user.password_hash =
+        await bcrypt.hash(
+          newPassword,
+          10
+        );
+    }
+
+    const token =
+      tokenFor(req.user);
+
+    res.json({
+      success: true,
+      token,
+      accessToken: token,
+    });
+  }
+);
+
+// ============================================================
+// LOGOUT
+// ============================================================
+
+app.post(
+  "/api/auth/logout",
+  auth,
+  (req, res) => {
+    res.json({
+      success: true,
+      message:
+        "Logged out successfully",
+    });
+  }
+);
+
+// ============================================================
+// RECOVERY RESET
+// ============================================================
+
+app.post(
+  "/api/auth/recovery/reset",
   async (req, res) => {
     try {
+      const username =
+        String(
+          req.body.username || ""
+        ).trim();
+
+      const code =
+        String(
+          req.body.recoveryCode ||
+            req.body.recovery_code ||
+            ""
+        )
+          .trim()
+          .toUpperCase();
+
+      const newPassword =
+        String(
+          req.body.newPassword || ""
+        );
+
+      let user;
+
+      if (useDatabase) {
+        const result =
+          await pool.query(
+            `
+            SELECT *
+            FROM users
+            WHERE LOWER(username) =
+                  LOWER($1)
+            LIMIT 1
+            `,
+            [username]
+          );
+
+        user =
+          result.rows[0];
+      } else {
+        user =
+          memory.users.find(
+            (u) =>
+              u.username.toLowerCase() ===
+              username.toLowerCase()
+          );
+      }
+
+      if (!user) {
+        return res.status(400).json({
+          error:
+            "Invalid recovery data",
+        });
+      }
+
       const valid =
-        await verifyChain();
+        await bcrypt.compare(
+          code,
+          user.recovery_code_hash
+        );
+
+      if (!valid) {
+        return res.status(400).json({
+          error:
+            "Invalid recovery data",
+        });
+      }
+
+      const hash =
+        await bcrypt.hash(
+          newPassword,
+          10
+        );
+
+      if (useDatabase) {
+        await pool.query(
+          `
+          UPDATE users
+          SET password_hash = $1
+          WHERE id = $2
+          `,
+          [
+            hash,
+            user.id,
+          ]
+        );
+      } else {
+        user.password_hash =
+          hash;
+      }
+
+      const token =
+        tokenFor(user);
 
       res.json({
         success: true,
-        valid,
-        verified:
-          valid,
-        status:
-          valid
-            ? "valid"
-            : "invalid",
-        version:
-          VERSION,
+        token,
+        accessToken: token,
+        user:
+          publicUser(user),
       });
     } catch (error) {
-      console.error(
-        "VERIFY ERROR:",
-        error
-      );
-
       res.status(500).json({
         error:
-          "Chain verification failed",
-        valid: false,
-        verified: false,
-        status:
-          "invalid",
+          "Recovery failed",
       });
     }
   }
@@ -2036,16 +2072,14 @@ app.use(
     res.status(404).json({
       error:
         "API endpoint not found",
-      version:
-        VERSION,
+      version: VERSION,
     });
   }
 );
 
 // ============================================================
 // FRONTEND FALLBACK
-// IMPORTANT: Express 5 compatible.
-// DO NOT change this to app.get("*")
+// EXPRESS 5 SAFE
 // ============================================================
 
 app.use(
@@ -2065,39 +2099,32 @@ app.use(
 
 app.use(
   (
-    err,
+    error,
     req,
     res,
     next
   ) => {
     console.error(
       "SERVER ERROR:",
-      err
+      error
     );
 
-    if (
-      res.headersSent
-    ) {
-      return next(err);
+    if (res.headersSent) {
+      return next(error);
     }
 
     res.status(500).json({
       error:
         "Internal server error",
-      message:
-        process.env.NODE_ENV ===
-        "production"
-          ? "Server error"
-          : err.message,
     });
   }
 );
 
 // ============================================================
-// START SERVER
+// START
 // ============================================================
 
-async function startServer() {
+async function start() {
   try {
     await initDatabase();
 
@@ -2105,67 +2132,54 @@ async function startServer() {
       PORT,
       "0.0.0.0",
       () => {
-        console.log("");
         console.log(
-          "=========================================="
+          "===================================="
         );
         console.log(
-          "        SLX NETWORK v1.8.2"
+          "SLX NETWORK v1.8.2"
         );
         console.log(
-          "=========================================="
+          "Network:",
+          NETWORK
         );
         console.log(
-          `Network: ${NETWORK_NAME}`
+          "Port:",
+          PORT
         );
         console.log(
-          `Port: ${PORT}`
+          "Node:",
+          process.version
         );
         console.log(
-          `Node: ${process.version}`
+          "Storage:",
+          useDatabase
+            ? "PostgreSQL"
+            : "Memory"
         );
         console.log(
           "Status: ONLINE"
         );
         console.log(
-          "=========================================="
+          "===================================="
         );
-        console.log("");
       }
     );
   } catch (error) {
-    console.error("");
     console.error(
-      "=========================================="
+      "STARTUP ERROR:",
+      error
     );
-    console.error(
-      "SLX NETWORK STARTUP FAILED"
-    );
-    console.error(
-      "=========================================="
-    );
-    console.error(error);
-    console.error(
-      "=========================================="
-    );
-    console.error("");
 
     process.exit(1);
   }
 }
 
-// ============================================================
-// SHUTDOWN
-// ============================================================
-
 process.on(
   "SIGTERM",
   async () => {
-    console.log(
-      "SIGTERM received."
-    );
-
-    await pool.end();
+    if (pool) {
+      await pool.end();
+    }
 
     process.exit(0);
   }
@@ -2174,18 +2188,12 @@ process.on(
 process.on(
   "SIGINT",
   async () => {
-    console.log(
-      "SIGINT received."
-    );
-
-    await pool.end();
+    if (pool) {
+      await pool.end();
+    }
 
     process.exit(0);
   }
 );
 
-// ============================================================
-// RUN
-// ============================================================
-
-startServer();
+start();
