@@ -103,14 +103,15 @@ function loadDB() {
   const defaults = emptyDB();
 
   for (const key of [
-    'users',
-    'wallets',
-    'transactions',
-    'blocks',
-    'faucetClaims',
-    'demoAccounts',
-    'demoTrades'
-  ]) {
+  'users',
+  'wallets',
+  'transactions',
+  'blocks',
+  'faucetClaims',
+  'demoAccounts',
+  'demoTrades',
+  'demoOrders'
+]) {
     parsed[key] = Array.isArray(parsed[key])
       ? parsed[key]
       : [];
