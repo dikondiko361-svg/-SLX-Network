@@ -56,8 +56,9 @@ function emptyDB() {
     blocks: [],
     faucetClaims: [],
     demoAccounts: [],
-    demoTrades: [],
-    network: {
+demoTrades: [],
+demoOrders: [],
+network: {
       version: VERSION,
       name: NETWORK,
       height: 0,
