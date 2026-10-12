@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#070b12">
+<meta name="theme-color" content="#080b12">
 <title>SLX Network v2.2</title>
 
 <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
@@ -11,674 +11,1040 @@
 
 <style>
 :root{
- --bg:#070b12;
- --card:#101722;
- --card2:#0b111b;
- --line:rgba(255,255,255,.07);
- --text:#f2f6fb;
- --muted:#718096;
- --blue:#617dff;
- --green:#2ecb7b;
- --red:#ed5b6c
+  color-scheme:dark;
+  --bg:#080b12;
+  --panel:#101621;
+  --panel2:#141c29;
+  --line:#232e40;
+  --text:#eef3fb;
+  --muted:#8290a6;
+  --green:#31d99a;
+  --red:#ff647c;
+  --blue:#607cff;
+  --safe:env(safe-area-inset-bottom,0px)
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{
- margin:0;
- min-height:100%;
- background:var(--bg);
- color:var(--text);
- font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",sans-serif
-}
-body{overflow-x:hidden}
-button,input{font:inherit}
-button{border:0;color:inherit;cursor:pointer}
-.hidden{display:none!important}
 
-.card{
- background:rgba(15,21,32,.96);
- border:1px solid var(--line);
- border-radius:13px
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif
 }
+
+body{overflow-x:hidden}
+
+button,input{
+  font:inherit
+}
+
+button{
+  cursor:pointer
+}
+
+.hidden{
+  display:none!important
+}
+
+.muted{color:var(--muted)}
+.good{color:var(--green)!important}
+.bad{color:var(--red)!important}
+.mono{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  overflow-wrap:anywhere
+}
+
+/* AUTH */
 
 .auth{
- min-height:100dvh;
- display:flex;
- align-items:center;
- justify-content:center;
- padding:18px;
- background:
- radial-gradient(circle at 50% 0,rgba(80,110,255,.18),transparent 35%),
- var(--bg)
-}
-.auth-card{width:min(400px,100%);padding:22px}
-.auth-logo{
- width:48px;height:48px;margin:auto auto 12px;
- display:grid;place-items:center;
- border-radius:14px;
- background:linear-gradient(135deg,#5b8cff,#765cff);
- font-weight:900
-}
-.auth-title{text-align:center;font-size:21px;font-weight:900}
-.auth-sub{text-align:center;color:var(--muted);font-size:10px;margin-top:5px}
-.auth-tabs{
- display:grid;grid-template-columns:1fr 1fr;
- gap:4px;padding:3px;margin-top:18px;
- background:#0b1018;border-radius:8px
-}
-.auth-tab{
- height:34px;background:transparent;
- color:#718096;border-radius:6px;
- font-size:10px;font-weight:800
-}
-.auth-tab.active{background:#202a3a;color:#fff}
-.auth-field{margin-top:8px}
-.auth-field input{
- width:100%;height:40px;
- padding:0 11px;
- border:1px solid rgba(255,255,255,.08);
- border-radius:8px;
- outline:0;
- background:#0b1018;
- color:#fff;
- font-size:11px
-}
-.auth-submit{
- width:100%;height:41px;margin-top:12px;
- border-radius:8px;
- background:#596fff;
- font-size:11px;
- font-weight:900
-}
-.auth-msg{
- min-height:18px;
- margin-top:8px;
- text-align:center;
- color:#ef6574;
- font-size:9px
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px
 }
 
-.app{min-height:100dvh;background:var(--bg)}
+.auth-card{
+  width:min(100%,420px);
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:24px
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px
+}
+
+.logo-box{
+  width:46px;
+  height:46px;
+  border-radius:15px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#607cff,#795cff);
+  font-weight:900;
+  font-size:19px
+}
+
+.logo-name{
+  font-size:18px;
+  font-weight:900
+}
+
+.logo-sub{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:3px
+}
+
+.auth h1{
+  margin:28px 0 7px;
+  font-size:27px
+}
+
+.auth p{
+  color:var(--muted);
+  font-size:13px
+}
+
+.tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#090e16;
+  border:1px solid var(--line);
+  padding:4px;
+  border-radius:12px;
+  margin:20px 0
+}
+
+.tab{
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:10px;
+  border-radius:9px;
+  font-weight:800
+}
+
+.tab.active{
+  background:#202d45;
+  color:white
+}
+
+.field{
+  margin:13px 0
+}
+
+.field label{
+  display:block;
+  color:#aab6c8;
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:7px
+}
+
+.field input{
+  width:100%;
+  min-height:46px;
+  border:1px solid #293548;
+  background:#0b111a;
+  color:white;
+  border-radius:12px;
+  padding:12px 14px;
+  outline:none
+}
+
+.btn{
+  border:1px solid var(--line);
+  background:#182335;
+  color:white;
+  border-radius:12px;
+  padding:12px 15px;
+  font-weight:800
+}
+
+.btn.primary{
+  background:#586fff;
+  border-color:transparent
+}
+
+.btn.green{
+  background:#123a31;
+  border-color:#1e654f;
+  color:#72efb7
+}
+
+.btn.red{
+  background:#3d1823;
+  border-color:#692838;
+  color:#ff91a2
+}
+
+.btn.full{
+  width:100%
+}
+
+/* APP */
+
+.app{
+  min-height:100dvh;
+  padding-bottom:92px
+}
 
 .topbar{
- position:sticky;
- top:0;
- z-index:50;
- height:52px;
- display:flex;
- align-items:center;
- justify-content:space-between;
- padding:0 12px;
- background:rgba(7,11,18,.94);
- backdrop-filter:blur(18px);
- border-bottom:1px solid var(--line)
-}
-.brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:850}
-.logo{
- width:28px;height:28px;
- display:grid;place-items:center;
- border-radius:9px;
- background:linear-gradient(135deg,#5b8cff,#765cff);
- font-size:11px;font-weight:900
-}
-.version{color:#718096;font-size:9px}
-.network{
- display:flex;align-items:center;gap:6px;
- padding:6px 9px;
- border-radius:999px;
- background:rgba(46,203,123,.07);
- color:#9eb0a8;
- font-size:9px;font-weight:800
-}
-.dot{width:6px;height:6px;border-radius:50%;background:#32d583}
-
-.main{
- width:min(1100px,100%);
- margin:auto;
- padding:9px 9px 78px
-}
-.page{display:none}
-.page.active{display:block}
-
-.wallet-card{padding:15px}
-.label{
- color:#8290a4;
- font-size:9px;
- font-weight:750
-}
-.big{
- margin-top:6px;
- font-size:28px;
- font-weight:900
-}
-.small{color:#718096;font-size:9px}
-.address{
- display:flex;
- align-items:center;
- gap:8px;
- margin-top:12px;
- padding:9px;
- border-radius:8px;
- background:var(--card2);
- color:#9aa7b9;
- font-size:10px
-}
-.address span{
- flex:1;
- min-width:0;
- overflow:hidden;
- text-overflow:ellipsis;
- white-space:nowrap
-}
-.text-btn{
- background:none;
- color:#9bacff;
- font-size:9px;
- font-weight:800
+  position:sticky;
+  top:0;
+  z-index:50;
+  height:86px;
+  padding:18px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#080b12ee;
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid #1a2433
 }
 
-.actions{
- display:grid;
- grid-template-columns:repeat(3,1fr);
- gap:6px;
- margin-top:9px
+.top-left{
+  display:flex;
+  align-items:center;
+  gap:12px
 }
-.btn{
- min-height:36px;
- padding:0 7px;
- border-radius:8px;
- background:#151f2d;
- color:#c9d3df;
- font-size:10px;
- font-weight:800
-}
-.btn.primary{background:#536fff;color:white}
-.btn.green{background:rgba(46,203,123,.13);color:#45dc94}
 
-.home-market{
- margin-top:8px;
- padding:12px
+.top-logo{
+  width:56px;
+  height:56px;
+  border-radius:17px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(145deg,#607cff,#795cff);
+  font-size:20px;
+  font-weight:900
 }
-.pair{
- display:flex;
- align-items:center;
- gap:8px
+
+.top-title{
+  font-size:22px;
+  font-weight:900
 }
-.coin{
- width:30px;height:30px;
- display:grid;place-items:center;
- border-radius:50%;
- background:linear-gradient(135deg,#657cff,#4855d8);
- font-size:11px;font-weight:900
+
+.version{
+  color:var(--muted);
+  font-size:13px
 }
-.pair-name{font-size:14px;font-weight:900}
-.pair-sub{color:#718096;font-size:9px;margin-top:2px}
-.demo{
- margin-left:auto;
- padding:5px 7px;
- border-radius:6px;
- color:#eab75c;
- background:rgba(255,190,70,.08);
- font-size:8px;font-weight:800
+
+.testnet{
+  background:#09221b;
+  border:1px solid #123d30;
+  color:#a1b8ae;
+  border-radius:30px;
+  padding:10px 16px;
+  font-size:12px;
+  font-weight:900
 }
-.price-line{
- display:flex;
- align-items:baseline;
- gap:8px;
- margin-top:9px
+
+.dot{
+  display:inline-block;
+  width:9px;
+  height:9px;
+  background:var(--green);
+  border-radius:50%;
+  margin-right:7px
 }
-.price{font-size:25px;font-weight:900}
-.change{color:#39d98a;font-size:10px;font-weight:800}
-.two{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:6px;
- margin-top:9px
+
+.content{
+  width:min(1120px,100%);
+  margin:auto;
+  padding:16px
 }
-.two button{
- height:35px;
- border-radius:8px;
- background:#172236;
- font-size:10px;
- font-weight:800
+
+.page{
+  display:none
 }
+
+.page.active{
+  display:block
+}
+
+/* CARDS */
+
+.card{
+  background:linear-gradient(145deg,#111823,#0e141e);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:16px
+}
+
+.section-gap{
+  margin-top:14px
+}
+
+/* MARKET */
 
 .market-head{
- padding:10px 11px;
- margin-bottom:7px
+  padding:18px 20px
 }
-.market-top{
- display:flex;
- align-items:center;
- justify-content:space-between
-}
-.market-price{text-align:right}
-.market-price .price{font-size:22px}
 
-.meta{
- display:flex;
- gap:17px;
- overflow:auto;
- margin-top:9px;
- padding-top:8px;
- border-top:1px solid rgba(255,255,255,.04)
+.market-main{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:15px
 }
-.meta div{flex:0 0 auto}
-.meta b{
- display:block;
- color:#68758a;
- font-size:8px;
- margin-bottom:3px
+
+.pair{
+  display:flex;
+  align-items:center;
+  gap:13px
 }
-.meta span{
- font-size:9px;
- color:#c1cbd8;
- font-weight:750
+
+.pair-icon{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#5269e8;
+  display:grid;
+  place-items:center;
+  font-size:21px;
+  font-weight:900
+}
+
+.pair-name{
+  font-size:28px;
+  font-weight:900
+}
+
+.pair-sub{
+  color:var(--muted);
+  margin-top:4px
+}
+
+.price{
+  text-align:right;
+  font-size:43px;
+  font-weight:950;
+  letter-spacing:-.05em
+}
+
+.change{
+  color:var(--green);
+  font-weight:900;
+  text-align:right;
+  margin-top:3px
+}
+
+.metrics{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  border-top:1px solid var(--line);
+  margin-top:16px;
+  padding-top:16px
+}
+
+.metric-title{
+  color:var(--muted);
+  font-size:11px;
+  font-weight:700
+}
+
+.metric-value{
+  margin-top:7px;
+  font-weight:900
+}
+
+/* CHART */
+
+.chart-card{
+  margin-top:14px;
+  overflow:hidden
+}
+
+.timeframes{
+  display:flex;
+  gap:5px;
+  padding:4px;
+  margin-bottom:10px
+}
+
+.timeframe{
+  flex:0 0 auto;
+  min-width:58px;
+  border:0;
+  border-radius:10px;
+  background:transparent;
+  color:var(--muted);
+  padding:10px 12px;
+  font-weight:900
+}
+
+.timeframe.active{
+  background:#24334e;
+  color:white
 }
 
 .chart{
- overflow:hidden;
- margin-bottom:7px
-}
-.timeframes{
- display:flex;
- gap:3px;
- padding:5px;
- border-bottom:1px solid rgba(255,255,255,.05)
-}
-.tf{
- padding:6px 10px;
- background:none;
- color:#718096;
- border-radius:6px;
- font-size:9px;
- font-weight:800
-}
-.tf.active{background:#202b3e;color:#fff}
-.chartbox{
- position:relative;
- height:185px;
- background:
- linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
- linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
- background-size:25% 20%
-}
-canvas{width:100%;height:100%;display:block}
-.chart-price{
- position:absolute;
- right:4px;
- top:50%;
- padding:3px 5px;
- border-radius:3px;
- background:#273247;
- font-size:8px
+  height:350px;
+  overflow:hidden
 }
 
-.market-grid{
- display:grid;
- grid-template-columns:minmax(0,1fr) 300px;
- gap:7px
-}
-.trade{padding:10px}
-.side{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:4px;
- padding:3px;
- border-radius:8px;
- background:#0b1018
-}
-.side button{
- height:31px;
- border-radius:6px;
- background:none;
- color:#718096;
- font-size:10px;
- font-weight:900
-}
-.side .buy.active{background:rgba(46,203,123,.13);color:#43dc92}
-.side .sell.active{background:rgba(237,91,108,.13);color:#ff7180}
-
-.types{
- display:flex;
- gap:18px;
- margin:10px 2px 7px
-}
-.type{
- position:relative;
- padding:0 0 6px;
- background:none;
- color:#718096;
- font-size:10px;
- font-weight:800
-}
-.type.active{color:#fff}
-.type.active:after{
- content:"";
- position:absolute;
- left:0;right:0;bottom:0;
- height:2px;
- background:var(--blue)
+.chart svg{
+  width:100%;
+  height:100%
 }
 
-.field{margin-top:7px}
-.field-label{
- display:flex;
- justify-content:space-between;
- margin-bottom:4px;
- color:#78869a;
- font-size:8px
+/* TRADE */
+
+.trade-card{
+  margin-top:14px;
+  padding:14px
 }
-.input{
- height:35px;
- display:flex;
- align-items:center;
- padding:0 9px;
- border:1px solid rgba(255,255,255,.07);
- border-radius:7px;
- background:#0b1018
+
+.trade-tabs{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  background:#090e16;
+  border-radius:13px;
+  padding:5px
 }
-.input input{
- width:100%;
- min-width:0;
- border:0;
- outline:0;
- background:none;
- color:#fff;
- font-size:11px
+
+.trade-side{
+  border:0;
+  background:transparent;
+  color:#77869e;
+  padding:14px;
+  border-radius:10px;
+  font-weight:900;
+  font-size:16px
 }
-.input span{color:#7c899d;font-size:9px}
+
+.trade-side.buy.active{
+  background:#0b3027;
+  color:#43e5a4
+}
+
+.trade-side.sell.active{
+  background:#3a1720;
+  color:#ff7288
+}
+
+.order-types{
+  display:flex;
+  gap:25px;
+  margin:16px 0 10px
+}
+
+.order-type{
+  border:0;
+  border-bottom:3px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  padding:4px 0 9px;
+  font-weight:900
+}
+
+.order-type.active{
+  color:white;
+  border-color:#6379ff
+}
+
+.input-label{
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:12px;
+  font-weight:700;
+  margin:9px 0 7px
+}
+
+.trade-input{
+  width:100%;
+  height:68px;
+  background:#090e16;
+  border:1px solid #202b3a;
+  color:white;
+  border-radius:14px;
+  padding:0 16px;
+  font-size:20px;
+  outline:none
+}
 
 .percent{
- display:grid;
- grid-template-columns:repeat(4,1fr);
- gap:5px;
- margin-top:7px
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:9px;
+  margin-top:12px
 }
+
 .percent button{
- height:25px;
- border-radius:5px;
- background:#141d2b;
- color:#8491a4;
- font-size:8px;
- font-weight:800
-}
-.percent button.active{background:#202b3e;color:#fff}
-
-.balance{
- display:flex;
- justify-content:space-between;
- margin-top:8px;
- color:#718096;
- font-size:9px
-}
-.balance strong{color:#c1cbd8}
-
-.submit{
- width:100%;
- height:37px;
- margin-top:10px;
- border-radius:7px;
- font-size:10px;
- font-weight:900
-}
-.submit.buy{background:var(--green);color:#06130d}
-.submit.sell{background:var(--red);color:#fff}
-.hint{
- margin-top:6px;
- color:#606e82;
- font-size:8px;
- line-height:1.4
+  border:0;
+  background:#152033;
+  color:#8795aa;
+  border-radius:10px;
+  padding:11px 4px;
+  font-weight:900
 }
 
-.book{overflow:hidden}
-.book summary{
- padding:12px;
- cursor:pointer;
- font-size:11px;
- font-weight:900;
- list-style:none
+.balance-row{
+  display:flex;
+  justify-content:space-between;
+  margin-top:13px;
+  color:var(--muted)
 }
-.book summary::-webkit-details-marker{display:none}
-.book-inner{padding:0 10px 10px}
-.book-head,.row{
- display:grid;
- grid-template-columns:1fr 1fr 1fr;
- gap:4px
+
+.balance-row strong{
+  color:#cdd6e5
 }
-.book-head{
- padding-bottom:5px;
- color:#69768a;
- font-size:8px
+
+.trade-submit{
+  width:100%;
+  border:0;
+  border-radius:13px;
+  margin-top:15px;
+  height:54px;
+  font-weight:950;
+  font-size:18px;
+  background:var(--green);
+  color:#06140f
 }
-.row{
- min-height:20px;
- font-size:9px
+
+.trade-submit.sell{
+  background:var(--red);
+  color:white
 }
-.row span:nth-child(2),.row span:nth-child(3){text-align:right}
-.ask{color:#f16472}
-.bid{color:#36d68a}
-.mid{
- display:flex;
- justify-content:space-between;
- padding:7px 0;
- margin:5px 0;
- border-top:1px solid rgba(255,255,255,.04);
- border-bottom:1px solid rgba(255,255,255,.04)
+
+.demo-note{
+  color:#68788f;
+  font-size:11px;
+  margin-top:11px
 }
-.mid strong{font-size:12px}
-.mid span{color:#39d98a;font-size:9px}
+
+/* BOOK */
+
+.book-card{
+  margin-top:14px
+}
+
+.book-title{
+  font-size:20px;
+  font-weight:900
+}
+
+.book-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-top:15px
+}
+
+.book-side-title{
+  display:flex;
+  justify-content:space-between;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:8px
+}
+
+.book-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  padding:7px 3px;
+  font-size:11px
+}
+
+.book-row span:last-child{
+  text-align:right
+}
+
+.mid-price{
+  border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);
+  margin:8px 0;
+  padding:10px 0;
+  text-align:center;
+  font-weight:900
+}
+
+/* MARKET TABS */
 
 .market-tabs{
- display:flex;
- gap:18px;
- height:38px;
- padding:0 10px;
- border-bottom:1px solid var(--line);
- overflow:auto
+  margin-top:14px;
+  background:#101621;
+  border:1px solid var(--line);
+  border-radius:20px;
+  overflow:hidden
 }
+
+.market-tab-buttons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  border-bottom:1px solid var(--line)
+}
+
 .market-tab{
- position:relative;
- background:none;
- color:#718096;
- font-size:9px;
- font-weight:850
+  border:0;
+  background:transparent;
+  color:var(--muted);
+  padding:17px 5px;
+  font-weight:900
 }
-.market-tab.active{color:#fff}
-.market-tab.active:after{
- content:"";
- position:absolute;
- left:0;right:0;bottom:-1px;
- height:2px;background:var(--blue)
-}
-.market-data{padding:8px 10px;min-height:70px}
 
-.item{
- display:flex;
- justify-content:space-between;
- gap:8px;
- padding:9px 2px;
- border-bottom:1px solid rgba(255,255,255,.045)
+.market-tab.active{
+  color:white;
+  box-shadow:inset 0 -3px #607cff
 }
-.item:last-child{border-bottom:0}
-.item-title{font-size:10px;font-weight:800}
-.item-sub{margin-top:3px;color:#68758a;font-size:8px}
-.item-right{text-align:right;font-size:9px;font-weight:800}
-.empty{text-align:center;color:#5e6b80;font-size:9px;padding:18px 4px}
+
+.tab-content{
+  padding:10px 20px 15px
+}
+
+.trade-item,
+.order-item{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:15px 0;
+  border-bottom:1px solid #1d2634
+}
+
+.trade-item:last-child,
+.order-item:last-child{
+  border-bottom:0
+}
+
+.trade-name{
+  font-weight:900
+}
+
+.trade-date{
+  color:var(--muted);
+  font-size:11px;
+  margin-top:5px
+}
+
+.trade-right{
+  text-align:right
+}
+
+.trade-price{
+  font-weight:900
+}
+
+.trade-total{
+  color:var(--green);
+  font-weight:900;
+  margin-top:4px
+}
+
 .cancel{
- margin-top:4px;
- padding:4px 7px;
- border-radius:5px;
- background:rgba(237,91,108,.1);
- color:#ff8791;
- font-size:8px
+  border:1px solid #613040;
+  background:#321924;
+  color:#ff8ea0;
+  border-radius:8px;
+  padding:6px 9px;
+  font-size:10px;
+  font-weight:900;
 }
 
-.info-grid{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:7px
-}
-.info{
- padding:12px
-}
-.info-label{color:#718096;font-size:8px}
-.info-value{margin-top:5px;font-size:13px;font-weight:850}
+/* WALLET */
 
-.bottom{
- position:fixed;
- left:0;right:0;bottom:0;
- z-index:60;
- height:62px;
- padding-bottom:env(safe-area-inset-bottom);
- background:rgba(7,11,18,.96);
- backdrop-filter:blur(18px);
- border-top:1px solid var(--line)
+.wallet-balance{
+  text-align:center;
+  padding:25px 10px
 }
-.nav{
- width:min(650px,100%);
- height:100%;
- margin:auto;
- display:grid;
- grid-template-columns:repeat(5,1fr)
+
+.wallet-number{
+  font-size:38px;
+  font-weight:950
 }
-.nav button{
- position:relative;
- background:none;
- color:#5f6c80;
- font-size:8px;
- font-weight:750
+
+.wallet-address{
+  margin-top:15px;
+  background:#0a1018;
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:12px;
+  text-align:center;
+  font-size:11px
 }
-.nav i{
- display:block;
- font-style:normal;
- font-size:16px;
- margin-bottom:2px
+
+.wallet-actions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:9px;
+  margin-top:13px
 }
-.nav button.active{color:#fff}
-.nav button.active:before{
- content:"";
- position:absolute;
- top:0;left:28%;right:28%;
- height:2px;
- background:var(--blue)
+
+.wallet-action{
+  border:1px solid #29364a;
+  background:#152033;
+  color:white;
+  border-radius:12px;
+  padding:13px 5px;
+  font-weight:900
+}
+
+/* PROFILE */
+
+.profile-card{
+  padding:24px
+}
+
+.profile-head{
+  display:flex;
+  align-items:center;
+  gap:16px
+}
+
+.avatar{
+  width:70px;
+  height:70px;
+  border-radius:22px;
+  background:linear-gradient(145deg,#607cff,#795cff);
+  display:grid;
+  place-items:center;
+  font-size:30px;
+  font-weight:950
+}
+
+.profile-name{
+  font-size:30px;
+  font-weight:950
+}
+
+.profile-sub{
+  color:var(--muted);
+  margin-top:5px
+}
+
+.profile-buttons{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:22px
+}
+
+.profile-btn{
+  border:0;
+  background:#162235;
+  color:#d5deeb;
+  border-radius:13px;
+  padding:15px 8px;
+  font-weight:900
+}
+
+.profile-btn.primary{
+  background:#566dff;
+  color:white
+}
+
+/* MODAL */
+
+.modal-bg{
+  position:fixed;
+  inset:0;
+  z-index:200;
+  background:#000b;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:15px
 }
 
 .modal{
- position:fixed;
- inset:0;
- z-index:100;
- display:none;
- align-items:center;
- justify-content:center;
- padding:15px;
- background:rgba(0,0,0,.76);
- backdrop-filter:blur(5px)
+  width:min(100%,470px);
+  max-height:92dvh;
+  overflow:auto;
+  background:#111823;
+  border:1px solid #2a374a;
+  border-radius:24px;
+  padding:20px
 }
-.modal.show{display:flex}
-.modal-card{
- width:min(420px,100%);
- padding:15px;
- max-height:90dvh;
- overflow:auto
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center
 }
-.modal-title{font-size:14px;font-weight:900}
-.modal-text{
- margin-top:7px;
- color:#8390a4;
- font-size:9px;
- line-height:1.5;
- white-space:pre-line
+
+.modal-title{
+  font-size:19px;
+  font-weight:950
 }
-.modal-actions{
- display:grid;
- grid-template-columns:1fr 1fr;
- gap:6px;
- margin-top:12px
+
+.modal-close{
+  width:35px;
+  height:35px;
+  border:1px solid var(--line);
+  background:#192334;
+  color:white;
+  border-radius:10px;
+  font-size:20px
 }
-.modal-actions button{
- height:37px;
- border-radius:7px;
- background:#172131;
- font-size:9px;
- font-weight:850
-}
-.modal-actions .ok{background:#536fff}
 
 .qr{
- display:flex;
- align-items:center;
- justify-content:center;
- min-height:200px;
- margin-top:10px;
- padding:12px;
- border-radius:9px;
- background:#fff
+  background:white;
+  width:max-content;
+  margin:18px auto;
+  padding:14px;
+  border-radius:14px
+}
+
+.qr-address{
+  text-align:center;
+  font-size:11px;
+  color:#9ba8ba;
+  word-break:break-all
 }
 
 .scanner{
- position:relative;
- height:300px;
- margin-top:10px;
- overflow:hidden;
- border-radius:10px;
- background:#000
+  position:relative;
+  margin-top:14px;
+  border-radius:16px;
+  overflow:hidden;
+  background:#000;
+  height:330px
 }
+
 .scanner video{
- width:100%;
- height:100%;
- object-fit:cover
+  width:100%;
+  height:100%;
+  object-fit:cover
 }
-.scan-frame{
- position:absolute;
- left:15%;right:15%;top:15%;bottom:15%;
- border:2px solid #6784ff;
- border-radius:14px
-}
+
 .scan-line{
- position:absolute;
- left:15%;right:15%;top:50%;
- height:2px;
- background:#6784ff;
- box-shadow:0 0 10px #6784ff
+  position:absolute;
+  left:12%;
+  right:12%;
+  top:50%;
+  height:2px;
+  background:#607cff;
+  box-shadow:0 0 15px #607cff
 }
-.scan-status{
- margin-top:7px;
- color:#8190a4;
- font-size:9px;
- line-height:1.4
+
+/* NAV */
+
+.bottom-nav{
+  position:fixed;
+  z-index:100;
+  bottom:0;
+  left:0;
+  right:0;
+  padding:7px 8px calc(7px + var(--safe));
+  background:#080d15ee;
+  backdrop-filter:blur(18px);
+  border-top:1px solid #1c2634
 }
+
+.nav{
+  max-width:760px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:3px
+}
+
+.nav button{
+  border:0;
+  background:transparent;
+  color:#718096;
+  padding:8px 2px;
+  border-radius:11px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  font-size:10px;
+  font-weight:900
+}
+
+.nav button.active{
+  color:white
+}
+
+.nav-icon{
+  font-size:19px
+}
+
+/* TOAST */
 
 .toast{
- position:fixed;
- z-index:200;
- left:50%;
- bottom:75px;
- transform:translateX(-50%) translateY(15px);
- padding:10px 13px;
- max-width:90%;
- border-radius:9px;
- background:#182131;
- border:1px solid var(--line);
- font-size:9px;
- opacity:0;
- pointer-events:none;
- transition:.2s
-}
-.toast.show{
- opacity:1;
- transform:translateX(-50%) translateY(0)
+  position:fixed;
+  z-index:300;
+  left:50%;
+  bottom:calc(90px + var(--safe));
+  transform:translateX(-50%);
+  background:#edf4ff;
+  color:#07111f;
+  padding:12px 16px;
+  border-radius:12px;
+  font-size:12px;
+  font-weight:900
 }
 
-@media(max-width:760px){
- .main{padding:8px 8px 75px}
- .market-grid{grid-template-columns:1fr}
- .chartbox{height:175px}
- .meta{gap:13px}
- .book{margin-top:0}
+/* MOBILE */
+
+@media(max-width:700px){
+
+  .topbar{
+    height:86px;
+    padding:15px 16px
+  }
+
+  .top-logo{
+    width:50px;
+    height:50px
+  }
+
+  .top-title{
+    font-size:19px
+  }
+
+  .testnet{
+    padding:9px 12px
+  }
+
+  .content{
+    padding:10px 8px
+  }
+
+  .market-head{
+    padding:14px
+  }
+
+  .pair-icon{
+    width:50px;
+    height:50px
+  }
+
+  .pair-name{
+    font-size:21px
+  }
+
+  .price{
+    font-size:32px
+  }
+
+  .metrics{
+    gap:7px
+  }
+
+  .metric-title{
+    font-size:9px
+  }
+
+  .metric-value{
+    font-size:12px
+  }
+
+  .chart-card{
+    padding:10px
+  }
+
+  .chart{
+    height:300px
+  }
+
+  .trade-card{
+    padding:12px
+  }
+
+  .trade-side{
+    padding:13px 5px
+  }
+
+  .trade-input{
+    height:58px
+  }
+
+  .book-grid{
+    gap:10px
+  }
+
+  .profile-card{
+    padding:18px
+  }
+
+  .profile-name{
+    font-size:25px
+  }
+
+  .profile-buttons{
+    grid-template-columns:1fr 1fr 1fr
+  }
 }
 
-@media(min-width:761px){
- .chartbox{height:250px}
+@media(max-width:430px){
+
+  .top-title{
+    font-size:18px
+  }
+
+  .version{
+    font-size:11px
+  }
+
+  .testnet{
+    font-size:10px;
+    padding:8px 10px
+  }
+
+  .market-main{
+    align-items:flex-start
+  }
+
+  .pair-name{
+    font-size:20px
+  }
+
+  .pair-sub{
+    font-size:10px
+  }
+
+  .price{
+    font-size:30px
+  }
+
+  .metrics{
+    grid-template-columns:repeat(4,1fr)
+  }
+
+  .metric-title{
+    white-space:nowrap;
+    overflow:hidden
+  }
+
+  .metric-value{
+    font-size:11px
+  }
+
+  .chart{
+    height:280px
+  }
+
+  .percent{
+    gap:6px
+  }
+
+  .percent button{
+    font-size:11px
+  }
+
+  .profile-buttons{
+    grid-template-columns:1fr 1fr
+  }
+
+  .profile-buttons .profile-btn:last-child{
+    grid-column:1 / -1
+  }
+
+  .wallet-number{
+    font-size:32px
+  }
 }
 </style>
 </head>
@@ -686,1990 +1052,1941 @@ canvas{width:100%;height:100%;display:block}
 <body>
 
 <!-- AUTH -->
-<div id="authScreen" class="auth">
- <div class="card auth-card">
-  <div class="auth-logo">SLX</div>
-  <div class="auth-title">SLX Network</div>
-  <div class="auth-sub">Testnet • Demo Market • v2.2</div>
+<section id="auth" class="auth">
+  <div class="auth-card">
 
-  <div class="auth-tabs">
-   <button class="auth-tab active" data-auth="login">Вход</button>
-   <button class="auth-tab" data-auth="register">Регистрация</button>
+    <div class="logo">
+      <div class="logo-box">SLX</div>
+      <div>
+        <div class="logo-name">SLX Network</div>
+        <div class="logo-sub">Wallet · Demo Market · Testnet</div>
+      </div>
+    </div>
+
+    <h1 id="authTitle">С возвращением</h1>
+    <p id="authSub">Войди в тестовый кошелёк SLX.</p>
+
+    <div class="tabs">
+      <button id="loginTab" class="tab active">Вход</button>
+      <button id="registerTab" class="tab">Регистрация</button>
+    </div>
+
+    <form id="loginForm">
+      <div class="field">
+        <label>Логин</label>
+        <input id="loginUsername" required minlength="3">
+      </div>
+
+      <div class="field">
+        <label>Пароль</label>
+        <input id="loginPassword" type="password" required minlength="6">
+      </div>
+
+      <button class="btn primary full">Войти</button>
+    </form>
+
+    <form id="registerForm" class="hidden">
+      <div class="field">
+        <label>Логин</label>
+        <input id="registerUsername" required minlength="3" maxlength="32">
+      </div>
+
+      <div class="field">
+        <label>Пароль</label>
+        <input id="registerPassword" type="password" required minlength="6">
+      </div>
+
+      <button class="btn primary full">Создать аккаунт</button>
+    </form>
+
   </div>
-
-  <div id="loginForm">
-   <div class="auth-field">
-    <input id="loginEmail" type="email" placeholder="Email">
-   </div>
-   <div class="auth-field">
-    <input id="loginPassword" type="password" placeholder="Пароль">
-   </div>
-   <button id="loginBtn" class="auth-submit">Войти</button>
-  </div>
-
-  <div id="registerForm" class="hidden">
-   <div class="auth-field">
-    <input id="regName" type="text" placeholder="Имя" maxlength="32">
-   </div>
-   <div class="auth-field">
-    <input id="regEmail" type="email" placeholder="Email">
-   </div>
-   <div class="auth-field">
-    <input id="regPassword" type="password" placeholder="Пароль">
-   </div>
-   <button id="registerBtn" class="auth-submit">Создать аккаунт</button>
-  </div>
-
-  <div id="authMsg" class="auth-msg"></div>
- </div>
-</div>
+</section>
 
 <!-- APP -->
 <div id="app" class="app hidden">
 
 <header class="topbar">
- <div class="brand">
-  <div class="logo">SLX</div>
-  <div>SLX Network <span class="version">v2.2</span></div>
- </div>
- <button class="network" data-page="network">
-  <span class="dot"></span> TESTNET
- </button>
+
+  <div class="top-left">
+    <div class="top-logo">SLX</div>
+
+    <div>
+      <div class="top-title">
+        SLX Network <span class="version">v2.2</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="testnet">
+    <span class="dot"></span>TESTNET
+  </div>
+
 </header>
 
-<main class="main">
+<main class="content">
 
 <!-- HOME -->
-<section id="page-home" class="page active">
+<section id="home" class="page">
 
- <div class="card wallet-card">
-  <div class="label">БАЛАНС КОШЕЛЬКА</div>
-  <div id="homeBalance" class="big">0.0000 SLX</div>
-  <div id="homeUsd" class="small">≈ 0.0000 USDT</div>
+  <div class="card wallet-balance">
 
-  <div class="address">
-   <span id="homeAddress">—</span>
-   <button id="copyHome" class="text-btn">Копировать</button>
+    <div class="muted">Баланс кошелька</div>
+
+    <div class="wallet-number">
+      <span id="homeBalance">0.0000</span> SLX
+    </div>
+
+    <div class="wallet-address mono" id="homeAddress">—</div>
+
+    <div class="wallet-actions">
+      <button class="wallet-action" id="homeSend">↗ Перевод</button>
+      <button class="wallet-action" id="homeQr">▦ Мой QR</button>
+      <button class="wallet-action" id="homeCopy">⧉ Копировать</button>
+      <button class="wallet-action" id="homeFaucet">＋ Faucet +10</button>
+    </div>
+
   </div>
 
-  <div class="actions">
-   <button class="btn primary" data-page="wallet">Кошелёк</button>
-   <button class="btn" data-page="market">Рынок</button>
-   <button id="homeFaucet" class="btn green">+10 SLX</button>
-  </div>
- </div>
+  <div class="card section-gap">
+    <b>SLX/USDT</b>
+    <div class="muted" style="margin-top:5px">Demo Market</div>
 
- <div class="card home-market">
-  <div class="pair">
-   <div class="coin">S</div>
-   <div>
-    <div class="pair-name">SLX/USDT</div>
-    <div class="pair-sub">Demo Market</div>
-   </div>
-   <div class="demo">SIMULATED</div>
+    <div class="row" style="margin-top:15px">
+      <strong id="homePrice">—</strong>
+      <button class="btn primary" data-page="market">Открыть рынок</button>
+    </div>
   </div>
-
-  <div class="price-line">
-   <div id="homePrice" class="price">0.1250</div>
-   <div id="homeChange" class="change">+0.00%</div>
-  </div>
-
-  <div class="two">
-   <button data-page="market">Купить / Продать</button>
-   <button data-page="history">История</button>
-  </div>
- </div>
 
 </section>
 
 <!-- WALLET -->
-<section id="page-wallet" class="page">
+<section id="wallet" class="page">
 
- <div class="card wallet-card">
-  <div class="label">SLX TESTNET WALLET</div>
-  <div id="walletBalance" class="big">0.0000 SLX</div>
-  <div id="walletUsd" class="small">≈ 0.0000 USDT</div>
+  <div class="card">
 
-  <div class="address">
-   <span id="walletAddress">—</span>
-   <button id="copyWallet" class="text-btn">Копировать</button>
+    <div class="wallet-balance">
+      <div class="muted">SLX Wallet</div>
+
+      <div class="wallet-number">
+        <span id="walletBalance">0.0000</span> SLX
+      </div>
+
+      <div class="wallet-address mono" id="walletAddress">—</div>
+    </div>
+
+    <div class="wallet-actions">
+
+      <button class="wallet-action" id="walletCopy">
+        ⧉ Копировать
+      </button>
+
+      <button class="wallet-action" id="walletQr">
+        ▦ QR
+      </button>
+
+      <button class="wallet-action" id="walletScan">
+        📷 Сканер
+      </button>
+
+      <button class="wallet-action" id="walletSend">
+        ↗ Перевод
+      </button>
+
+      <button class="wallet-action" id="walletFaucet">
+        ＋ Получить +10
+      </button>
+
+    </div>
+
   </div>
 
-  <div class="actions">
-   <button id="qrBtn" class="btn primary">QR</button>
-   <button id="scanBtn" class="btn">📷 Сканировать</button>
-   <button id="faucetBtn" class="btn green">+10 SLX</button>
+  <div class="card section-gap">
+    <b>Мои кошельки</b>
+    <div id="walletList" style="margin-top:12px"></div>
   </div>
-
-  <div class="two">
-   <button id="sendBtn">Отправить</button>
-   <button data-page="history">История</button>
-  </div>
- </div>
-
- <div class="card wallet-card" style="margin-top:8px">
-  <div class="label">ПОСЛЕДНИЕ ОПЕРАЦИИ</div>
-  <div id="walletHistory" class="empty">Загрузка...</div>
- </div>
 
 </section>
 
 <!-- MARKET -->
-<section id="page-market" class="page">
+<section id="market" class="page">
 
- <div class="card market-head">
-  <div class="market-top">
+  <div class="card market-head">
 
-   <div class="pair">
-    <div class="coin">S</div>
-    <div>
-     <div class="pair-name">SLX/USDT</div>
-     <div class="pair-sub">SLX Testnet · Demo</div>
+    <div class="market-main">
+
+      <div class="pair">
+
+        <div class="pair-icon">S</div>
+
+        <div>
+          <div class="pair-name">SLX/USDT</div>
+          <div class="pair-sub">SLX Testnet · Demo</div>
+        </div>
+
+      </div>
+
+      <div>
+        <div class="price" id="marketPrice">0.1233</div>
+        <div class="change" id="marketChange">-0.01%</div>
+      </div>
+
     </div>
-   </div>
 
-   <div class="market-price">
-    <div id="marketPrice" class="price">0.1250</div>
-    <div id="marketChange" class="change">+0.00%</div>
-   </div>
+    <div class="metrics">
+
+      <div>
+        <div class="metric-title">24ч максимум</div>
+        <div class="metric-value" id="marketHigh">0.1360</div>
+      </div>
+
+      <div>
+        <div class="metric-title">24ч минимум</div>
+        <div class="metric-value" id="marketLow">0.1191</div>
+      </div>
+
+      <div>
+        <div class="metric-title">Объём</div>
+        <div class="metric-value" id="marketVolume">167,081 SLX</div>
+      </div>
+
+      <div>
+        <div class="metric-title">Режим</div>
+        <div class="metric-value">DEMO</div>
+      </div>
+
+    </div>
 
   </div>
 
-  <div class="meta">
-   <div><b>24ч максимум</b><span id="high">0.1250</span></div>
-   <div><b>24ч минимум</b><span id="low">0.1250</span></div>
-   <div><b>Объём</b><span id="volume">0 SLX</span></div>
-   <div><b>Режим</b><span>DEMO</span></div>
-  </div>
- </div>
+  <div class="card chart-card">
 
- <div class="card chart">
-  <div class="timeframes">
-   <button class="tf" data-tf="15m">15м</button>
-   <button class="tf active" data-tf="1h">1ч</button>
-   <button class="tf" data-tf="4h">4ч</button>
-   <button class="tf" data-tf="1d">1д</button>
-  </div>
+    <div class="timeframes">
+      <button class="timeframe" data-tf="15m">15м</button>
+      <button class="timeframe active" data-tf="1h">1ч</button>
+      <button class="timeframe" data-tf="4h">4ч</button>
+      <button class="timeframe" data-tf="1d">1д</button>
+    </div>
 
-  <div class="chartbox">
-   <canvas id="chart"></canvas>
-   <div id="chartPrice" class="chart-price">0.1250</div>
-  </div>
- </div>
+    <div id="chart" class="chart"></div>
 
- <div class="market-grid">
+  </div>
 
   <!-- TRADE -->
-  <div class="card trade">
+  <div class="card trade-card">
 
-   <div class="side">
-    <button id="buyBtn" class="buy active">Купить</button>
-    <button id="sellBtn" class="sell">Продать</button>
-   </div>
+    <div class="trade-tabs">
 
-   <div class="types">
-    <button class="type active" data-type="market">Рынок</button>
-    <button class="type" data-type="limit">Лимит</button>
-   </div>
+      <button id="buyTab" class="trade-side buy active">
+        Купить
+      </button>
 
-   <div class="field">
-    <div class="field-label">
-     <span>Цена</span><span>USDT</span>
+      <button id="sellTab" class="trade-side sell">
+        Продать
+      </button>
+
     </div>
-    <div class="input">
-     <input id="priceInput" type="number" step="0.0001" value="0.1250">
-     <span>USDT</span>
+
+    <div class="order-types">
+
+      <button id="marketType" class="order-type active">
+        Рынок
+      </button>
+
+      <button id="limitType" class="order-type">
+        Лимит
+      </button>
+
     </div>
-   </div>
 
-   <div class="field">
-    <div class="field-label">
-     <span>Количество</span><span>SLX</span>
+    <div class="input-label">
+      <span>Цена</span>
+      <span>USDT</span>
     </div>
-    <div class="input">
-     <input id="amountInput" type="number" step="0.0001" placeholder="0.0000">
-     <span>SLX</span>
+
+    <input
+      id="orderPrice"
+      class="trade-input"
+      value="0.1233"
+      inputmode="decimal"
+    >
+
+    <div class="input-label">
+      <span>Количество</span>
+      <span>SLX</span>
     </div>
-   </div>
 
-   <div class="percent">
-    <button data-p="25">25%</button>
-    <button data-p="50">50%</button>
-    <button data-p="75">75%</button>
-    <button data-p="100">100%</button>
-   </div>
+    <input
+      id="orderAmount"
+      class="trade-input"
+      value="0.0000"
+      inputmode="decimal"
+    >
 
-   <div class="balance">
-    <span>Доступно</span>
-    <strong id="available">1000.00 USDT</strong>
-   </div>
+    <div class="percent">
 
-   <div class="balance">
-    <span>Сумма</span>
-    <strong id="total">0.0000 USDT</strong>
-   </div>
+      <button data-percent="25">25%</button>
+      <button data-percent="50">50%</button>
+      <button data-percent="75">75%</button>
+      <button data-percent="100">100%</button>
 
-   <button id="submitTrade" class="submit buy">Купить SLX</button>
+    </div>
 
-   <div class="hint">
-    Только виртуальные Demo-балансы Testnet.
-   </div>
+    <div class="balance-row">
+      <span>Доступно</span>
+      <strong id="availableBalance">1000.00 USDT</strong>
+    </div>
+
+    <div class="balance-row">
+      <span>Сумма</span>
+      <strong id="orderTotal">0.0000 USDT</strong>
+    </div>
+
+    <button id="submitOrder" class="trade-submit">
+      Купить SLX
+    </button>
+
+    <div class="demo-note">
+      Только виртуальные Demo-балансы Testnet.
+    </div>
 
   </div>
 
   <!-- ORDER BOOK -->
-  <details id="book" class="card book">
-   <summary>Стакан</summary>
+  <div class="card book-card">
 
-   <div class="book-inner">
-    <div class="book-head">
-     <span>Цена</span>
-     <span>SLX</span>
-     <span>Всего</span>
+    <div class="book-title">Стакан</div>
+
+    <div class="book-grid">
+
+      <div>
+        <div class="book-side-title">
+          <span class="bad">Продажа</span>
+          <span>SLX</span>
+        </div>
+        <div id="asks"></div>
+      </div>
+
+      <div>
+        <div class="book-side-title">
+          <span class="good">Покупка</span>
+          <span>SLX</span>
+        </div>
+        <div id="bids"></div>
+      </div>
+
     </div>
 
-    <div id="asks"></div>
-
-    <div class="mid">
-     <strong id="midPrice">0.1250</strong>
-     <span id="midChange">+0.00%</span>
+    <div class="mid-price" id="midPrice">
+      0.1233 USDT
     </div>
 
-    <div id="bids"></div>
-   </div>
-  </details>
-
- </div>
-
- <div class="card" style="margin-top:7px">
-
-  <div class="market-tabs">
-   <button class="market-tab active" data-tab="orders">Мои заявки</button>
-   <button class="market-tab" data-tab="trades">Сделки</button>
-   <button class="market-tab" data-tab="portfolio">Портфель</button>
   </div>
 
-  <div id="ordersTab" class="market-data"></div>
-  <div id="tradesTab" class="market-data hidden"></div>
-  <div id="portfolioTab" class="market-data hidden"></div>
+  <!-- TABS -->
+  <div class="market-tabs">
 
- </div>
+    <div class="market-tab-buttons">
+
+      <button class="market-tab active" data-market-tab="orders">
+        Мои заявки
+      </button>
+
+      <button class="market-tab" data-market-tab="trades">
+        Сделки
+      </button>
+
+      <button class="market-tab" data-market-tab="portfolio">
+        Портфель
+      </button>
+
+    </div>
+
+    <div id="ordersTab" class="tab-content"></div>
+    <div id="tradesTab" class="tab-content hidden"></div>
+    <div id="portfolioTab" class="tab-content hidden"></div>
+
+  </div>
 
 </section>
 
 <!-- HISTORY -->
-<section id="page-history" class="page">
+<section id="history" class="page">
 
- <div class="card wallet-card">
-  <div class="label">ИСТОРИЯ</div>
-  <div id="historyList" class="empty">Загрузка...</div>
- </div>
-
-</section>
-
-<!-- NETWORK -->
-<section id="page-network" class="page">
-
- <div class="info-grid">
-
-  <div class="card info">
-   <div class="info-label">Сеть</div>
-   <div class="info-value">SLX-Testnet</div>
+  <div class="card">
+    <h2>История</h2>
+    <div id="historyList"></div>
   </div>
-
-  <div class="card info">
-   <div class="info-label">Версия</div>
-   <div class="info-value">v2.2</div>
-  </div>
-
-  <div class="card info">
-   <div class="info-label">Комиссия</div>
-   <div class="info-value">0.1 SLX</div>
-  </div>
-
-  <div class="card info">
-   <div class="info-label">Faucet</div>
-   <div class="info-value">+10 SLX</div>
-  </div>
-
-  <div class="card info">
-   <div class="info-label">Market</div>
-   <div class="info-value">DEMO</div>
-  </div>
-
-  <div class="card info">
-   <div class="info-label">Статус</div>
-   <div class="info-value" style="color:#39d98a">ONLINE</div>
-  </div>
-
- </div>
 
 </section>
 
 <!-- PROFILE -->
-<section id="page-profile" class="page">
+<section id="profile" class="page">
 
- <div class="card wallet-card">
+  <div class="card profile-card">
 
-  <div class="label">ПРОФИЛЬ</div>
+    <div class="profile-head">
 
-  <div id="profileName" class="big" style="font-size:22px">
-   SLX User
+      <div class="avatar" id="avatar">D</div>
+
+      <div>
+        <div class="profile-name" id="profileName">
+          Пользователь
+        </div>
+
+        <div class="profile-sub">
+          SLX Testnet · Demo Account
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="profile-buttons">
+
+      <button id="profileQr" class="profile-btn primary">
+        ▦ Мой QR
+      </button>
+
+      <button id="profileScan" class="profile-btn">
+        📷 Сканер
+      </button>
+
+      <button id="profileCopy" class="profile-btn">
+        ⧉ Копировать
+      </button>
+
+      <button id="profileNetwork" class="profile-btn">
+        🌐 Сеть
+      </button>
+
+      <button id="profileLogout" class="profile-btn">
+        Выйти
+      </button>
+
+    </div>
+
   </div>
-
-  <div id="profileEmail" class="small">—</div>
-
-  <div class="actions">
-   <button id="profileQr" class="btn primary">Мой QR</button>
-   <button id="logout" class="btn">Выйти</button>
-   <button data-page="network" class="btn">Сеть</button>
-  </div>
-
- </div>
 
 </section>
 
 </main>
 
 <!-- NAV -->
-<nav class="bottom">
- <div class="nav">
-  <button class="active" data-page="home">
-   <i>⌂</i>Главная
-  </button>
-  <button data-page="wallet">
-   <i>◉</i>Кошелёк
-  </button>
-  <button data-page="market">
-   <i>↗</i>Рынок
-  </button>
-  <button data-page="history">
-   <i>≡</i>История
-  </button>
-  <button data-page="profile">
-   <i>●</i>Профиль
-  </button>
- </div>
+<nav class="bottom-nav">
+
+  <div class="nav">
+
+    <button class="active" data-page="home">
+      <span class="nav-icon">⌂</span>
+      Главная
+    </button>
+
+    <button data-page="wallet">
+      <span class="nav-icon">◉</span>
+      Кошелёк
+    </button>
+
+    <button data-page="market">
+      <span class="nav-icon">↗</span>
+      Рынок
+    </button>
+
+    <button data-page="history">
+      <span class="nav-icon">▤</span>
+      История
+    </button>
+
+    <button data-page="profile">
+      <span class="nav-icon">●</span>
+      Профиль
+    </button>
+
+  </div>
+
 </nav>
 
 </div>
 
-<!-- QR -->
-<div id="qrModal" class="modal">
- <div class="card modal-card">
+<!-- MODAL -->
+<div id="modal" class="modal-bg hidden">
 
-  <div class="modal-title">QR кошелька</div>
-  <div class="modal-text">
-   Покажи этот QR-код для получения адреса.
+  <div class="modal">
+
+    <div class="modal-head">
+      <div id="modalTitle" class="modal-title">Окно</div>
+      <button id="modalClose" class="modal-close">×</button>
+    </div>
+
+    <div id="modalBody"></div>
+
   </div>
 
-  <div id="qrBox" class="qr"></div>
-
-  <div class="address">
-   <span id="qrAddress">—</span>
-  </div>
-
-  <div class="modal-actions">
-   <button id="qrClose">Закрыть</button>
-   <button id="qrCopy" class="ok">Копировать</button>
-  </div>
-
- </div>
 </div>
 
-<!-- SCANNER -->
-<div id="scannerModal" class="modal">
- <div class="card modal-card">
-
-  <div class="modal-title">Сканировать QR</div>
-
-  <div class="modal-text">
-   Наведи камеру на QR-код адреса кошелька.
-  </div>
-
-  <div class="scanner">
-   <video id="video" autoplay muted playsinline></video>
-   <div class="scan-frame"></div>
-   <div class="scan-line"></div>
-  </div>
-
-  <div id="scanStatus" class="scan-status">
-   Подготовка камеры...
-  </div>
-
-  <div class="modal-actions">
-   <button id="scanClose">Закрыть</button>
-   <button id="scanAgain" class="ok">Повторить</button>
-  </div>
-
- </div>
-</div>
-
-<!-- SEND -->
-<div id="sendModal" class="modal">
- <div class="card modal-card">
-
-  <div class="modal-title">Отправить SLX</div>
-
-  <div class="auth-field">
-   <input id="sendTo" type="text" placeholder="Адрес получателя">
-  </div>
-
-  <div class="auth-field">
-   <input id="sendAmount" type="number" step="0.0001" placeholder="Количество SLX">
-  </div>
-
-  <div class="modal-text">
-   Комиссия сети: 0.1 SLX
-  </div>
-
-  <div class="modal-actions">
-   <button id="sendCancel">Отмена</button>
-   <button id="sendConfirm" class="ok">Отправить</button>
-  </div>
-
- </div>
-</div>
-
-<!-- CONFIRM -->
-<div id="confirmModal" class="modal">
- <div class="card modal-card">
-
-  <div id="confirmTitle" class="modal-title">Подтверждение</div>
-  <div id="confirmText" class="modal-text"></div>
-
-  <div class="modal-actions">
-   <button id="confirmNo">Отмена</button>
-   <button id="confirmYes" class="ok">Подтвердить</button>
-  </div>
-
- </div>
-</div>
-
-<div id="toast" class="toast"></div>
+<div id="toast" class="toast hidden"></div>
 
 <script>
-const TOKEN_KEY="slx_token";
+'use strict';
 
-let token=localStorage.getItem(TOKEN_KEY)||"";
+const TOKEN_KEY='slx_token';
+
+let token=localStorage.getItem(TOKEN_KEY)||'';
 let user=null;
 let wallets=[];
-let wallet=null;
-let market=null;
-let candles=[];
-let timeframe="1h";
-let side="buy";
-let type="market";
+let activeWallet=null;
 
-const FEE=.1;
+let price=0.1233;
+let side='buy';
+let orderType='market';
+let timeframe='1h';
 
-const demo={
- orders:JSON.parse(localStorage.getItem("slx_demo_orders")||"[]"),
- trades:JSON.parse(localStorage.getItem("slx_demo_trades")||"[]"),
- usdt:Number(localStorage.getItem("slx_demo_usdt")||1000),
- slx:Number(localStorage.getItem("slx_demo_slx")||0)
+let demo={
+  usdt:Number(localStorage.getItem('slx_demo_usdt')||1000),
+  slx:Number(localStorage.getItem('slx_demo_slx')||0),
+  orders:JSON.parse(localStorage.getItem('slx_demo_orders')||'[]'),
+  trades:JSON.parse(localStorage.getItem('slx_demo_trades')||'[]')
 };
 
+const $=id=>document.getElementById(id);
+
 function saveDemo(){
- localStorage.setItem("slx_demo_orders",JSON.stringify(demo.orders));
- localStorage.setItem("slx_demo_trades",JSON.stringify(demo.trades));
- localStorage.setItem("slx_demo_usdt",demo.usdt);
- localStorage.setItem("slx_demo_slx",demo.slx);
+  localStorage.setItem('slx_demo_usdt',demo.usdt);
+  localStorage.setItem('slx_demo_slx',demo.slx);
+  localStorage.setItem('slx_demo_orders',JSON.stringify(demo.orders));
+  localStorage.setItem('slx_demo_trades',JSON.stringify(demo.trades));
 }
 
 function toast(text){
- const el=document.getElementById("toast");
- el.textContent=text;
- el.classList.add("show");
- clearTimeout(window.toastTimer);
- window.toastTimer=setTimeout(()=>el.classList.remove("show"),2200);
-}
+  $('toast').textContent=text;
+  $('toast').classList.remove('hidden');
 
-function fmt(n,d=4){
- n=Number(n);
- if(!Number.isFinite(n))n=0;
- return n.toLocaleString("en-US",{
-  minimumFractionDigits:d,
-  maximumFractionDigits:d
- });
-}
-
-function shortAddress(a){
- if(!a)return"—";
- if(a.length<20)return a;
- return a.slice(0,9)+"..."+a.slice(-7);
-}
-
-function escapeHTML(v){
- return String(v??"")
- .replace(/[&<>"']/g,c=>({
-  "&":"&amp;",
-  "<":"&lt;",
-  ">":"&gt;",
-  '"':"&quot;",
-  "'":"&#39;"
- }[c]));
-}
-
-async function api(path,opt={}){
- const headers={
-  "Content-Type":"application/json",
-  ...(opt.headers||{})
- };
-
- if(token)headers.Authorization="Bearer "+token;
-
- const res=await fetch(path,{...opt,headers});
-
- let data={};
- try{data=await res.json()}catch{}
-
- if(!res.ok){
-  throw new Error(data.error||data.message||"Ошибка запроса");
- }
-
- return data;
-}
-
-/* NAVIGATION */
-
-function page(name){
- const target=document.getElementById("page-"+name);
- if(!target)return;
-
- document.querySelectorAll(".page")
-  .forEach(x=>x.classList.toggle("active",x===target));
-
- document.querySelectorAll(".nav button")
-  .forEach(x=>x.classList.toggle("active",x.dataset.page===name));
-
- if(name==="market"){
   setTimeout(()=>{
-   resizeChart();
-   drawChart();
-  },50);
- }
+    $('toast').classList.add('hidden');
+  },2500);
 }
 
-document.querySelectorAll("[data-page]")
- .forEach(b=>b.addEventListener("click",()=>page(b.dataset.page)));
+async function api(url,options={}){
+  const headers={
+    'Content-Type':'application/json',
+    ...(options.headers||{})
+  };
+
+  if(token){
+    headers.Authorization='Bearer '+token;
+  }
+
+  const res=await fetch(url,{
+    ...options,
+    headers,
+    cache:'no-store'
+  });
+
+  let data={};
+
+  try{
+    data=await res.json();
+  }catch(e){}
+
+  if(!res.ok || data.ok===false){
+    throw new Error(
+      data.message||
+      data.error||
+      'Ошибка запроса'
+    );
+  }
+
+  return data;
+}
 
 /* AUTH */
 
-document.querySelectorAll(".auth-tab").forEach(btn=>{
- btn.onclick=()=>{
-  document.querySelectorAll(".auth-tab")
-   .forEach(x=>x.classList.remove("active"));
+$('loginTab').onclick=()=>{
+  $('loginTab').classList.add('active');
+  $('registerTab').classList.remove('active');
+  $('loginForm').classList.remove('hidden');
+  $('registerForm').classList.add('hidden');
+  $('authTitle').textContent='С возвращением';
+  $('authSub').textContent='Войди в тестовый кошелёк SLX.';
+};
 
-  btn.classList.add("active");
+$('registerTab').onclick=()=>{
+  $('registerTab').classList.add('active');
+  $('loginTab').classList.remove('active');
+  $('registerForm').classList.remove('hidden');
+  $('loginForm').classList.add('hidden');
+  $('authTitle').textContent='Создать аккаунт';
+  $('authSub').textContent='Создай аккаунт SLX Testnet.';
+};
 
-  const register=btn.dataset.auth==="register";
-
-  document.getElementById("loginForm")
-   .classList.toggle("hidden",register);
-
-  document.getElementById("registerForm")
-   .classList.toggle("hidden",!register);
-
-  document.getElementById("authMsg").textContent="";
- };
-});
-
-function authMsg(text){
- document.getElementById("authMsg").textContent=text||"";
-}
-
-async function login(){
-
- const email=document.getElementById("loginEmail").value.trim();
- const password=document.getElementById("loginPassword").value;
-
- if(!email||!password){
-  authMsg("Введите email и пароль");
-  return;
- }
-
- try{
-
-  const data=await api("/api/auth/login",{
-   method:"POST",
-   body:JSON.stringify({email,password})
-  });
-
-  token=data.token||data.accessToken;
-
-  if(!token)throw new Error("Сервер не вернул токен");
-
-  localStorage.setItem(TOKEN_KEY,token);
-
-  await start();
-
- }catch(e){
-  authMsg(e.message);
- }
-}
-
-async function register(){
-
- const name=document.getElementById("regName").value.trim();
- const email=document.getElementById("regEmail").value.trim();
- const password=document.getElementById("regPassword").value;
-
- if(name.length<3||name.length>32){
-  authMsg("Имя должно содержать от 3 до 32 символов");
-  return;
- }
-
- if(!email||!password){
-  authMsg("Заполни email и пароль");
-  return;
- }
-
- try{
-
-  const data=await api("/api/auth/register",{
-   method:"POST",
-   body:JSON.stringify({
-    username:name,
-    name:name,
-    email:email,
-    password:password
-   })
-  });
-
-  token=data.token||data.accessToken;
-
-  if(!token)throw new Error("Сервер не вернул токен");
-
-  localStorage.setItem(TOKEN_KEY,token);
-
-  await start();
-
- }catch(e){
-  authMsg(e.message);
- }
-}
-
-document.getElementById("loginBtn").onclick=login;
-document.getElementById("registerBtn").onclick=register;
-
-/* START */
-
-async function start(){
-
- document.getElementById("authScreen").classList.add("hidden");
- document.getElementById("app").classList.remove("hidden");
-
- try{
-
-  await loadMe();
-  await loadWallet();
-  await loadMarket();
-  await loadHistory();
-
-  renderDemo();
-  page("home");
-
- }catch(e){
-
-  console.error(e);
-  toast(e.message);
-
- }
-}
-
-async function loadMe(){
-
- const data=await api("/api/auth/me");
-
- user=data.user||data;
-
- document.getElementById("profileName").textContent=
-  user.name||user.username||"SLX User";
-
- document.getElementById("profileEmail").textContent=
-  user.email||"—";
-}
-
-/* WALLET */
-
-async function loadWallet(){
-
- const data=await api("/api/wallets");
-
- wallets=Array.isArray(data)
-  ?data
-  :(data.wallets||[]);
-
- if(!wallets.length){
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();
 
   try{
 
-   const created=await api("/api/wallet/create",{
-    method:"POST"
-   });
+    const data=await api('/api/auth/login',{
+      method:'POST',
+      body:JSON.stringify({
+        username:$('loginUsername').value.trim(),
+        password:$('loginPassword').value
+      })
+    });
 
-   if(created.wallet){
-    wallets=[created.wallet];
-   }
+    token=data.token||data.accessToken||'';
+    localStorage.setItem(TOKEN_KEY,token);
 
-  }catch{}
+    user=data.user||null;
 
- }
+    await startApp();
 
- wallet=wallets[0]||null;
+  }catch(err){
+    toast(err.message);
+  }
+};
 
- renderWallet();
+$('registerForm').onsubmit=async e=>{
+  e.preventDefault();
+
+  try{
+
+    const username=$('registerUsername').value.trim();
+
+    const data=await api('/api/auth/register',{
+      method:'POST',
+      body:JSON.stringify({
+        username:username,
+        name:username,
+        email:'',
+        password:$('registerPassword').value
+      })
+    });
+
+    token=data.token||data.accessToken||'';
+    localStorage.setItem(TOKEN_KEY,token);
+
+    user=data.user||null;
+
+    await startApp();
+
+  }catch(err){
+    toast(err.message);
+  }
+};
+
+/* APP */
+
+async function startApp(){
+
+  $('auth').classList.add('hidden');
+  $('app').classList.remove('hidden');
+
+  await loadWallets();
+  await loadMarket();
+  await loadHistory();
+
+  showPage('home');
+
+  renderProfile();
 }
 
-function walletBalance(){
+/* NAV */
 
- if(!wallet)return 0;
+function showPage(page){
 
- return Number(
-  wallet.balance??
-  wallet.amount??
-  wallet.balanceSLX??
-  0
- );
+  document.querySelectorAll('.page').forEach(p=>{
+    p.classList.toggle(
+      'active',
+      p.id===page
+    );
+  });
+
+  document.querySelectorAll('.nav button').forEach(b=>{
+    b.classList.toggle(
+      'active',
+      b.dataset.page===page
+    );
+  });
+
+  if(page==='wallet')loadWallets();
+  if(page==='market')loadMarket();
+  if(page==='history')loadHistory();
+  if(page==='profile')renderProfile();
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
 }
 
-function walletAddress(){
+document.querySelectorAll('[data-page]').forEach(btn=>{
+  btn.onclick=()=>showPage(btn.dataset.page);
+});
 
- if(!wallet)return"";
+/* WALLET */
 
- return wallet.address||
-        wallet.walletAddress||
-        "";
+async function loadWallets(){
+
+  try{
+
+    const data=await api('/api/wallets');
+
+    wallets=data.wallets||data.data||[];
+
+    if(!wallets.length){
+
+      const created=await api('/api/wallet/create',{
+        method:'POST',
+        body:'{}'
+      });
+
+      if(created.wallet){
+        wallets=[created.wallet];
+      }
+    }
+
+    const saved=localStorage.getItem('slx_active_wallet');
+
+    activeWallet=
+      wallets.find(w=>String(w.id)===String(saved))||
+      wallets[0]||
+      null;
+
+    if(activeWallet){
+      localStorage.setItem(
+        'slx_active_wallet',
+        activeWallet.id
+      );
+    }
+
+    renderWallet();
+
+  }catch(err){
+
+    if(!token)return;
+
+    toast(err.message);
+  }
 }
 
 function renderWallet(){
 
- const balance=walletBalance();
- const address=walletAddress();
- const price=currentPrice();
+  if(!activeWallet)return;
 
- document.getElementById("homeBalance").textContent=
-  fmt(balance)+" SLX";
+  const balance=Number(activeWallet.balance)||0;
 
- document.getElementById("walletBalance").textContent=
-  fmt(balance)+" SLX";
+  $('walletBalance').textContent=
+    balance.toFixed(4);
 
- document.getElementById("homeUsd").textContent=
-  "≈ "+fmt(balance*price)+" USDT";
+  $('walletAddress').textContent=
+    activeWallet.address;
 
- document.getElementById("walletUsd").textContent=
-  "≈ "+fmt(balance*price)+" USDT";
+  $('homeBalance').textContent=
+    balance.toFixed(4);
 
- document.getElementById("homeAddress").textContent=
-  shortAddress(address);
+  $('homeAddress').textContent=
+    activeWallet.address;
 
- document.getElementById("walletAddress").textContent=
-  shortAddress(address);
+  $('walletList').innerHTML=
+    wallets.map((w,i)=>`
+      <button
+        class="wallet-action"
+        style="width:100%;margin-top:8px;text-align:left"
+        data-wallet="${w.id}">
+        S${i+1} · ${String(w.address).slice(0,12)}…
+        <br>
+        <small>${Number(w.balance||0).toFixed(4)} SLX</small>
+      </button>
+    `).join('');
 
-}
+  document.querySelectorAll('[data-wallet]').forEach(btn=>{
+    btn.onclick=async()=>{
+      try{
 
-/* MARKET */
+        const data=await api('/api/wallet/select',{
+          method:'POST',
+          body:JSON.stringify({
+            walletId:btn.dataset.wallet
+          })
+        });
 
-function currentPrice(){
- return Number(market?.price)||.125;
-}
+        activeWallet=data.wallet||activeWallet;
 
-async function loadMarket(){
+        localStorage.setItem(
+          'slx_active_wallet',
+          activeWallet.id
+        );
 
- try{
+        renderWallet();
+        toast('Кошелёк выбран');
 
-  const data=await api("/api/market");
-
-  market=data||{};
-
-  market.price=
-   Number(
-    market.price??
-    market.lastPrice??
-    market.currentPrice
-   )||.125;
-
- }catch{
-
-  market={
-   price:.125,
-   change24h:0,
-   high24h:.125,
-   low24h:.125,
-   volume24h:0
-  };
-
- }
-
- const p=currentPrice();
-
- const ch=Number(
-  market.change24h??
-  market.change??
-  0
- )||0;
-
- document.getElementById("marketPrice").textContent=fmt(p);
- document.getElementById("homePrice").textContent=fmt(p);
-
- const change=(ch>=0?"+":"")+ch.toFixed(2)+"%";
-
- document.getElementById("marketChange").textContent=change;
- document.getElementById("homeChange").textContent=change;
- document.getElementById("midChange").textContent=change;
-
- document.getElementById("high").textContent=
-  fmt(market.high24h??market.high??p);
-
- document.getElementById("low").textContent=
-  fmt(market.low24h??market.low??p);
-
- document.getElementById("volume").textContent=
-  fmt(market.volume24h??market.volume??0,2)+" SLX";
-
- document.getElementById("midPrice").textContent=
-  p.toFixed(4);
-
- document.getElementById("chartPrice").textContent=
-  p.toFixed(4);
-
- syncPrice();
-
- await loadCandles();
- await loadBook();
-
- renderWallet();
- updateTotal();
-}
-
-function syncPrice(){
-
- const input=document.getElementById("priceInput");
-
- if(type==="market"){
-  input.value=currentPrice().toFixed(4);
-  input.readOnly=true;
- }else{
-  input.readOnly=false;
-
-  if(!Number(input.value))
-   input.value=currentPrice().toFixed(4);
- }
-}
-
-/* CANDLES */
-
-async function loadCandles(){
-
- try{
-
-  const data=await api(
-   "/api/market/candles?interval="+
-   encodeURIComponent(timeframe)+
-   "&limit=80"
-  );
-
-  candles=Array.isArray(data)
-   ?data
-   :(data.candles||data.data||[]);
-
- }catch{
-  candles=[];
- }
-
- if(!candles.length)
-  generateCandles();
-
- resizeChart();
- drawChart();
-}
-
-function generateCandles(){
-
- let p=currentPrice();
- candles=[];
-
- for(let i=0;i<70;i++){
-
-  const open=p;
-  const move=(Math.random()-.5)*.003;
-
-  const close=Math.max(.0001,open+move);
-
-  const high=Math.max(open,close)+Math.random()*.0015;
-  const low=Math.max(.0001,Math.min(open,close)-Math.random()*.0015);
-
-  candles.push({
-   open,high,low,close
+      }catch(err){
+        toast(err.message);
+      }
+    };
   });
 
-  p=close;
- }
+  $('homePrice').textContent=
+    price.toFixed(4)+' USDT';
 }
 
-function resizeChart(){
+/* COPY */
 
- const c=document.getElementById("chart");
+async function copyAddress(){
 
- if(!c)return;
-
- const r=c.getBoundingClientRect();
- const dpr=window.devicePixelRatio||1;
-
- c.width=r.width*dpr;
- c.height=r.height*dpr;
-}
-
-function drawChart(){
-
- const c=document.getElementById("chart");
-
- if(!c||!candles.length)return;
-
- const ctx=c.getContext("2d");
- const dpr=window.devicePixelRatio||1;
-
- const w=c.width/dpr;
- const h=c.height/dpr;
-
- ctx.setTransform(dpr,0,0,dpr,0,0);
- ctx.clearRect(0,0,w,h);
-
- const data=candles.map(x=>({
-  o:Number(x.open??x.o),
-  h:Number(x.high??x.h),
-  l:Number(x.low??x.l),
-  c:Number(x.close??x.c)
- })).filter(x=>x.o>0&&x.h>0&&x.l>0&&x.c>0);
-
- if(!data.length)return;
-
- let min=Math.min(...data.map(x=>x.l));
- let max=Math.max(...data.map(x=>x.h));
-
- const pad=(max-min)*.08||.001;
-
- min-=pad;
- max+=pad;
-
- const left=5;
- const right=w-38;
- const top=7;
- const bottom=h-7;
-
- const step=(right-left)/data.length;
- const candleWidth=Math.max(2,Math.min(7,step*.58));
-
- const y=v=>
-  bottom-((v-min)/(max-min))*(bottom-top);
-
- for(let i=1;i<5;i++){
-
-  const yy=top+(bottom-top)*i/5;
-
-  ctx.strokeStyle="rgba(255,255,255,.055)";
-  ctx.lineWidth=.6;
-
-  ctx.beginPath();
-  ctx.moveTo(left,yy);
-  ctx.lineTo(right,yy);
-  ctx.stroke();
- }
-
- data.forEach((x,i)=>{
-
-  const xx=left+i*step+step/2;
-
-  const yo=y(x.o);
-  const yc=y(x.c);
-  const yh=y(x.h);
-  const yl=y(x.l);
-
-  const up=x.c>=x.o;
-
-  ctx.strokeStyle=up?"#35d68a":"#f05f70";
-  ctx.fillStyle=ctx.strokeStyle;
-
-  ctx.beginPath();
-  ctx.moveTo(xx,yh);
-  ctx.lineTo(xx,yl);
-  ctx.stroke();
-
-  ctx.fillRect(
-   xx-candleWidth/2,
-   Math.min(yo,yc),
-   candleWidth,
-   Math.max(1,Math.abs(yc-yo))
-  );
- });
-
- const last=data[data.length-1].c;
-
- document.getElementById("chartPrice").textContent=
-  last.toFixed(4);
-}
-
-document.querySelectorAll(".tf").forEach(btn=>{
- btn.onclick=async()=>{
-
-  document.querySelectorAll(".tf")
-   .forEach(x=>x.classList.remove("active"));
-
-  btn.classList.add("active");
-
-  timeframe=btn.dataset.tf;
-
-  await loadCandles();
- };
-});
-
-/* ORDER BOOK */
-
-async function loadBook(){
-
- try{
-
-  const data=await api("/api/market/orderbook");
-
-  renderBook(
-   data.asks||[],
-   data.bids||[]
-  );
-
-  return;
-
- }catch{}
-
- try{
-
-  const data=await api("/api/market/depth");
-
-  renderBook(
-   data.asks||[],
-   data.bids||[]
-  );
-
-  return;
-
- }catch{}
-
- generateBook();
-}
-
-function generateBook(){
-
- const p=currentPrice();
- const asks=[];
- const bids=[];
-
- for(let i=1;i<=6;i++){
-
-  const ap=p+i*.0007;
-  const bp=Math.max(.0001,p-i*.0007);
-
-  const aa=20+Math.random()*150;
-  const ba=20+Math.random()*150;
-
-  asks.push({
-   price:ap,
-   amount:aa,
-   total:ap*aa
-  });
-
-  bids.push({
-   price:bp,
-   amount:ba,
-   total:bp*ba
-  });
- }
-
- renderBook(asks,bids);
-}
-
-function renderBook(asks,bids){
-
- const a=document.getElementById("asks");
- const b=document.getElementById("bids");
-
- a.innerHTML="";
- b.innerHTML="";
-
- function normal(x){
-
-  const p=Number(x.price??x[0]??0);
-  const q=Number(
-   x.amount??
-   x.quantity??
-   x.size??
-   x[1]??0
-  );
-
-  return{
-   price:p,
-   amount:q,
-   total:Number(x.total??p*q)
-  };
- }
-
- asks.slice(0,6).reverse()
- .map(normal)
- .forEach(x=>{
-  a.insertAdjacentHTML(
-   "beforeend",
-   `<div class="row">
-    <span class="ask">${fmt(x.price)}</span>
-    <span>${fmt(x.amount,2)}</span>
-    <span>${fmt(x.total,2)}</span>
-   </div>`
-  );
- });
-
- bids.slice(0,6)
- .map(normal)
- .forEach(x=>{
-  b.insertAdjacentHTML(
-   "beforeend",
-   `<div class="row">
-    <span class="bid">${fmt(x.price)}</span>
-    <span>${fmt(x.amount,2)}</span>
-    <span>${fmt(x.total,2)}</span>
-   </div>`
-  );
- });
-
- if(!asks.length&&!bids.length)
-  a.innerHTML='<div class="empty">Стакан недоступен</div>';
-}
-
-/* BUY / SELL */
-
-document.getElementById("buyBtn").onclick=()=>{
- setSide("buy");
-};
-
-document.getElementById("sellBtn").onclick=()=>{
- setSide("sell");
-};
-
-function setSide(s){
-
- side=s;
-
- document.getElementById("buyBtn")
-  .classList.toggle("active",s==="buy");
-
- document.getElementById("sellBtn")
-  .classList.toggle("active",s==="sell");
-
- const submit=document.getElementById("submitTrade");
-
- submit.className="submit "+s;
- submit.textContent=s==="buy"
-  ?"Купить SLX"
-  :"Продать SLX";
-
- updateTotal();
-}
-
-document.querySelectorAll(".type").forEach(btn=>{
- btn.onclick=()=>{
-
-  document.querySelectorAll(".type")
-   .forEach(x=>x.classList.remove("active"));
-
-  btn.classList.add("active");
-
-  type=btn.dataset.type;
-
-  syncPrice();
-  updateTotal();
- };
-});
-
-function available(){
-
- return side==="buy"
-  ?demo.usdt
-  :demo.slx;
-}
-
-function updateTotal(){
-
- const p=type==="market"
-  ?currentPrice()
-  :Number(document.getElementById("priceInput").value)||0;
-
- const amount=
-  Number(document.getElementById("amountInput").value)||0;
-
- document.getElementById("total").textContent=
-  fmt(p*amount)+" USDT";
-
- document.getElementById("available").textContent=
-  side==="buy"
-   ?fmt(demo.usdt,2)+" USDT"
-   :fmt(demo.slx)+" SLX";
-}
-
-document.getElementById("priceInput")
- .addEventListener("input",updateTotal);
-
-document.getElementById("amountInput")
- .addEventListener("input",updateTotal);
-
-document.querySelectorAll(".percent button")
- .forEach(btn=>{
-
-  btn.onclick=()=>{
-
-   document.querySelectorAll(".percent button")
-    .forEach(x=>x.classList.remove("active"));
-
-   btn.classList.add("active");
-
-   const percent=Number(btn.dataset.p);
-
-   const price=
-    type==="market"
-     ?currentPrice()
-     :Number(document.getElementById("priceInput").value)||currentPrice();
-
-   let amount;
-
-   if(side==="buy")
-    amount=(demo.usdt*percent/100)/price;
-   else
-    amount=demo.slx*percent/100;
-
-   document.getElementById("amountInput").value=
-    amount.toFixed(4);
-
-   updateTotal();
-  };
- });
-
-document.getElementById("submitTrade").onclick=()=>{
-
- const price=
-  type==="market"
-   ?currentPrice()
-   :Number(document.getElementById("priceInput").value);
-
- const amount=
-  Number(document.getElementById("amountInput").value);
-
- if(!price||price<=0){
-  toast("Укажи цену");
-  return;
- }
-
- if(!amount||amount<=0){
-  toast("Укажи количество");
-  return;
- }
-
- const total=price*amount;
-
- /* BUY */
-
- if(side==="buy"){
-
-  if(demo.usdt<total){
-   toast("Недостаточно Demo USDT");
-   return;
+  if(!activeWallet){
+    toast('Кошелёк не найден');
+    return;
   }
-
-  if(type==="market"){
-
-   demo.usdt-=total;
-   demo.slx+=amount;
-
-   demo.trades.unshift({
-    id:"T"+Date.now(),
-    side:"BUY",
-    price,
-    amount,
-    total,
-    time:Date.now()
-   });
-
-   toast("Демо-покупка выполнена");
-
-  }else{
-
-   demo.orders.unshift({
-    id:"O"+Date.now(),
-    side:"BUY",
-    price,
-    amount,
-    total,
-    time:Date.now(),
-    status:"OPEN"
-   });
-
-   toast("Лимитная заявка создана");
-  }
-
- }
-
- /* SELL */
-
- else{
-
-  if(demo.slx<amount){
-   toast("Недостаточно Demo SLX");
-   return;
-  }
-
-  if(type==="market"){
-
-   demo.slx-=amount;
-   demo.usdt+=total;
-
-   demo.trades.unshift({
-    id:"T"+Date.now(),
-    side:"SELL",
-    price,
-    amount,
-    total,
-    time:Date.now()
-   });
-
-   toast("Демо-продажа выполнена");
-
-  }else{
-
-   demo.orders.unshift({
-    id:"O"+Date.now(),
-    side:"SELL",
-    price,
-    amount,
-    total,
-    time:Date.now(),
-    status:"OPEN"
-   });
-
-   toast("Лимитная заявка создана");
-  }
- }
-
- saveDemo();
-
- document.getElementById("amountInput").value="";
-
- document.querySelectorAll(".percent button")
-  .forEach(x=>x.classList.remove("active"));
-
- renderDemo();
- updateTotal();
-};
-
-/* MARKET TABS */
-
-document.querySelectorAll(".market-tab").forEach(btn=>{
- btn.onclick=()=>{
-
-  document.querySelectorAll(".market-tab")
-   .forEach(x=>x.classList.remove("active"));
-
-  btn.classList.add("active");
-
-  const tab=btn.dataset.tab;
-
-  document.getElementById("ordersTab")
-   .classList.toggle("hidden",tab!=="orders");
-
-  document.getElementById("tradesTab")
-   .classList.toggle("hidden",tab!=="trades");
-
-  document.getElementById("portfolioTab")
-   .classList.toggle("hidden",tab!=="portfolio");
- };
-});
-
-/* DEMO */
-
-function renderDemo(){
-
- renderOrders();
- renderTrades();
- renderPortfolio();
- renderHistoryDemo();
- renderWallet();
-}
-
-function renderOrders(){
-
- const el=document.getElementById("ordersTab");
-
- if(!demo.orders.length){
-  el.innerHTML='<div class="empty">Активных заявок нет</div>';
-  return;
- }
-
- el.innerHTML=demo.orders.map(o=>`
-
-  <div class="item">
-
-   <div>
-    <div class="item-title">
-     ${o.side==="BUY"?"Покупка":"Продажа"}
-     ${fmt(o.amount)} SLX
-    </div>
-
-    <div class="item-sub">
-     LIMIT · ${fmt(o.price)} USDT
-    </div>
-   </div>
-
-   <div class="item-right">
-
-    ${fmt(o.total)} USDT
-
-    <br>
-
-    <button
-     class="cancel"
-     onclick="cancelOrder('${o.id}')">
-     Отменить
-    </button>
-
-   </div>
-
-  </div>
-
- `).join("");
-}
-
-function cancelOrder(id){
-
- const index=demo.orders.findIndex(
-  x=>String(x.id)===String(id)
- );
-
- if(index<0)return;
-
- demo.orders.splice(index,1);
-
- saveDemo();
- renderDemo();
-
- toast("Заявка отменена");
-}
-
-function renderTrades(){
-
- const el=document.getElementById("tradesTab");
-
- if(!demo.trades.length){
-  el.innerHTML='<div class="empty">Сделок пока нет</div>';
-  return;
- }
-
- el.innerHTML=demo.trades.slice(0,30).map(t=>`
-
-  <div class="item">
-
-   <div>
-    <div class="item-title">
-     ${t.side==="BUY"?"Покупка":"Продажа"}
-     ${fmt(t.amount)} SLX
-    </div>
-
-    <div class="item-sub">
-     ${new Date(t.time).toLocaleString()}
-    </div>
-   </div>
-
-   <div class="item-right">
-    ${fmt(t.price)}<br>
-    <span style="color:#39d98a">
-     ${fmt(t.total)} USDT
-    </span>
-   </div>
-
-  </div>
-
- `).join("");
-}
-
-function renderPortfolio(){
-
- const el=document.getElementById("portfolioTab");
-
- const value=
-  demo.usdt+
-  demo.slx*currentPrice();
-
- el.innerHTML=`
-
-  <div class="balance">
-   <span>Demo USDT</span>
-   <strong>${fmt(demo.usdt,2)}</strong>
-  </div>
-
-  <div class="balance">
-   <span>Demo SLX</span>
-   <strong>${fmt(demo.slx)}</strong>
-  </div>
-
-  <div class="balance">
-   <span>Стоимость Demo</span>
-   <strong>${fmt(value)}</strong>
-  </div>
-
-  <div class="balance">
-   <span>Открытые заявки</span>
-   <strong>${demo.orders.length}</strong>
-  </div>
-
-  <div class="hint">
-   Demo Market отделён от настоящего Testnet-кошелька.
-  </div>
- `;
-}
-
-/* HISTORY */
-
-async function loadHistory(){
-
- let data=[];
-
- try{
-  data=await api("/api/transactions");
- }catch{
 
   try{
-   data=await api("/api/history");
-  }catch{}
 
- }
+    await navigator.clipboard.writeText(
+      activeWallet.address
+    );
 
- window.walletHistory=
-  Array.isArray(data)
-   ?data
-   :(data.transactions||data.history||[]);
+    toast('Адрес скопирован');
 
- renderHistoryDemo();
-}
+  }catch(e){
 
-function renderHistoryDemo(){
+    const ta=document.createElement('textarea');
 
- const rows=[];
+    ta.value=activeWallet.address;
 
- (window.walletHistory||[])
-  .slice(0,20)
-  .forEach(x=>{
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
 
-   rows.push({
-    title:x.type||x.kind||"TRANSFER",
-    amount:Number(x.amount||x.value||0),
-    date:x.createdAt||x.timestamp||x.date||Date.now(),
-    status:"COMPLETED"
-   });
-
-  });
-
- demo.trades.slice(0,20)
-  .forEach(t=>{
-
-   rows.push({
-    title:t.side==="BUY"?"Покупка SLX":"Продажа SLX",
-    amount:t.total,
-    date:t.time,
-    status:"DEMO"
-   });
-
-  });
-
- rows.sort((a,b)=>
-  new Date(b.date)-new Date(a.date)
- );
-
- const html=rows.length
-  ?rows.map(x=>`
-
-   <div class="item">
-
-    <div>
-     <div class="item-title">${escapeHTML(x.title)}</div>
-     <div class="item-sub">
-      ${new Date(x.date).toLocaleString()}
-     </div>
-    </div>
-
-    <div class="item-right">
-     ${fmt(x.amount)}
-     <br>
-     <span style="color:#39d98a">
-      ${x.status}
-     </span>
-    </div>
-
-   </div>
-
-  `).join("")
-  :'<div class="empty">История пуста</div>';
-
- document.getElementById("historyList").innerHTML=html;
- document.getElementById("walletHistory").innerHTML=html;
+    toast('Адрес скопирован');
+  }
 }
 
 /* QR */
 
 function openQR(){
 
- const address=walletAddress();
-
- if(!address){
-  toast("Адрес кошелька не найден");
-  return;
- }
-
- document.getElementById("qrBox").innerHTML="";
-
- document.getElementById("qrAddress").textContent=address;
-
- new QRCode(
-  document.getElementById("qrBox"),
-  {
-   text:address,
-   width:180,
-   height:180
+  if(!activeWallet){
+    toast('Кошелёк не найден');
+    return;
   }
- );
 
- document.getElementById("qrModal")
-  .classList.add("show");
-}
+  openModal(
+    'QR кошелька',
+    `
+      <div class="muted" style="text-align:center">
+        Покажи этот QR для получения адреса.
+      </div>
 
-document.getElementById("qrBtn").onclick=openQR;
-document.getElementById("profileQr").onclick=openQR;
+      <div id="qrBox" class="qr"></div>
 
-document.getElementById("qrClose").onclick=()=>{
- document.getElementById("qrModal").classList.remove("show");
-};
+      <div class="qr-address mono">
+        ${activeWallet.address}
+      </div>
 
-document.getElementById("qrCopy").onclick=()=>{
- copy(walletAddress());
-};
+      <button id="copyQr"
+        class="btn primary full"
+        style="margin-top:15px">
+        ⧉ Копировать адрес
+      </button>
+    `
+  );
 
-document.getElementById("copyHome").onclick=()=>{
- copy(walletAddress());
-};
+  new QRCode($('qrBox'),{
+    text:activeWallet.address,
+    width:200,
+    height:200,
+    colorDark:'#07101d',
+    colorLight:'#ffffff'
+  });
 
-document.getElementById("copyWallet").onclick=()=>{
- copy(walletAddress());
-};
-
-async function copy(text){
-
- if(!text){
-  toast("Адрес не найден");
-  return;
- }
-
- try{
-
-  await navigator.clipboard.writeText(text);
-  toast("Адрес скопирован");
-
- }catch{
-
-  const input=document.createElement("textarea");
-  input.value=text;
-  document.body.appendChild(input);
-  input.select();
-  document.execCommand("copy");
-  input.remove();
-
-  toast("Адрес скопирован");
- }
+  $('copyQr').onclick=copyAddress;
 }
 
 /* SCANNER */
 
-let stream=null;
-let scanAnimation=null;
+let scannerStream=null;
+let scannerFrame=0;
 
-async function startScanner(){
+async function openScanner(){
 
- stopScanner();
+  if(!navigator.mediaDevices||
+     !navigator.mediaDevices.getUserMedia){
 
- const modal=document.getElementById("scannerModal");
- const video=document.getElementById("video");
- const status=document.getElementById("scanStatus");
-
- modal.classList.add("show");
-
- status.textContent="Запрашиваем доступ к камере...";
-
- if(!navigator.mediaDevices?.getUserMedia){
-
-  status.textContent=
-   "Камера недоступна. Открой сайт через HTTPS.";
-
-  return;
- }
-
- try{
-
-  stream=await navigator.mediaDevices.getUserMedia({
-   video:{
-    facingMode:{ideal:"environment"}
-   },
-   audio:false
-  });
-
-  video.srcObject=stream;
-
-  await video.play();
-
-  status.textContent=
-   "Наведи камеру на QR-код.";
-
-  scanQR();
-
- }catch(e){
-
-  status.textContent=
-   "Нет доступа к камере. Разреши камеру и нажми «Повторить».";
-
- }
-}
-
-function scanQR(){
-
- if(!stream)return;
-
- const video=document.getElementById("video");
-
- if(video.readyState>=2&&window.jsQR){
-
-  const canvas=document.createElement("canvas");
-
-  canvas.width=video.videoWidth;
-  canvas.height=video.videoHeight;
-
-  const ctx=canvas.getContext("2d");
-
-  ctx.drawImage(
-   video,
-   0,
-   0,
-   canvas.width,
-   canvas.height
-  );
-
-  const image=ctx.getImageData(
-   0,
-   0,
-   canvas.width,
-   canvas.height
-  );
-
-  const code=jsQR(
-   image.data,
-   image.width,
-   image.height
-  );
-
-  if(code&&code.data){
-
-   document.getElementById("sendTo").value=
-    code.data.trim();
-
-   stopScanner();
-
-   document.getElementById("scannerModal")
-    .classList.remove("show");
-
-   document.getElementById("sendModal")
-    .classList.add("show");
-
-   toast("QR считан");
-
-   return;
+    toast('Камера недоступна');
+    return;
   }
- }
 
- scanAnimation=requestAnimationFrame(scanQR);
+  openModal(
+    'Сканировать QR',
+    `
+      <div class="muted">
+        Разреши доступ к камере и наведи её на QR.
+      </div>
+
+      <div class="scanner">
+        <video id="scannerVideo"
+          autoplay
+          playsinline
+          muted></video>
+
+        <div class="scan-line"></div>
+      </div>
+
+      <div id="scannerStatus"
+        class="muted"
+        style="margin-top:10px">
+        Запрашиваем камеру…
+      </div>
+
+      <button id="stopScanner"
+        class="btn full"
+        style="margin-top:12px">
+        Остановить
+      </button>
+    `
+  );
+
+  $('stopScanner').onclick=closeModal;
+
+  try{
+
+    scannerStream=
+      await navigator.mediaDevices.getUserMedia({
+        video:{
+          facingMode:{
+            ideal:'environment'
+          }
+        },
+        audio:false
+      });
+
+    const video=$('scannerVideo');
+
+    video.srcObject=scannerStream;
+
+    await video.play();
+
+    const canvas=document.createElement('canvas');
+    const ctx=canvas.getContext(
+      '2d',
+      {willReadFrequently:true}
+    );
+
+    function scan(){
+
+      if(
+        $('modal').classList.contains('hidden')||
+        !scannerStream
+      ){
+        return;
+      }
+
+      if(
+        video.readyState>=2 &&
+        video.videoWidth>0 &&
+        window.jsQR
+      ){
+
+        canvas.width=video.videoWidth;
+        canvas.height=video.videoHeight;
+
+        ctx.drawImage(
+          video,
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        const image=ctx.getImageData(
+          0,
+          0,
+          canvas.width,
+          canvas.height
+        );
+
+        const code=jsQR(
+          image.data,
+          image.width,
+          image.height,
+          {
+            inversionAttempts:'attemptBoth'
+          }
+        );
+
+        if(code&&code.data){
+
+          const address=code.data.trim();
+
+          stopScanner();
+
+          closeModal();
+
+          openSend(address);
+
+          toast('QR считан');
+
+          return;
+        }
+      }
+
+      scannerFrame=requestAnimationFrame(scan);
+    }
+
+    $('scannerStatus').textContent=
+      'Камера активна. Наведи на QR.';
+
+    scannerFrame=requestAnimationFrame(scan);
+
+  }catch(err){
+
+    $('scannerStatus').textContent=
+      'Нет доступа к камере. Разреши камеру для сайта.';
+  }
 }
 
 function stopScanner(){
 
- if(scanAnimation)
-  cancelAnimationFrame(scanAnimation);
+  if(scannerFrame){
+    cancelAnimationFrame(scannerFrame);
+    scannerFrame=0;
+  }
 
- scanAnimation=null;
+  if(scannerStream){
 
- if(stream){
+    scannerStream
+      .getTracks()
+      .forEach(track=>track.stop());
 
-  stream.getTracks().forEach(t=>t.stop());
-  stream=null;
- }
-
- const video=document.getElementById("video");
-
- if(video)
-  video.srcObject=null;
+    scannerStream=null;
+  }
 }
-
-document.getElementById("scanBtn").onclick=startScanner;
-
-document.getElementById("scanClose").onclick=()=>{
- stopScanner();
-
- document.getElementById("scannerModal")
-  .classList.remove("show");
-};
-
-document.getElementById("scanAgain").onclick=startScanner;
 
 /* SEND */
 
-document.getElementById("sendBtn").onclick=()=>{
+function openSend(scannedAddress=''){
 
- document.getElementById("sendTo").value="";
- document.getElementById("sendAmount").value="";
+  if(!activeWallet){
+    toast('Кошелёк не найден');
+    return;
+  }
 
- document.getElementById("sendModal")
-  .classList.add("show");
-};
+  openModal(
+    'Перевод SLX',
+    `
+      <div class="field">
+        <label>Адрес получателя</label>
+        <input
+          id="sendTo"
+          class="mono"
+          value="${scannedAddress}"
+          placeholder="SLXC…">
+      </div>
 
-document.getElementById("sendCancel").onclick=()=>{
- document.getElementById("sendModal")
-  .classList.remove("show");
-};
+      <div class="field">
+        <label>Сумма SLX</label>
+        <input
+          id="sendAmount"
+          type="number"
+          min="0.00000001"
+          step="0.00000001"
+          placeholder="0.00">
+      </div>
 
-document.getElementById("sendConfirm").onclick=async()=>{
+      <div class="muted">
+        Доступно:
+        <b>${Number(activeWallet.balance||0).toFixed(4)} SLX</b>
+      </div>
 
- const to=document.getElementById("sendTo").value.trim();
+      <button id="sendScan"
+        class="btn full"
+        style="margin-top:12px">
+        📷 Сканировать QR
+      </button>
 
- const amount=Number(
-  document.getElementById("sendAmount").value
- );
+      <button id="sendConfirm"
+        class="btn primary full"
+        style="margin-top:8px">
+        Отправить
+      </button>
+    `
+  );
 
- if(!to||!amount||amount<=0){
-  toast("Заполни адрес и сумму");
-  return;
- }
+  $('sendScan').onclick=openScanner;
 
- if(amount+FEE>walletBalance()){
-  toast("Недостаточно SLX с учётом комиссии");
-  return;
- }
+  $('sendConfirm').onclick=async()=>{
 
- try{
+    const to=$('sendTo').value.trim();
+    const amount=Number($('sendAmount').value);
 
-  await api("/api/send",{
-   method:"POST",
-   body:JSON.stringify({
-    to,
-    amount
-   })
-  });
+    if(!to||!amount||amount<=0){
+      toast('Заполни адрес и сумму');
+      return;
+    }
 
-  document.getElementById("sendModal")
-   .classList.remove("show");
+    try{
 
-  toast("Перевод отправлен");
+      await api('/api/send',{
+        method:'POST',
+        body:JSON.stringify({
+          to,
+          amount,
+          fromWalletId:activeWallet.id
+        })
+      });
 
-  await loadWallet();
-  await loadHistory();
+      closeModal();
 
- }catch(e){
+      await loadWallets();
+      await loadHistory();
 
-  toast(e.message);
+      toast('Перевод отправлен');
 
- }
-};
+    }catch(err){
+
+      toast(err.message);
+    }
+  };
+}
 
 /* FAUCET */
 
 async function faucet(){
 
- try{
+  if(!activeWallet){
+    toast('Кошелёк не найден');
+    return;
+  }
 
-  const data=await api("/api/faucet",{
-   method:"POST"
-  });
+  try{
 
-  toast(data.message||"Получено +10 SLX");
+    const data=await api('/api/faucet',{
+      method:'POST',
+      body:JSON.stringify({
+        walletId:activeWallet.id
+      })
+    });
 
-  await loadWallet();
-  await loadHistory();
+    await loadWallets();
 
- }catch(e){
+    toast(
+      'Получено +'+
+      Number(data.amount||10).toFixed(2)+
+      ' SLX'
+    );
 
-  toast(e.message);
+  }catch(err){
 
- }
+    toast(err.message);
+  }
 }
 
-document.getElementById("faucetBtn").onclick=faucet;
-document.getElementById("homeFaucet").onclick=faucet;
+/* MARKET */
 
-/* LOGOUT */
+async function loadMarket(){
 
-document.getElementById("logout").onclick=async()=>{
+  try{
 
- try{
-  await api("/api/auth/logout",{method:"POST"});
- }catch{}
+    const data=await api('/api/market/ticker');
 
- token="";
- localStorage.removeItem(TOKEN_KEY);
+    const t=data.ticker||data.data||data;
 
- document.getElementById("app")
-  .classList.add("hidden");
+    if(t.price){
+      price=Number(t.price);
+    }
 
- document.getElementById("authScreen")
-  .classList.remove("hidden");
+    $('marketPrice').textContent=
+      price.toFixed(4);
 
+    $('homePrice').textContent=
+      price.toFixed(4)+' USDT';
+
+    if(t.high24h)
+      $('marketHigh').textContent=
+        Number(t.high24h).toFixed(4);
+
+    if(t.low24h)
+      $('marketLow').textContent=
+        Number(t.low24h).toFixed(4);
+
+    if(t.volume24h)
+      $('marketVolume').textContent=
+        Number(t.volume24h).toLocaleString();
+
+  }catch(e){}
+
+  renderChart();
+  renderBook();
+  renderTradeUI();
+  renderMarketTabs();
+}
+
+function generateCandles(){
+
+  let value=price||0.1233;
+
+  const result=[];
+
+  for(let i=0;i<55;i++){
+
+    const open=value;
+
+    const move=
+      (Math.random()-.5)*0.004;
+
+    const close=
+      Math.max(
+        0.001,
+        open+move
+      );
+
+    const high=
+      Math.max(open,close)+Math.random()*0.002;
+
+    const low=
+      Math.min(open,close)-Math.random()*0.002;
+
+    result.push({
+      open,
+      close,
+      high,
+      low
+    });
+
+    value=close;
+  }
+
+  return result;
+}
+
+function renderChart(){
+
+  const candles=generateCandles();
+
+  const W=760;
+  const H=320;
+
+  const min=Math.min(
+    ...candles.map(c=>c.low)
+  );
+
+  const max=Math.max(
+    ...candles.map(c=>c.high)
+  );
+
+  const range=max-min||0.01;
+
+  const xStep=W/candles.length;
+
+  const y=v=>
+    15+
+    (max-v)/range*
+    (H-35);
+
+  let svg=`
+    <svg viewBox="0 0 ${W} ${H}"
+      preserveAspectRatio="none">
+
+      <rect
+        width="${W}"
+        height="${H}"
+        fill="#101621"/>
+  `;
+
+  for(let i=1;i<5;i++){
+
+    const yy=
+      15+(H-35)*(i/5);
+
+    svg+=`
+      <line
+        x1="0"
+        y1="${yy}"
+        x2="${W}"
+        y2="${yy}"
+        stroke="#1d2735"/>
+    `;
+  }
+
+  candles.forEach((c,i)=>{
+
+    const x=
+      i*xStep+
+      xStep/2;
+
+    const up=
+      c.close>=c.open;
+
+    const color=
+      up?'#31d99a':'#ff647c';
+
+    const top=
+      y(Math.max(c.open,c.close));
+
+    const body=
+      Math.max(
+        2,
+        Math.abs(
+          y(c.open)-y(c.close)
+        )
+      );
+
+    svg+=`
+      <line
+        x1="${x}"
+        y1="${y(c.high)}"
+        x2="${x}"
+        y2="${y(c.low)}"
+        stroke="${color}"
+        stroke-width="1.4"/>
+
+      <rect
+        x="${x-xStep*.27}"
+        y="${top}"
+        width="${xStep*.54}"
+        height="${body}"
+        fill="${color}"
+        rx="1"/>
+    `;
+  });
+
+  svg+=`</svg>`;
+
+  $('chart').innerHTML=svg;
+}
+
+/* TIMEFRAMES */
+
+document.querySelectorAll('[data-tf]').forEach(btn=>{
+
+  btn.onclick=()=>{
+
+    timeframe=btn.dataset.tf;
+
+    document.querySelectorAll('[data-tf]')
+      .forEach(b=>
+        b.classList.toggle(
+          'active',
+          b===btn
+        )
+      );
+
+    renderChart();
+  };
+});
+
+/* BOOK */
+
+function renderBook(){
+
+  let asks='';
+  let bids='';
+
+  for(let i=5;i>=1;i--){
+
+    const p=
+      price+
+      i*0.0006;
+
+    asks+=`
+      <div class="book-row">
+        <span class="bad">${p.toFixed(4)}</span>
+        <span>${(Math.random()*900+100).toFixed(2)}</span>
+      </div>
+    `;
+  }
+
+  for(let i=1;i<=5;i++){
+
+    const p=
+      price-
+      i*0.0006;
+
+    bids+=`
+      <div class="book-row">
+        <span class="good">${p.toFixed(4)}</span>
+        <span>${(Math.random()*900+100).toFixed(2)}</span>
+      </div>
+    `;
+  }
+
+  $('asks').innerHTML=asks;
+  $('bids').innerHTML=bids;
+
+  $('midPrice').textContent=
+    price.toFixed(4)+' USDT';
+}
+
+/* TRADE */
+
+$('buyTab').onclick=()=>{
+  side='buy';
+
+  $('buyTab').classList.add('active');
+  $('sellTab').classList.remove('active');
+
+  renderTradeUI();
 };
 
-/* RESIZE */
+$('sellTab').onclick=()=>{
+  side='sell';
 
-window.addEventListener("resize",()=>{
- resizeChart();
- drawChart();
+  $('sellTab').classList.add('active');
+  $('buyTab').classList.remove('active');
+
+  renderTradeUI();
+};
+
+$('marketType').onclick=()=>{
+  orderType='market';
+
+  $('marketType').classList.add('active');
+  $('limitType').classList.remove('active');
+
+  $('orderPrice').value=price.toFixed(4);
+
+  renderTradeUI();
+};
+
+$('limitType').onclick=()=>{
+  orderType='limit';
+
+  $('limitType').classList.add('active');
+  $('marketType').classList.remove('active');
+
+  renderTradeUI();
+};
+
+function available(){
+
+  if(side==='buy'){
+    return demo.usdt;
+  }
+
+  return demo.slx+
+    Number(activeWallet?.balance||0);
+}
+
+function renderTradeUI(){
+
+  const input=$('orderPrice');
+
+  if(orderType==='market'){
+    input.value=price.toFixed(4);
+    input.disabled=true;
+  }else{
+    input.disabled=false;
+  }
+
+  $('submitOrder').textContent=
+    side==='buy'
+      ?'Купить SLX'
+      :'Продать SLX';
+
+  $('submitOrder').classList.toggle(
+    'sell',
+    side==='sell'
+  );
+
+  $('availableBalance').textContent=
+    side==='buy'
+      ?demo.usdt.toFixed(2)+' USDT'
+      :available().toFixed(4)+' SLX';
+
+  updateTotal();
+}
+
+function updateTotal(){
+
+  const p=
+    Number($('orderPrice').value)||
+    price;
+
+  const amount=
+    Number($('orderAmount').value)||
+    0;
+
+  const total=
+    p*amount;
+
+  $('orderTotal').textContent=
+    total.toFixed(4)+' USDT';
+}
+
+$('orderPrice').oninput=updateTotal;
+$('orderAmount').oninput=updateTotal;
+
+document.querySelectorAll('[data-percent]').forEach(btn=>{
+
+  btn.onclick=()=>{
+
+    const percent=
+      Number(btn.dataset.percent)/100;
+
+    if(side==='buy'){
+
+      const max=
+        demo.usdt/
+        (Number($('orderPrice').value)||price);
+
+      $('orderAmount').value=
+        (max*percent).toFixed(4);
+
+    }else{
+
+      $('orderAmount').value=
+        (available()*percent).toFixed(4);
+    }
+
+    updateTotal();
+  };
 });
+
+/* ORDER */
+
+$('submitOrder').onclick=()=>{
+
+  const p=
+    Number($('orderPrice').value)||price;
+
+  const amount=
+    Number($('orderAmount').value)||0;
+
+  if(amount<=0){
+    toast('Укажи количество');
+    return;
+  }
+
+  const total=p*amount;
+
+  if(side==='buy'){
+
+    if(total>demo.usdt){
+      toast('Недостаточно USDT');
+      return;
+    }
+
+    if(orderType==='market'){
+
+      demo.usdt-=total;
+      demo.slx+=amount;
+
+      addTrade(
+        'Покупка',
+        amount,
+        p,
+        total
+      );
+
+      toast('Покупка выполнена');
+
+    }else{
+
+      demo.orders.unshift({
+        id:Date.now(),
+        side:'buy',
+        price:p,
+        amount,
+        total,
+        time:Date.now()
+      });
+
+      toast('Лимитная заявка создана');
+    }
+
+  }else{
+
+    if(amount>available()){
+      toast('Недостаточно SLX');
+      return;
+    }
+
+    if(orderType==='market'){
+
+      const demoPart=
+        Math.min(
+          demo.slx,
+          amount
+        );
+
+      demo.slx-=demoPart;
+
+      const walletPart=
+        amount-demoPart;
+
+      const receive=
+        total;
+
+      demo.usdt+=receive;
+
+      addTrade(
+        'Продажа',
+        amount,
+        p,
+        total
+      );
+
+      toast(
+        walletPart>0
+          ?'Продажа выполнена в Demo-режиме'
+          :'Продажа выполнена'
+      );
+
+    }else{
+
+      demo.orders.unshift({
+        id:Date.now(),
+        side:'sell',
+        price:p,
+        amount,
+        total,
+        time:Date.now()
+      });
+
+      toast('Лимитная заявка создана');
+    }
+  }
+
+  saveDemo();
+
+  $('orderAmount').value='0.0000';
+
+  renderTradeUI();
+  renderMarketTabs();
+};
+
+/* TRADES */
+
+function addTrade(name,amount,p,total){
+
+  demo.trades.unshift({
+    id:Date.now(),
+    name,
+    amount,
+    price:p,
+    total,
+    time:Date.now()
+  });
+
+  demo.trades=
+    demo.trades.slice(0,50);
+}
+
+/* MARKET TABS */
+
+document.querySelectorAll('[data-market-tab]')
+.forEach(btn=>{
+
+  btn.onclick=()=>{
+
+    document.querySelectorAll(
+      '[data-market-tab]'
+    ).forEach(b=>
+      b.classList.toggle(
+        'active',
+        b===btn
+      )
+    );
+
+    ['orders','trades','portfolio']
+      .forEach(id=>{
+        $(id+'Tab').classList.toggle(
+          'hidden',
+          id!==btn.dataset.marketTab
+        );
+      });
+
+  };
+});
+
+function renderMarketTabs(){
+
+  $('ordersTab').innerHTML=
+    demo.orders.length
+      ?demo.orders.map(o=>`
+        <div class="order-item">
+
+          <div>
+            <div class="trade-name">
+              ${o.side==='buy'?'Покупка':'Продажа'}
+              ${o.amount.toFixed(4)} SLX
+            </div>
+
+            <div class="trade-date">
+              ${new Date(o.time).toLocaleString('ru-RU')}
+            </div>
+          </div>
+
+          <div class="trade-right">
+
+            <div class="trade-price">
+              ${o.price.toFixed(4)}
+            </div>
+
+            <button
+              class="cancel"
+              data-cancel="${o.id}">
+              Отменить
+            </button>
+
+          </div>
+
+        </div>
+      `).join('')
+      :
+      '<div class="muted" style="padding:20px 0;text-align:center">Открытых заявок нет</div>';
+
+  document.querySelectorAll('[data-cancel]')
+  .forEach(btn=>{
+
+    btn.onclick=()=>{
+
+      demo.orders=
+        demo.orders.filter(
+          o=>String(o.id)!==String(btn.dataset.cancel)
+        );
+
+      saveDemo();
+      renderMarketTabs();
+
+      toast('Заявка отменена');
+    };
+  });
+
+  $('tradesTab').innerHTML=
+    demo.trades.length
+      ?demo.trades.map(t=>`
+        <div class="trade-item">
+
+          <div>
+            <div class="trade-name">
+              ${t.name} ${t.amount.toFixed(4)} SLX
+            </div>
+
+            <div class="trade-date">
+              ${new Date(t.time).toLocaleString('ru-RU')}
+            </div>
+          </div>
+
+          <div class="trade-right">
+            <div class="trade-price">
+              ${t.price.toFixed(4)}
+            </div>
+
+            <div class="trade-total">
+              ${t.total.toFixed(4)} USDT
+            </div>
+          </div>
+
+        </div>
+      `).join('')
+      :
+      '<div class="muted" style="padding:20px;text-align:center">Сделок пока нет</div>';
+
+  const walletSlx=
+    Number(activeWallet?.balance||0);
+
+  $('portfolioTab').innerHTML=`
+    <div class="info-row" style="padding:12px 0">
+      <span>Кошелёк SLX</span>
+      <b>${walletSlx.toFixed(4)} SLX</b>
+    </div>
+
+    <div class="info-row" style="padding:12px 0">
+      <span>Demo SLX</span>
+      <b>${demo.slx.toFixed(4)} SLX</b>
+    </div>
+
+    <div class="info-row" style="padding:12px 0">
+      <span>Demo USDT</span>
+      <b>${demo.usdt.toFixed(2)} USDT</b>
+    </div>
+
+    <div class="info-row" style="padding:12px 0">
+      <span>Общая стоимость Demo</span>
+      <b>${(demo.usdt+demo.slx*price).toFixed(2)} USDT</b>
+    </div>
+  `;
+}
+
+/* HISTORY */
+
+async function loadHistory(){
+
+  try{
+
+    const data=await api('/api/transactions');
+
+    const list=
+      data.transactions||
+      data.data||
+      [];
+
+    $('historyList').innerHTML=
+      list.length
+        ?list.slice(0,50).map(tx=>`
+          <div class="trade-item">
+
+            <div>
+              <div class="trade-name">
+                ${tx.type==='faucet'
+                  ?'Faucet'
+                  :'Перевод SLX'}
+              </div>
+
+              <div class="trade-date">
+                ${new Date(
+                  tx.createdAt||
+                  tx.timestamp||
+                  Date.now()
+                ).toLocaleString('ru-RU')}
+              </div>
+            </div>
+
+            <div class="trade-right">
+              ${Number(tx.amount||0).toFixed(4)} SLX
+            </div>
+
+          </div>
+        `).join('')
+        :
+        '<div class="muted" style="padding:20px;text-align:center">История пуста</div>';
+
+  }catch(err){
+
+    $('historyList').innerHTML=
+      '<div class="muted" style="padding:20px">'+
+      err.message+
+      '</div>';
+  }
+}
+
+/* PROFILE */
+
+function renderProfile(){
+
+  const name=
+    user?.username||
+    'SLX User';
+
+  $('profileName').textContent=name;
+
+  $('avatar').textContent=
+    name.charAt(0).toUpperCase();
+}
+
+$('profileQr').onclick=openQR;
+$('profileScan').onclick=openScanner;
+$('profileCopy').onclick=copyAddress;
+
+$('profileNetwork').onclick=()=>{
+  toast('SLX Testnet · Demo Network');
+};
+
+$('profileLogout').onclick=async()=>{
+
+  try{
+
+    await api('/api/auth/logout',{
+      method:'POST',
+      body:'{}'
+    });
+
+  }catch(e){}
+
+  localStorage.removeItem(TOKEN_KEY);
+  token='';
+
+  $('app').classList.add('hidden');
+  $('auth').classList.remove('hidden');
+
+  toast('Вы вышли из аккаунта');
+};
+
+/* BUTTONS */
+
+$('homeSend').onclick=openSend;
+$('homeQr').onclick=openQR;
+$('homeCopy').onclick=copyAddress;
+$('homeFaucet').onclick=faucet;
+
+$('walletSend').onclick=openSend;
+$('walletQr').onclick=openQR;
+$('walletCopy').onclick=copyAddress;
+$('walletScan').onclick=openScanner;
+$('walletFaucet').onclick=faucet;
+
+/* MODAL */
+
+function openModal(title,html){
+
+  $('modalTitle').textContent=title;
+  $('modalBody').innerHTML=html;
+  $('modal').classList.remove('hidden');
+}
+
+function closeModal(){
+
+  stopScanner();
+
+  $('modal').classList.add('hidden');
+  $('modalBody').innerHTML='';
+}
+
+$('modalClose').onclick=closeModal;
+
+$('modal').onclick=e=>{
+  if(e.target===$('modal')){
+    closeModal();
+  }
+};
 
 /* START */
 
-if(token){
+async function bootstrap(){
 
- start().catch(e=>{
-  console.error(e);
+  if(!token){
+    return;
+  }
 
-  token="";
-  localStorage.removeItem(TOKEN_KEY);
+  try{
 
-  document.getElementById("app")
-   .classList.add("hidden");
+    const data=await api('/api/auth/me');
 
-  document.getElementById("authScreen")
-   .classList.remove("hidden");
- });
+    user=data.user||null;
+
+    await startApp();
+
+  }catch(e){
+
+    localStorage.removeItem(TOKEN_KEY);
+    token='';
+  }
 }
 
-/* AUTO REFRESH */
+setInterval(()=>{
 
-setInterval(async()=>{
+  if(
+    token &&
+    !$('app').classList.contains('hidden')
+  ){
 
- if(!token)return;
+    loadMarket();
 
- try{
+    if(
+      document.querySelector(
+        '#wallet.active'
+      )
+    ){
+      loadWallets();
+    }
 
-  await loadMarket();
-  renderDemo();
-
- }catch{}
+  }
 
 },20000);
 
+bootstrap();
+
 </script>
+
 </body>
 </html>
