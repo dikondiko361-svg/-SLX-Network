@@ -2,2131 +2,1512 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1020">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>SLX Network v1.9.1</title>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" defer></script>
-<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js" defer></script>
-
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d17">
+<meta name="description" content="SLX Network v2.0 — SLX Testnet Wallet and simulated demo market.">
+<title>SLX Network v2.0</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 <style>
-:root{
-  --bg:#070b14;
-  --panel:#0f1626;
-  --panel2:#131c30;
-  --line:#24304a;
-  --text:#f4f7fb;
-  --muted:#91a0ba;
-  --accent:#7c5cff;
-  --accent2:#4f8cff;
-  --good:#31d08a;
-  --warn:#ffc857;
-  --bad:#ff5f6d;
-  --shadow:0 12px 32px rgba(0,0,0,.28);
-  --radius:20px;
-}
-
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-body{min-height:100vh;padding-bottom:92px}
-button,input,select{font:inherit}
-button{cursor:pointer}
-button:disabled{opacity:.55;cursor:not-allowed}
-.hidden{display:none!important}
-.app{width:min(100%,680px);margin:0 auto;padding:14px 14px 0}
-
-.topbar{
-  display:flex;align-items:center;justify-content:space-between;gap:10px;
-  padding:10px 2px 14px;
-}
-.brand{display:flex;align-items:center;gap:10px;min-width:0}
-.logo{
-  width:42px;height:42px;border-radius:14px;display:grid;place-items:center;
-  background:linear-gradient(135deg,var(--accent),var(--accent2));
-  font-weight:900;box-shadow:var(--shadow);flex:none;
-}
-.brand-title{font-size:18px;font-weight:800;line-height:1}
-.brand-sub{font-size:11px;color:var(--muted);margin-top:4px}
-.avatar{
-  width:42px;height:42px;border-radius:50%;object-fit:cover;
-  background:var(--panel2);border:1px solid var(--line);flex:none;
-}
-.card{
-  background:linear-gradient(180deg,rgba(19,28,48,.98),rgba(12,18,32,.98));
-  border:1px solid var(--line);border-radius:var(--radius);
-  padding:16px;box-shadow:var(--shadow);margin-bottom:12px;
-}
-.card h2,.card h3{margin:0 0 12px}
-.muted{color:var(--muted)}
-.small{font-size:12px}
-.tiny{font-size:11px}
-.row{display:flex;align-items:center;gap:10px}
-.row-between{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.stack{display:flex;flex-direction:column;gap:10px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.btn{
-  width:100%;border:0;border-radius:14px;padding:13px 14px;
-  background:var(--panel2);color:var(--text);font-weight:800;
-}
-.btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2))}
-.btn.good{background:rgba(49,208,138,.16);border:1px solid rgba(49,208,138,.32);color:#8df1bd}
-.btn.warn{background:rgba(255,200,87,.13);border:1px solid rgba(255,200,87,.28);color:#ffd97c}
-.btn.danger{background:rgba(255,95,109,.12);border:1px solid rgba(255,95,109,.25);color:#ff9aa3}
-.btn.smallbtn{width:auto;padding:8px 9px;border-radius:10px;font-size:11px;min-width:48px}
-.input,.select{
-  width:100%;padding:13px 14px;border-radius:13px;border:1px solid var(--line);
-  outline:none;background:#0a1020;color:var(--text);
-}
-.input:focus,.select:focus{border-color:var(--accent)}
-.label{font-size:12px;color:var(--muted);margin-bottom:6px}
-.field{display:flex;flex-direction:column;gap:6px}
-.balance{font-size:40px;font-weight:900;letter-spacing:-1px;margin:8px 0 4px}
-.token{font-size:14px;color:#b7c0d0}
-.wallet-address{
-  word-break:break-all;padding:11px 12px;border-radius:12px;
-  background:#090e1b;border:1px dashed #34415f;color:#cad3e5;font-size:12px;
-}
-.badge{
-  display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;
-  font-size:11px;font-weight:800;background:rgba(145,160,186,.12);color:#c5cede;
-}
-.badge.good{background:rgba(49,208,138,.12);color:#86efb7}
-.badge.warn{background:rgba(255,200,87,.12);color:#ffd76d}
-.badge.bad{background:rgba(255,95,109,.12);color:#ff9aa4}
-
-.wallet-item{
-  padding:9px;border-radius:14px;border:1px solid var(--line);background:#0b1120;
-  display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;overflow:hidden;
-}
-.wallet-item.active{border-color:var(--accent);box-shadow:0 0 0 1px rgba(124,92,255,.25) inset}
-.wallet-left{min-width:0;overflow:hidden}
-.wallet-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wallet-mini{font-size:11px;color:var(--muted);margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.wallet-balance{font-size:12px;font-weight:800;margin-top:5px}
-.wallet-actions{display:flex;gap:6px;flex-shrink:0}
-.wallet-actions .smallbtn{min-width:48px;padding:8px 9px;border-radius:10px;font-size:11px}
-
-.scan-frame{position:relative;margin-top:10px;border-radius:18px;overflow:hidden;background:#000;border:1px solid var(--line)}
-.scan-frame:after{content:"";position:absolute;inset:16%;border:2px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 0 0 999px rgba(0,0,0,.08);pointer-events:none}
-.tx{padding:12px;border-radius:14px;border:1px solid var(--line);background:#0b1120}
-.tx-head{display:flex;justify-content:space-between;gap:10px}
-.tx-type{font-weight:800}
-.amount.plus{color:#75e8a9}
-.amount.minus{color:#ff8c97}
-.kv{display:grid;grid-template-columns:1fr auto;gap:8px;font-size:13px}
-.kv div:nth-child(odd){color:var(--muted)}
-.section-title{font-weight:900;font-size:17px;margin:4px 0 10px}
-.empty{padding:18px 8px;text-align:center;color:var(--muted)}
-.info{
-  padding:11px 12px;border-radius:13px;background:rgba(79,140,255,.09);
-  border:1px solid rgba(79,140,255,.22);font-size:12px;line-height:1.45;
-}
-.warning{
-  padding:11px 12px;border-radius:13px;background:rgba(255,200,87,.08);
-  border:1px solid rgba(255,200,87,.22);font-size:12px;line-height:1.45;
-}
-.success{
-  padding:11px 12px;border-radius:13px;background:rgba(49,208,138,.08);
-  border:1px solid rgba(49,208,138,.22);font-size:12px;line-height:1.45;
-}
-.recovery-code{
-  padding:16px;border-radius:14px;background:#090e1a;border:1px solid #3d4c6b;
-  text-align:center;font-size:24px;font-weight:900;letter-spacing:4px;user-select:text;
-}
-.qr-box{
-  width:240px;height:240px;margin:0 auto;border-radius:18px;background:white;
-  display:grid;place-items:center;padding:12px;
-}
-#qrCode{display:grid;place-items:center}
-#qrCode img,#qrCode canvas{max-width:216px!important;max-height:216px!important}
-.modal{
-  position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(8px);
-  display:flex;align-items:flex-end;justify-content:center;z-index:1000;padding:10px;
-}
-.modal-box{
-  width:min(100%,680px);max-height:88vh;overflow:auto;
-  background:#0d1424;border:1px solid var(--line);border-radius:24px;padding:16px;
-}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
-.iconbtn{
-  width:40px;height:40px;border-radius:12px;border:1px solid var(--line);
-  background:#10192c;color:var(--text);
-}
-.toast{
-  position:fixed;left:50%;bottom:100px;transform:translateX(-50%) translateY(20px);
-  width:min(calc(100% - 28px),620px);padding:13px 15px;border-radius:14px;
-  background:#111a2d;border:1px solid var(--line);box-shadow:var(--shadow);
-  opacity:0;pointer-events:none;transition:.22s;z-index:1200;font-size:13px;
-}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.toast.good{border-color:rgba(49,208,138,.4)}
-.toast.bad{border-color:rgba(255,95,109,.45)}
-.bottom-nav{
-  position:fixed;left:0;right:0;bottom:0;z-index:900;
-  padding:8px 10px calc(8px + env(safe-area-inset-bottom));
-  background:rgba(7,11,20,.92);backdrop-filter:blur(16px);border-top:1px solid var(--line);
-}
-.nav-inner{width:min(100%,680px);margin:0 auto;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px}
-.nav-btn{
-  border:0;background:transparent;color:var(--muted);padding:8px 3px;border-radius:12px;
-  font-size:10px;font-weight:800;line-height:1.35;min-width:0;
-}
-.nav-btn.active{background:#131d33;color:#fff}
-.auth{
-  min-height:100vh;display:flex;align-items:center;justify-content:center;
-  padding:18px;
-}
-.auth-box{width:min(100%,560px)}
-.auth-logo{margin:0 auto 14px}
-.auth-tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
-.tab{
-  border:1px solid var(--line);background:#0c1322;color:var(--muted);padding:11px;border-radius:12px;font-weight:800;
-}
-.tab.active{background:#151f37;color:#fff;border-color:#3b4b72}
-.file-btn{
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:11px 13px;border-radius:13px;background:#10192c;border:1px solid var(--line);font-weight:800;
-}
-#avatarInput{display:none}
-.avatar-preview{width:90px;height:90px;border-radius:50%;object-fit:cover;border:1px solid var(--line);background:#10192c}
-.scanner-video{width:100%;border-radius:16px;background:#000;aspect-ratio:1/1;object-fit:cover}
-hr{border:0;border-top:1px solid var(--line);margin:14px 0}
-
-@media(min-width:560px){.modal{align-items:center}}
-@media(max-width:390px){
-  .nav-btn{font-size:9px;padding-left:1px;padding-right:1px}
-  .wallet-actions{gap:4px}
-  .wallet-actions .smallbtn{min-width:42px;padding:7px 6px}
-}
+:root{color-scheme:dark;--bg:#080d17;--panel:#101827;--panel2:#0c1422;--stroke:#24334a;--text:#f3f6ff;--muted:#8fa0b8;--blue:#4d8cff;--blue2:#2670e8;--green:#27d6a0;--red:#ff6d83;--gold:#f2c66d;--radius:20px;--shadow:0 14px 36px rgba(0,0,0,.22)}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg);scroll-behavior:smooth}body{margin:0;background:radial-gradient(900px 500px at 90% -10%,rgba(38,112,232,.16),transparent 60%),var(--bg);color:var(--text);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #76aaff;outline-offset:2px}a{color:#9ac3ff}.hidden{display:none!important}.muted{color:var(--muted)}.positive{color:var(--green)!important}.negative{color:var(--red)!important}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;overflow-wrap:anywhere}.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:10px;color:#92a6c4;font-weight:800}.tiny{font-size:11px}.small{font-size:13px}.hrow{display:flex;align-items:center;gap:10px}.between{justify-content:space-between}.wrap{flex-wrap:wrap}.stack{display:flex;flex-direction:column;gap:12px}.pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #294262;background:#0d2037;color:#9bc6ff;padding:5px 9px;border-radius:99px;font-weight:800;font-size:10px;letter-spacing:.06em}.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px #27d6a066}.btn{border:1px solid var(--stroke);background:#172337;color:var(--text);border-radius:13px;padding:11px 14px;font-weight:750;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .15s,border-color .15s,background .15s}.btn:active{transform:scale(.98)}.btn.primary{background:linear-gradient(135deg,var(--blue),var(--blue2));border-color:transparent;color:white}.btn.ghost{background:transparent}.btn.danger{border-color:#5a2939;background:#2a1520;color:#ff9aab}.btn.green{background:#10372f;border-color:#1c6652;color:#73f0c7}.btn.full{width:100%}.btn.smallBtn{padding:8px 10px;font-size:12px;border-radius:10px}.iconbtn{width:38px;height:38px;border-radius:12px;padding:0;font-size:18px}
+/* auth */
+.auth-wrap{min-height:100vh;display:grid;place-items:center;padding:26px 16px}.auth-box{width:min(100%,440px)}.brand{display:flex;align-items:center;gap:12px;font-weight:900;letter-spacing:-.03em;font-size:22px}.brand-mark{width:45px;height:45px;border-radius:15px;display:grid;place-items:center;background:linear-gradient(145deg,#6ba7ff,#2259d7);box-shadow:0 8px 25px #2e75ee44;font-weight:1000;color:white;letter-spacing:-.1em}.auth-head{margin:24px 0 18px}.auth-head h1{font-size:29px;line-height:1.15;margin:0 0 10px;letter-spacing:-.04em}.auth-card,.panel{border:1px solid var(--stroke);background:linear-gradient(160deg,rgba(20,31,49,.97),rgba(12,20,34,.97));border-radius:var(--radius);padding:18px;box-shadow:var(--shadow)}.tabs{display:flex;padding:4px;background:#0a111e;border:1px solid var(--stroke);border-radius:13px;gap:4px;margin-bottom:18px}.tabs button{flex:1;background:transparent;border:0;border-radius:10px;padding:10px;color:var(--muted);font-weight:800}.tabs button.active{background:#1a2a43;color:white}.field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}.field label{font-size:12px;color:#b7c6dc;font-weight:750}.field input,.field select,.field textarea,.input{min-width:0;width:100%;padding:13px 13px;border:1px solid #2a3b54;border-radius:12px;background:#09111f;color:var(--text);outline:none}.field input:focus,.field select:focus,.field textarea:focus{border-color:#5e9bff}.field .hint{font-size:11px;color:var(--muted)}.auth-note{border:1px solid #3c3423;background:#201b12;color:#dcc68d;border-radius:12px;padding:11px 12px;font-size:12px;margin-top:13px}
+/* app */
+.app{max-width:1240px;margin:0 auto;padding:18px 20px 110px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}.top-left{display:flex;align-items:center;gap:12px}.top-title{font-size:18px;font-weight:900;letter-spacing:-.04em}.top-sub{font-size:11px;color:var(--muted);margin-top:1px}.top-actions{display:flex;gap:9px;align-items:center}.status-chip{display:flex;align-items:center;gap:7px;border:1px solid #254b48;color:#85ebc7;background:#0e2528;padding:7px 10px;border-radius:99px;font-size:11px;font-weight:800}.page{display:none;animation:fade .18s ease}.page.active{display:block}@keyframes fade{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}.pagehead{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;margin:4px 0 20px}.pagehead h1{margin:3px 0;font-size:27px;letter-spacing:-.05em;line-height:1.1}.pagehead p{margin:6px 0 0;color:var(--muted);font-size:13px}.grid{display:grid;gap:14px}.grid.two{grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr)}.grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}.grid.equal{grid-template-columns:repeat(2,minmax(0,1fr))}.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}.panel-head h2,.panel-head h3{font-size:15px;margin:0;letter-spacing:-.02em}.balance-card{position:relative;overflow:hidden;background:linear-gradient(120deg,#12284a,#12213a 58%,#101827);border-color:#2b4f7d}.balance-card:after{content:"";position:absolute;width:240px;height:240px;border:1px solid #477fcf28;border-radius:50%;right:-90px;top:-90px;box-shadow:0 0 0 25px #477fcf0b,0 0 0 55px #477fcf08}.balance-amount{font-size:clamp(32px,5vw,46px);font-weight:900;letter-spacing:-.055em;margin:8px 0 4px}.balance-amount span{font-size:15px;color:#9fb4d2;font-weight:750;letter-spacing:0}.address{padding:10px 11px;border:1px solid #30445f;background:#0a1729;border-radius:11px;font-size:11px;color:#bbcae0;overflow-wrap:anywhere}.quick-actions{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:15px 0 0}.quick{background:#0c1727;border:1px solid #293b55;border-radius:14px;padding:13px 5px;display:flex;flex-direction:column;align-items:center;gap:7px;color:#dbe6f8;font-size:11px;font-weight:750}.quick span:first-child{width:33px;height:33px;border-radius:11px;background:#172b47;display:grid;place-items:center;font-size:17px;color:#94bdff}.metric{padding:14px;border:1px solid var(--stroke);border-radius:15px;background:#0d1625}.metric strong{display:block;font-size:18px;letter-spacing:-.03em;margin-top:6px}.metric span{color:var(--muted);font-size:11px}.divider{height:1px;background:#233249;margin:14px 0}.wallet-mini{display:flex;align-items:center;gap:11px;width:100%;text-align:left;border:1px solid var(--stroke);background:#0b1422;color:var(--text);padding:13px;border-radius:14px}.wallet-mini.selected{border-color:#4f8fff;background:#10223a}.coin-icon{width:37px;height:37px;flex:none;border-radius:13px;display:grid;place-items:center;background:linear-gradient(145deg,#367bec,#16449b);font-weight:900}.wallet-info{min-width:0;flex:1}.wallet-info strong{display:block;font-size:13px}.wallet-info small{display:block;font-size:10px;color:var(--muted);overflow:hidden;text-overflow:ellipsis}.wallet-balance{font-size:14px;font-weight:850;white-space:nowrap}.list{display:flex;flex-direction:column;gap:9px}.tx-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #202d40}.tx-row:last-child{border-bottom:0}.tx-icon{width:34px;height:34px;border:1px solid #2b3d54;background:#122035;border-radius:12px;display:grid;place-items:center;flex:none}.tx-text{flex:1;min-width:0}.tx-text strong{display:block;font-size:12px}.tx-text small{display:block;color:var(--muted);font-size:10px}.tx-amount{text-align:right;font-size:12px;font-weight:850;white-space:nowrap}.empty{text-align:center;padding:28px 12px;color:var(--muted);font-size:13px}.empty .empty-icon{font-size:28px;margin-bottom:9px}.bottom-nav{position:fixed;z-index:50;left:50%;transform:translateX(-50%);bottom:max(10px,env(safe-area-inset-bottom));width:min(calc(100% - 22px),690px);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;padding:7px;border:1px solid #2b3d56;background:rgba(8,14,25,.94);backdrop-filter:blur(22px);border-radius:20px;box-shadow:0 16px 50px #0009}.nav-btn{border:0;background:transparent;color:#8394ac;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px 2px;border-radius:13px;font-size:9px;font-weight:750;min-width:0}.nav-btn .nav-icon{font-size:18px;line-height:1}.nav-btn.active{background:#152947;color:#b2d1ff}.nav-btn.active .nav-icon{color:#73a7ff}
+/* market */
+.demo-banner{display:flex;align-items:center;gap:10px;padding:11px 13px;background:linear-gradient(90deg,#251d10,#171a20);border:1px solid #51402b;border-radius:13px;color:#e6c990;font-size:11px;margin-bottom:14px}.demo-banner strong{color:#ffe0a0}.pair-card{border:1px solid var(--stroke);background:linear-gradient(120deg,#12233b,#0d1727);border-radius:18px;padding:17px;width:100%;text-align:left;color:var(--text)}.pair-card .pair-symbol{font-size:18px;font-weight:900;letter-spacing:-.02em}.pair-price{font-size:27px;font-weight:900;letter-spacing:-.05em;margin:12px 0 3px}.market-main-price{font-size:clamp(31px,5vw,42px);font-weight:900;letter-spacing:-.06em;line-height:1.08}.market-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:18px}.market-stat{background:#0b1422;border:1px solid #22324a;border-radius:13px;padding:10px}.market-stat span{display:block;font-size:10px;color:var(--muted);margin-bottom:5px}.market-stat strong{display:block;font-size:12px;word-break:break-word}.timeframes{display:flex;gap:5px;background:#09111e;border:1px solid #253650;border-radius:11px;padding:4px}.timeframes button{flex:1;border:0;background:transparent;color:#8ea0ba;border-radius:8px;padding:8px 5px;font-size:11px;font-weight:850}.timeframes button.active{background:#1b3355;color:#b8d5ff}.chart-wrap{position:relative;height:300px;width:100%;margin-top:10px}.chart-wrap canvas{width:100%;height:100%;display:block}.chart-legend{display:flex;gap:13px;align-items:center;flex-wrap:wrap;font-size:10px;color:var(--muted)}.legend-item{display:flex;align-items:center;gap:5px}.legend-line{display:inline-block;width:8px;height:8px;border-radius:2px}.book-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.book-side h4{margin:0 0 9px;font-size:11px;color:var(--muted);font-weight:800}.book-row{display:grid;grid-template-columns:1fr 1fr;position:relative;padding:6px 5px;font-size:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;border-bottom:1px solid #1c293a;overflow:hidden}.book-row span{position:relative;z-index:1}.book-row .depth{position:absolute;right:0;top:0;bottom:0;opacity:.12}.depth.bid{background:var(--green)}.depth.ask{background:var(--red)}.book-row .qty{text-align:right;color:#a6b4c9}.orderbook-price{text-align:center;font-size:17px;font-weight:900;padding:12px 0;border-top:1px solid #23334a;border-bottom:1px solid #23334a;margin:8px 0}.trade-table{width:100%;border-collapse:collapse;font-size:11px}.trade-table th{text-align:left;color:var(--muted);font-weight:700;padding:7px 4px}.trade-table td{padding:8px 4px;border-top:1px solid #1e2a3d}.trade-table th:last-child,.trade-table td:last-child{text-align:right}.trade-table th:nth-child(2),.trade-table td:nth-child(2){text-align:right}.subtabs{display:flex;gap:7px;flex-wrap:wrap}.subtabs button{background:#0a1321;border:1px solid #263650;border-radius:10px;padding:8px 11px;color:#90a3be;font-size:11px;font-weight:800}.subtabs button.active{border-color:#4e8fff;background:#142a48;color:#c7dcff}
+/* modal and toast */
+.modal-layer{position:fixed;inset:0;z-index:100;background:#02050bcc;backdrop-filter:blur(7px);display:grid;place-items:end center;padding:14px}.modal{width:min(100%,500px);max-height:88vh;overflow:auto;border:1px solid #30435e;background:#101a2a;border-radius:22px;padding:19px;box-shadow:0 30px 90px #000b;animation:rise .18s ease}@keyframes rise{from{transform:translateY(20px);opacity:.5}to{transform:none;opacity:1}}.modal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.modal-head h2{font-size:18px;margin:0}.close-btn{border:1px solid #2d4059;background:#18263a;color:#dbe7fb;border-radius:11px;width:34px;height:34px}.qr-box{display:grid;place-items:center;background:white;border-radius:15px;padding:15px;width:max-content;max-width:100%;margin:13px auto}.qr-box img,.qr-box canvas{max-width:100%}.toast{position:fixed;z-index:200;left:50%;transform:translateX(-50%);top:max(14px,env(safe-area-inset-top));width:min(calc(100% - 24px),470px);background:#14233a;border:1px solid #385276;color:#eff6ff;padding:13px 15px;border-radius:14px;box-shadow:var(--shadow);font-size:13px;font-weight:700}.toast.error{border-color:#73364a;background:#2a1620}.scanner-view{width:100%;max-height:300px;background:#030609;border-radius:14px;object-fit:cover}.footnote{font-size:10px;color:#8395ae;line-height:1.5}.section-title{font-weight:900;font-size:13px;margin-bottom:11px}.stats-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.block-card{padding:12px;border:1px solid var(--stroke);border-radius:13px;background:#0b1421}.block-card strong{font-size:12px;display:block}.block-card small{color:var(--muted);font-size:10px}.profile-avatar{width:54px;height:54px;display:grid;place-items:center;border-radius:18px;background:linear-gradient(145deg,#3a78db,#192f59);font-size:21px;font-weight:900}.loading{color:var(--muted);font-size:12px;padding:16px;text-align:center}
+@media(min-width:850px){.app{padding-top:25px}.modal-layer{place-items:center}.grid.market-columns{grid-template-columns:minmax(0,1.45fr) minmax(280px,.75fr);align-items:start}.right-stack{display:flex;flex-direction:column;gap:14px}.chart-wrap{height:360px}}
+@media(max-width:720px){.app{padding:13px 12px 105px}.topbar{margin-bottom:20px}.top-title{font-size:16px}.top-sub{font-size:10px}.status-chip{font-size:9px;padding:6px 8px}.pagehead{align-items:flex-start;margin-bottom:15px}.pagehead h1{font-size:25px}.grid.two,.grid.three{grid-template-columns:1fr}.grid.equal{grid-template-columns:1fr}.balance-card{padding:17px}.quick-actions{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.quick{padding:11px 2px;font-size:10px}.market-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.chart-wrap{height:255px}.panel{padding:15px}.market-main-price{font-size:34px}.book-grid{gap:6px}.book-row{font-size:9px;padding:6px 2px}.bottom-nav{width:calc(100% - 16px);bottom:max(7px,env(safe-area-inset-bottom));padding:5px}.nav-btn{font-size:8px}.nav-btn .nav-icon{font-size:17px}.metric strong{font-size:17px}.status-chip .dot{width:6px;height:6px}}
+@media(max-width:380px){.brand{font-size:18px}.brand-mark{width:39px;height:39px}.top-actions .status-chip{display:none}.quick{font-size:9px}.quick span:first-child{width:30px;height:30px}.wallet-balance{font-size:12px}.pagehead h1{font-size:23px}}
 </style>
 </head>
-
 <body>
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
-<!-- АВТОРИЗАЦИЯ -->
-
-<div id="authScreen" class="auth">
+<section id="authScreen" class="auth-wrap">
   <div class="auth-box">
-    <div class="card">
-      <div class="logo auth-logo">SLX</div>
-      <h1 style="text-align:center;margin:0 0 6px">SLX Network</h1>
-      <div class="muted small" style="text-align:center;margin-bottom:18px">Testnet • v1.9.1</div>
-
-      <div class="auth-tabs">
-        <button id="loginTab" class="tab active" type="button">Вход</button>
-        <button id="registerTab" class="tab" type="button">Регистрация</button>
-      </div>
-
-      <form id="loginForm" class="stack">
-        <div class="field">
-          <div class="label">Имя пользователя</div>
-          <input id="loginUsername" class="input" autocomplete="username" required>
-        </div>
-        <div class="field">
-          <div class="label">Пароль</div>
-          <input id="loginPassword" class="input" type="password" autocomplete="current-password" required>
-        </div>
-        <button class="btn primary" type="submit">Войти</button>
-        <button id="showRecoveryBtn" class="btn" type="button">Восстановить пароль</button>
+    <div class="brand"><div class="brand-mark">SLX</div><div>SLX Network<div class="top-sub">WALLET + DEMO MARKET · v2.0</div></div></div>
+    <div class="auth-head"><div class="pill"><span class="dot"></span> TESTNET ONLINE</div><h1 id="authTitle" style="margin-top:15px">Твой кошелёк в SLX</h1><p id="authSubtitle" class="muted" style="margin:0">Управляй тестовыми токенами и изучай симуляцию рынка.</p></div>
+    <div class="auth-card">
+      <div class="tabs"><button id="tabLogin" class="active" type="button" onclick="setAuthTab('login')">Войти</button><button id="tabRegister" type="button" onclick="setAuthTab('register')">Создать аккаунт</button></div>
+      <form id="loginForm">
+        <div class="field"><label for="loginUsername">Логин</label><input id="loginUsername" name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="Твой логин"></div>
+        <div class="field"><label for="loginPassword">Пароль</label><input id="loginPassword" name="password" type="password" autocomplete="current-password" required placeholder="Пароль"></div>
+        <button class="btn primary full" type="submit">Войти в кошелёк <span>→</span></button>
+        <button class="btn ghost full" type="button" style="margin-top:8px" onclick="openModal('recoveryModal')">Восстановить доступ</button>
       </form>
-
-      <form id="registerForm" class="stack hidden">
-        <div class="field">
-          <div class="label">Имя пользователя</div>
-          <input id="registerUsername" class="input" autocomplete="username" required>
-        </div>
-        <div class="field">
-          <div class="label">Пароль</div>
-          <input id="registerPassword" class="input" type="password" autocomplete="new-password" required>
-        </div>
-        <div class="field">
-          <div class="label">Повтор пароля</div>
-          <input id="registerPassword2" class="input" type="password" autocomplete="new-password" required>
-        </div>
-        <button class="btn primary" type="submit">Создать аккаунт</button>
+      <form id="registerForm" class="hidden">
+        <div class="field"><label for="registerUsername">Логин</label><input id="registerUsername" name="username" autocomplete="username" minlength="3" maxlength="32" required placeholder="От 3 до 32 символов"></div>
+        <div class="field"><label for="registerPassword">Пароль</label><input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Минимум 8 символов"></div>
+        <div class="field"><label for="registerPassword2">Повтори пароль</label><input id="registerPassword2" type="password" autocomplete="new-password" minlength="8" maxlength="128" required placeholder="Ещё раз пароль"></div>
+        <button class="btn primary full" type="submit">Создать кошелёк <span>→</span></button>
+        <div class="auth-note">После регистрации сохрани код восстановления отдельно. Это учебная тестовая сеть, а не настоящий финансовый аккаунт.</div>
       </form>
-
-      <div class="info" style="margin-top:14px">
-        SLX Network работает как тестовая сеть. Балансы SLX здесь являются тестовыми данными и не являются банковскими деньгами.
-      </div>
     </div>
+    <p class="footnote" style="text-align:center;margin:16px 8px">SLX-Testnet · Все цены рынка генерируются искусственно и не являются рыночными котировками.</p>
   </div>
-</div>
+</section>
 
-<!-- ПРИЛОЖЕНИЕ -->
+<section id="appScreen" class="app hidden">
+  <header class="topbar">
+    <div class="top-left"><div class="brand-mark" style="width:40px;height:40px;border-radius:13px">SLX</div><div><div class="top-title">SLX Network</div><div id="topSub" class="top-sub">Wallet · Testnet v2.0</div></div></div>
+    <div class="top-actions"><div class="status-chip"><span class="dot"></span><span>TESTNET ONLINE</span></div><button class="btn iconbtn ghost" type="button" title="Профиль" onclick="showPage('profile')">♙</button></div>
+  </header>
 
-<div id="appScreen" class="hidden">
-  <div class="app">
-
-    <div class="topbar">
-      <div class="brand">
-        <div class="logo">SLX</div>
-        <div>
-          <div class="brand-title">SLX Network</div>
-          <div id="topVersion" class="brand-sub">v1.9.1 • testnet</div>
-        </div>
-      </div>
-      <img id="topAvatar" class="avatar" alt="avatar">
-    </div>
-
-    <!-- ГЛАВНАЯ -->
-
-    <main id="page-home" class="page">
-      <div class="card">
-        <div class="row-between">
-          <span class="badge" id="homeNetworkBadge">TESTNET</span>
-          <span class="small muted" id="homeUsername">—</span>
-        </div>
-        <div class="balance" id="homeBalance">0</div>
-        <div class="token">SLX</div>
-        <div class="wallet-address" id="homeAddress" style="margin-top:12px">—</div>
-        <div class="grid2" style="margin-top:10px">
-          <button id="copyAddressBtn" class="btn" type="button">Копировать</button>
-          <button id="showQrBtn" class="btn" type="button">Мой QR</button>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="row-between">
-          <div class="section-title">Активный кошелёк</div>
-          <button id="homeCreateWalletBtn" class="btn smallbtn" type="button">+ Кошелёк</button>
-        </div>
-        <div id="walletListHome" class="stack"></div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Быстрые действия</div>
-        <div class="grid2">
-          <button id="faucetBtn" class="btn good" type="button">Получить 10 SLX</button>
-          <button id="goSendBtn" class="btn primary" type="button">Отправить</button>
-        </div>
-        <div class="tiny muted" style="margin-top:10px">Faucet: один запрос на кошелёк каждые 24 часа.</div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Последние операции</div>
-        <div id="homeHistory" class="stack"></div>
-      </div>
-    </main>
-
-    <!-- КОШЕЛЬКИ -->
-
-    <main id="page-wallet" class="page hidden">
-      <div class="card">
-        <div class="section-title">Кошельки</div>
-        <div id="walletListPage" class="stack"></div>
-        <button id="walletCreateBtn" class="btn primary" type="button" style="margin-top:10px">Создать новый кошелёк</button>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Получить SLX</div>
-        <div class="wallet-address" id="walletReceiveAddress">—</div>
-        <div class="grid2" style="margin-top:10px">
-          <button id="walletCopyBtn" class="btn" type="button">Копировать адрес</button>
-          <button id="walletQrBtn" class="btn" type="button">Показать QR</button>
-        </div>
-      </div>
-    </main>
-
-    <!-- ИСТОРИЯ -->
-
-    <main id="page-history" class="page hidden">
-      <div class="card">
-        <div class="row-between">
-          <div class="section-title">История</div>
-          <button id="historyRefreshBtn" class="btn smallbtn" type="button">Обновить</button>
-        </div>
-        <div id="historyList" class="stack"></div>
-      </div>
-    </main>
-
-    <!-- СЕТЬ -->
-
-    <main id="page-network" class="page hidden">
-      <div class="card">
-        <div class="section-title">Сеть</div>
-        <div id="networkInfo" class="kv">
-          <div>Статус</div><div>—</div>
-          <div>Версия</div><div>—</div>
-          <div>Высота</div><div>—</div>
-          <div>Supply</div><div>—</div>
-          <div>Fee</div><div>—</div>
-        </div>
-        <button id="networkRefreshBtn" class="btn" type="button" style="margin-top:12px">Обновить сеть</button>
-        <button id="chainVerifyBtn" class="btn good" type="button" style="margin-top:8px">Проверить цепочку</button>
-        <div id="chainVerifyResult" class="tiny muted" style="margin-top:10px">Проверка ещё не запускалась.</div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Экономика</div>
-        <div id="economyInfo" class="kv"></div>
-      </div>
-
-      <div class="card">
-        <div class="section-title">Последние блоки</div>
-        <div id="blocksList" class="stack"></div>
-      </div>
-    </main>
-
-    <!-- ПРОФИЛЬ -->
-
-    <main id="page-profile" class="page hidden">
-      <div class="card">
-        <div class="section-title">Профиль</div>
-        <div class="row" style="align-items:center">
-          <img id="avatarPreview" class="avatar-preview" alt="avatar">
-          <div class="stack" style="flex:1;min-width:0">
-            <div id="profileUsername" style="font-weight:900">—</div>
-            <div id="profileCreatedAt" class="tiny muted">Аккаунт SLX Network</div>
-            <label class="file-btn">
-              Выбрать фото
-              <input id="avatarInput" type="file" accept="image/*">
-            </label>
+  <main>
+    <section id="page-home" class="page active">
+      <div class="pagehead"><div><div class="eyebrow">Обзор сети</div><h1>Главная</h1><p>Твои SLX и состояние тестовой сети.</p></div><span class="pill">v2.0.0</span></div>
+      <div class="grid two">
+        <div class="panel balance-card">
+          <div class="hrow between"><span class="eyebrow">Общий баланс активного кошелька</span><span class="pill">SLX</span></div>
+          <div id="homeBalance" class="balance-amount">— <span>SLX</span></div>
+          <div class="small muted">Только тестовые токены · не имеют денежной стоимости</div>
+          <div class="divider"></div>
+          <div class="hrow between" style="margin-bottom:8px"><span class="small muted">Адрес кошелька</span><button class="btn smallBtn" type="button" onclick="copyActiveAddress()">⧉ Копировать</button></div>
+          <div id="homeAddress" class="address mono">Загрузка…</div>
+          <div class="quick-actions">
+            <button class="quick" type="button" onclick="openSend()"><span>↗</span><span>Отправить</span></button>
+            <button class="quick" type="button" onclick="openReceive()"><span>▦</span><span>Получить</span></button>
+            <button class="quick" type="button" onclick="claimFaucet()"><span>＋</span><span>Faucet</span></button>
+            <button class="quick" type="button" onclick="showPage('market')"><span>▥</span><span>Рынок</span></button>
           </div>
         </div>
-        <button id="removeAvatarBtn" class="btn danger" type="button" style="margin-top:10px">Удалить локальное фото</button>
-        <div class="info" style="margin-top:12px">Аватар хранится только на этом устройстве. Не отправляй кому-либо пароль или код восстановления.</div>
-      </div>
-      <div class="card">
-        <div class="section-title">Состояние сессии</div>
-        <div id="sessionInfo" class="tiny muted">Проверка сессии...</div>
-        <div class="kv" style="margin-top:12px">
-          <div>Пользователь</div><div id="profileUserSummary">—</div>
-          <div>Сеть</div><div>SLX-Testnet</div>
-        </div>
-      </div>
-    </main>
-
-    <!-- НАСТРОЙКИ -->
-
-    <main id="page-settings" class="page hidden">
-      <div class="card">
-        <div class="section-title">Настройки</div>
-        <div class="row-between" style="padding:10px 0;gap:12px">
-          <div style="min-width:0">
-            <div style="font-weight:800">Автообновление</div>
-            <div class="tiny muted" style="margin-top:4px">Обновлять кошельки и статус сети каждые 20 секунд</div>
+        <div class="stack">
+          <div class="grid equal">
+            <div class="metric"><span>Высота сети</span><strong id="metricHeight">—</strong></div>
+            <div class="metric"><span>Комиссия</span><strong>0.1 SLX</strong></div>
+            <div class="metric"><span>Пользователи</span><strong id="metricUsers">—</strong></div>
+            <div class="metric"><span>Кошельки</span><strong id="metricWallets">—</strong></div>
           </div>
-          <button id="autoRefreshBtn" class="btn good smallbtn" type="button" aria-pressed="true">Включено</button>
-        </div>
-        <hr>
-        <div class="section-title">Безопасность</div>
-        <button id="changePasswordBtn" class="btn" type="button" style="margin-top:8px">Сменить пароль</button>
-        <button id="logoutBtn" class="btn danger" type="button" style="margin-top:8px">Выйти из аккаунта</button>
-      </div>
-      <div class="card">
-        <div class="section-title">О проекте</div>
-        <div class="info">
-          SLX Network v1.9.1 — тестовая сеть. Балансы SLX здесь являются тестовыми данными и не представляют собой банковские деньги.
-        </div>
-        <div class="kv" style="margin-top:12px">
-          <div>Комиссия перевода</div><div>0.1 SLX</div>
-          <div>Faucet</div><div>10 SLX / 24 ч</div>
+          <div class="panel"><div class="panel-head"><h2>Активный кошелёк</h2><button class="btn smallBtn" type="button" onclick="showPage('wallet')">Все кошельки →</button></div><div id="homeWalletSwitcher" class="list"><div class="loading">Загружаем кошельки…</div></div></div>
         </div>
       </div>
-    </main>
+      <div class="panel" style="margin-top:14px"><div class="panel-head"><h2>Последние операции</h2><button class="btn smallBtn" type="button" onclick="showPage('history')">Вся история →</button></div><div id="homeTransactions" class="list"><div class="loading">Загрузка истории…</div></div></div>
+      <div class="demo-banner" style="margin-top:14px;margin-bottom:0">ⓘ <span><strong>Рынок — демо.</strong> SLX/USDT — синтетические данные для интерфейса; настоящих торгов и USDT здесь нет.</span></div>
+    </section>
 
-  </div>
-
-  <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-
-  <div class="bottom-nav">
-    <div class="nav-inner">
-      <button class="nav-btn active" data-page="home" type="button">⌂<br>Главная</button>
-      <button class="nav-btn" data-page="wallet" type="button">◈<br>Кошелёк</button>
-      <button class="nav-btn" data-page="history" type="button">↕<br>История</button>
-      <button class="nav-btn" data-page="network" type="button">◉<br>Сеть</button>
-      <button class="nav-btn" data-page="profile" type="button">●<br>Профиль</button>
-      <button class="nav-btn" data-page="settings" type="button">⚙<br>Настройки</button>
-    </div>
-  </div>
-</div>
-
-<!-- ОТПРАВКА -->
-
-<div id="sendModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">Отправить SLX</h2>
-      <button class="iconbtn" data-close="sendModal" type="button">✕</button>
-    </div>
-    <form id="sendForm" class="stack">
-      <div class="field">
-        <div class="label">Адрес получателя</div>
-        <input id="sendTo" class="input" placeholder="SLXC..." autocomplete="off" required>
+    <section id="page-wallet" class="page">
+      <div class="pagehead"><div><div class="eyebrow">Ключи и адреса</div><h1>Кошелёк</h1><p>Создавай тестовые кошельки и переключайся между ними.</p></div><button class="btn primary" type="button" onclick="createWallet()">＋ Новый</button></div>
+      <div class="grid two">
+        <div class="panel"><div class="panel-head"><h2>Мои кошельки</h2><span id="walletCount" class="pill">0</span></div><div id="walletList" class="list"><div class="loading">Загрузка…</div></div></div>
+        <div class="panel"><div class="panel-head"><h2>Активный адрес</h2><button class="btn smallBtn" type="button" onclick="openReceive()">Показать QR</button></div><div id="walletBalance" class="balance-amount" style="font-size:31px">— <span>SLX</span></div><div id="walletAddress" class="address mono">—</div><div class="hrow wrap" style="margin-top:12px"><button class="btn primary" type="button" onclick="openSend()">↗ Отправить</button><button class="btn" type="button" onclick="openReceive()">▦ Получить</button><button class="btn" type="button" onclick="copyActiveAddress()">⧉ Копировать адрес</button></div><div class="divider"></div><div class="footnote">В этой тестовой сети переводы проходят только между кошельками, зарегистрированными в SLX-Testnet. Переводы самому себе и между своими кошельками запрещены.</div></div>
       </div>
-      <button id="scanQrBtn" class="btn" type="button">Сканировать QR</button>
-      <div class="field">
-        <div class="label">Количество</div>
-        <input id="sendAmount" class="input" type="number" min="0.00000001" step="0.00000001" placeholder="0.00000000" required>
-      </div>
-      <div class="card" style="margin:0;background:#0a1020">
-        <div class="kv">
-          <div>Комиссия</div><div id="sendFee">0.1 SLX</div>
-          <div>Итого</div><div id="sendTotal">0 SLX</div>
-          <div>Баланс</div><div id="sendBalance">0 SLX</div>
+    </section>
+
+    <section id="page-market" class="page">
+      <div class="pagehead"><div><div class="eyebrow">Рыночная симуляция</div><h1>Рынок</h1><p>Данные для тестирования интерфейса, а не котировки биржи.</p></div><span class="pill">SIMULATED</span></div>
+      <div class="demo-banner">⚠ <span><strong>DEMO / TESTNET.</strong> Цена, объём и стакан сгенерированы программно. Реальной торговли и баланса USDT нет.</span></div>
+      <button class="pair-card" type="button" onclick="openPair()"><div class="hrow between"><div class="hrow"><div class="coin-icon">S</div><div><div class="pair-symbol">SLX / USDT</div><div class="tiny muted">SLX Network · Demo pair</div></div></div><span class="pill">Открыть пару ↗</span></div><div id="overviewPrice" class="pair-price">— USDT</div><div class="hrow between wrap"><span id="overviewChange" class="positive small">—</span><span id="overviewVol" class="small muted">Объём 24ч: —</span></div><div class="divider"></div><div class="hrow between"><span class="small muted">Свечной график · стакан · история цены</span><span class="muted">→</span></div></button>
+      <div class="grid three" style="margin-top:14px"><div class="metric"><span>Режим</span><strong>Только демо</strong></div><div class="metric"><span>Рыночный источник</span><strong>Симулятор</strong></div><div class="metric"><span>Реальный USDT</span><strong>Не используется</strong></div></div>
+    </section>
+
+    <section id="page-pair" class="page">
+      <div class="pagehead"><div><button class="btn smallBtn" type="button" onclick="showPage('market')">← Рынок</button><div class="hrow" style="margin-top:12px"><div class="coin-icon">S</div><div><div class="eyebrow">DEMO PAIR</div><h1 style="font-size:24px;margin:3px 0">SLX / USDT</h1><div class="small muted">SLX Network Testnet</div></div></div></div><span class="pill"><span class="dot"></span> DEMO LIVE</span></div>
+      <div class="demo-banner">ⓘ <span><strong>Симуляция.</strong> Все рыночные цифры ниже искусственные. Этот экран не подключён к бирже и не принимает торговые ордера.</span></div>
+      <div class="panel" style="margin-bottom:14px"><div class="hrow between wrap"><div><div class="eyebrow">Последняя тестовая цена</div><div id="pairPrice" class="market-main-price" style="margin-top:8px">— <span style="font-size:13px;color:var(--muted);letter-spacing:0">USDT</span></div><div id="pairChange" class="positive small" style="margin-top:8px">—</div></div><div class="hrow"><span class="pill">SLX/USDT</span></div></div><div class="market-stat-grid"><div class="market-stat"><span>24ч максимум</span><strong id="pairHigh">—</strong></div><div class="market-stat"><span>24ч минимум</span><strong id="pairLow">—</strong></div><div class="market-stat"><span>Объём 24ч</span><strong id="pairVolume">—</strong></div><div class="market-stat"><span>Обновлено</span><strong id="pairUpdated">—</strong></div></div></div>
+      <div class="grid market-columns">
+        <div class="stack">
+          <div class="panel"><div class="panel-head"><h2>Свечной график</h2><span class="pill">OHLC</span></div><div class="hrow between wrap"><div class="timeframes" role="group" aria-label="Таймфрейм"><button class="active" data-interval="15m" type="button" onclick="setIntervalFrame('15m',this)">15м</button><button data-interval="1h" type="button" onclick="setIntervalFrame('1h',this)">1ч</button><button data-interval="4h" type="button" onclick="setIntervalFrame('4h',this)">4ч</button><button data-interval="1d" type="button" onclick="setIntervalFrame('1d',this)">1д</button></div><span id="chartRange" class="tiny muted">Последние свечи</span></div><div class="chart-wrap"><canvas id="candleChart" aria-label="Симулированный свечной график SLX/USDT"></canvas></div><div class="chart-legend"><span class="legend-item"><i class="legend-line" style="background:var(--green)"></i> Рост</span><span class="legend-item"><i class="legend-line" style="background:var(--red)"></i> Снижение</span><span>Данные: симуляция</span></div></div>
+          <div class="panel"><div class="panel-head"><h2>История цены</h2><span class="tiny muted">OHLC · DEMO</span></div><div id="priceHistory" class="list"><div class="loading">Загрузка свечей…</div></div></div>
+        </div>
+        <div class="right-stack">
+          <div class="panel"><div class="panel-head"><h2>Стакан заявок</h2><span class="pill">TEST</span></div><div class="hrow between tiny muted" style="margin-bottom:8px"><span>Цена (USDT)</span><span>Количество (SLX)</span></div><div class="book-grid"><div id="asksList" class="book-side"><h4>Продажа · ASK</h4><div class="loading">Загрузка…</div></div><div id="bidsList" class="book-side"><h4>Покупка · BID</h4><div class="loading">Загрузка…</div></div></div><div class="orderbook-price"><span id="bookMidPrice">—</span> <span class="tiny muted">USDT</span><div id="bookSpread" class="tiny muted" style="font-weight:500;margin-top:3px">Спред —</div></div><div class="footnote">Стакан сгенерирован для демонстрации и не соответствует реальному спросу или предложению.</div></div>
+          <div class="panel"><div class="panel-head"><h2>Последние сделки</h2><span class="pill">SIMULATED</span></div><div style="overflow-x:auto"><table class="trade-table"><thead><tr><th>Цена</th><th>SLX</th><th>Время</th></tr></thead><tbody id="marketTrades"><tr><td colspan="3" class="loading">Загрузка…</td></tr></tbody></table></div></div>
+          <div class="panel"><div class="panel-head"><h2>О рынке</h2></div><div class="stack small"><div class="hrow between"><span class="muted">Тип</span><strong>Учебная симуляция</strong></div><div class="hrow between"><span class="muted">Пара</span><strong>SLX/USDT</strong></div><div class="hrow between"><span class="muted">Ордера</span><strong>Отключены</strong></div><div class="hrow between"><span class="muted">Связь с балансом</span><strong>Нет</strong></div></div></div>
         </div>
       </div>
-      <button class="btn primary" type="submit">Подтвердить отправку</button>
-    </form>
-  </div>
+    </section>
+
+    <section id="page-history" class="page">
+      <div class="pagehead"><div><div class="eyebrow">Активность аккаунта</div><h1>История</h1><p>Переводы и начисления по всем твоим кошелькам.</p></div><button class="btn" type="button" onclick="loadTransactions()">↻ Обновить</button></div>
+      <div class="panel"><div class="panel-head"><h2>Операции</h2><span id="historyCount" class="pill">0</span></div><div id="historyList" class="list"><div class="loading">Загрузка истории…</div></div></div>
+    </section>
+
+    <section id="page-network" class="page">
+      <div class="pagehead"><div><div class="eyebrow">Инфраструктура</div><h1>Сеть</h1><p>Параметры SLX-Testnet и последние блоки.</p></div><button class="btn" type="button" onclick="loadNetwork()">↻ Обновить</button></div>
+      <div class="grid three"><div class="metric"><span>Статус сервера</span><strong id="netStatus" class="positive">—</strong></div><div class="metric"><span>Высота блока</span><strong id="netHeight">—</strong></div><div class="metric"><span>Комиссия</span><strong id="netFee">—</strong></div><div class="metric"><span>Общая эмиссия</span><strong id="netSupply">—</strong></div><div class="metric"><span>В обращении</span><strong id="netCirculating">—</strong></div><div class="metric"><span>Версия</span><strong id="netVersion">—</strong></div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-head"><h2>Проверка цепочки</h2><button class="btn smallBtn" type="button" onclick="verifyChain()">Проверить</button></div><div id="chainResult" class="small muted">Нажми «Проверить», чтобы сверить хеши блоков.</div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-head"><h2>Последние блоки</h2><span id="blockCount" class="pill">0</span></div><div id="blocksList" class="list"><div class="loading">Загрузка блоков…</div></div></div>
+    </section>
+
+    <section id="page-profile" class="page">
+      <div class="pagehead"><div><div class="eyebrow">Учётная запись</div><h1>Профиль</h1><p>Настройки доступа и сессии.</p></div><button class="btn danger" type="button" onclick="logout()">Выйти</button></div>
+      <div class="panel"><div class="hrow"><div id="avatarInitial" class="profile-avatar">S</div><div><h2 id="profileUsername" style="margin:0 0 4px">—</h2><div id="profileCreated" class="small muted">SLX-Testnet user</div><div class="pill" style="margin-top:8px">TESTNET ACCOUNT</div></div></div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-head"><h2>Безопасность</h2></div><form id="passwordForm"><div class="field"><label for="currentPassword">Текущий пароль</label><input id="currentPassword" type="password" autocomplete="current-password" required></div><div class="field"><label for="newPassword">Новый пароль</label><input id="newPassword" type="password" minlength="8" maxlength="128" autocomplete="new-password" required><div class="hint">Минимум 8 символов.</div></div><button class="btn primary" type="submit">Изменить пароль</button></form><div class="divider"></div><div class="hrow between"><div><strong class="small">Автообновление</strong><div class="tiny muted">Обновлять данные каждые 20 секунд</div></div><label class="hrow" style="gap:7px"><input id="autoRefresh" type="checkbox" checked onchange="toggleAutoRefresh(this.checked)"> <span class="small">Вкл.</span></label></div></div>
+      <div class="panel" style="margin-top:14px"><div class="panel-head"><h2>О приложении</h2></div><div class="stack small"><div class="hrow between"><span class="muted">Версия</span><strong>SLX Network v2.0.0</strong></div><div class="hrow between"><span class="muted">Сеть</span><strong>SLX-Testnet</strong></div><div class="hrow between"><span class="muted">Demo Market</span><strong>Включён</strong></div></div><p class="footnote" style="margin-bottom:0">Это программная тестовая сеть с локально хранящимися балансами. Рыночные цены, объёмы, свечи и стакан полностью синтетические и не являются финансовыми данными.</p></div>
+    </section>
+  </main>
+</section>
+
+<nav id="bottomNav" class="bottom-nav hidden" aria-label="Основная навигация">
+  <button class="nav-btn active" data-page="home" type="button" onclick="showPage('home')"><span class="nav-icon">⌂</span><span>Главная</span></button>
+  <button class="nav-btn" data-page="wallet" type="button" onclick="showPage('wallet')"><span class="nav-icon">▣</span><span>Кошелёк</span></button>
+  <button class="nav-btn" data-page="market" type="button" onclick="showPage('market')"><span class="nav-icon">▥</span><span>Рынок</span></button>
+  <button class="nav-btn" data-page="history" type="button" onclick="showPage('history')"><span class="nav-icon">◷</span><span>История</span></button>
+  <button class="nav-btn" data-page="network" type="button" onclick="showPage('network')"><span class="nav-icon">⌘</span><span>Сеть</span></button>
+  <button class="nav-btn" data-page="profile" type="button" onclick="showPage('profile')"><span class="nav-icon">♙</span><span>Профиль</span></button>
+</nav>
+
+<div id="modalLayer" class="modal-layer hidden" onclick="if(event.target===this)closeModal()">
+  <div id="sendModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="sendTitle"><div class="modal-head"><h2 id="sendTitle">Отправить SLX</h2><button class="close-btn" type="button" onclick="closeModal()">✕</button></div><form id="sendForm"><div class="field"><label for="sendTo">Адрес получателя</label><input id="sendTo" class="mono" required placeholder="SLXC…" autocomplete="off"><button class="btn smallBtn" type="button" onclick="openScanner()">▦ Сканировать QR</button></div><div class="field"><label for="sendAmount">Сумма SLX</label><input id="sendAmount" type="number" min="0.00000001" step="0.00000001" required placeholder="0.0" oninput="updateSendTotal()"><div id="sendFeeHint" class="hint">Комиссия сети: 0.1 SLX</div><div id="sendTotal" class="hint">Итого: —</div></div><div class="field"><label for="sendMemo">Заметка (необязательно, только на экране)</label><input id="sendMemo" maxlength="80" placeholder="Например, тестовый перевод"></div><button class="btn primary full" type="submit">Подтвердить тестовый перевод</button></form><p class="footnote">Переводы необратимы в рамках тестовой базы. Не используй здесь реальные секреты или данные банковских аккаунтов.</p></div>
+  <div id="receiveModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="receiveTitle"><div class="modal-head"><h2 id="receiveTitle">Получить SLX</h2><button class="close-btn" type="button" onclick="closeModal()">✕</button></div><div class="small muted">Передай этот адрес другому участнику SLX-Testnet.</div><div id="receiveQr" class="qr-box"><span style="color:#111">Генерируем QR…</span></div><div id="receiveAddress" class="address mono">—</div><button class="btn primary full" style="margin-top:12px" type="button" onclick="copyActiveAddress()">⧉ Копировать адрес</button><p class="footnote">QR содержит только публичный тестовый адрес. Он не содержит приватный ключ.</p></div>
+  <div id="recoveryModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryTitle"><div class="modal-head"><h2 id="recoveryTitle">Восстановить доступ</h2><button class="close-btn" type="button" onclick="closeModal()">✕</button></div><form id="recoveryForm"><div class="field"><label for="recoveryUsername">Логин</label><input id="recoveryUsername" required autocomplete="username"></div><div class="field"><label for="recoveryCode">Код восстановления</label><input id="recoveryCode" required autocomplete="off" placeholder="SLX-XXXXXXXX"></div><div class="field"><label for="recoveryNewPassword">Новый пароль</label><input id="recoveryNewPassword" type="password" minlength="8" maxlength="128" required autocomplete="new-password"></div><button class="btn primary full" type="submit">Сбросить пароль</button></form><p class="footnote">Код восстановления создаётся при регистрации. Храни его отдельно от пароля и не передавай другим.</p></div>
+  <div id="scannerModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="scannerTitle"><div class="modal-head"><h2 id="scannerTitle">Сканер QR</h2><button class="close-btn" type="button" onclick="stopScanner();closeModal()">✕</button></div><video id="scannerVideo" class="scanner-view" playsinline muted></video><canvas id="scannerCanvas" class="hidden"></canvas><p id="scannerMessage" class="small muted">Разреши доступ к камере, чтобы прочитать SLX-адрес.</p><button class="btn full" type="button" onclick="stopScanner();closeModal()">Закрыть сканер</button></div>
+  <div id="recoveryCodeModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="recoveryCodeTitle"><div class="modal-head"><h2 id="recoveryCodeTitle">Сохрани код восстановления</h2><button class="close-btn" type="button" onclick="closeModal()">✕</button></div><div class="demo-banner">⚠ <span>Код показан один раз. Сохрани его в надёжном месте отдельно от пароля.</span></div><div id="newRecoveryCode" class="address mono" style="font-size:18px;text-align:center;margin:12px 0">SLX-—</div><button class="btn primary full" type="button" onclick="copyRecoveryCode()">Копировать код</button><button class="btn full" style="margin-top:8px" type="button" onclick="closeModal()">Я сохранил код</button></div>
 </div>
-
-<!-- ВОССТАНОВЛЕНИЕ ПАРОЛЯ -->
-
-<div id="recoveryModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">Восстановление</h2>
-      <button class="iconbtn" data-close="recoveryModal" type="button">✕</button>
-    </div>
-    <form id="recoveryForm" class="stack">
-      <div class="field">
-        <div class="label">Имя пользователя</div>
-        <input id="recoveryUsername" class="input" required>
-      </div>
-      <div class="field">
-        <div class="label">Код восстановления</div>
-        <input id="recoveryCode" class="input" inputmode="text" autocapitalize="characters" required>
-      </div>
-      <div class="field">
-        <div class="label">Новый пароль</div>
-        <input id="recoveryNewPassword" class="input" type="password" autocomplete="new-password" required>
-      </div>
-      <button class="btn primary" type="submit">Сбросить пароль</button>
-    </form>
-  </div>
-</div>
-
-<!-- СМЕНА ПАРОЛЯ -->
-
-<div id="passwordModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">Смена пароля</h2>
-      <button class="iconbtn" data-close="passwordModal" type="button">✕</button>
-    </div>
-    <form id="passwordForm" class="stack">
-      <div class="field">
-        <div class="label">Текущий пароль</div>
-        <input id="oldPassword" class="input" type="password" autocomplete="current-password" required>
-      </div>
-      <div class="field">
-        <div class="label">Новый пароль</div>
-        <input id="newPassword" class="input" type="password" autocomplete="new-password" required>
-      </div>
-      <button class="btn primary" type="submit">Изменить пароль</button>
-    </form>
-  </div>
-</div>
-
-<!-- УСПЕШНАЯ РЕГИСТРАЦИЯ -->
-
-<div id="registerSuccessModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">Аккаунт создан</h2>
-      <button class="iconbtn" data-close="registerSuccessModal" type="button">✕</button>
-    </div>
-    <div class="warning">
-      Код восстановления показывается сейчас. Сохрани его в безопасном месте.
-    </div>
-    <div id="recoveryCodeDisplay" class="recovery-code" style="margin-top:12px">—</div>
-    <button id="copyRecoveryBtn" class="btn" type="button" style="margin-top:10px">Копировать код</button>
-    <button id="continueAfterRegisterBtn" class="btn primary" type="button" style="margin-top:8px">Продолжить</button>
-  </div>
-</div>
-
-<!-- QR КОШЕЛЬКА -->
-
-<div id="qrModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">QR кошелька</h2>
-      <button class="iconbtn" data-close="qrModal" type="button">✕</button>
-    </div>
-    <div class="qr-box"><div id="qrCode"></div></div>
-    <div id="qrAddressText" class="wallet-address" style="margin-top:12px">—</div>
-    <button id="qrCopyBtn" class="btn" type="button" style="margin-top:10px">Копировать адрес</button>
-  </div>
-</div>
-
-<!-- QR-СКАНЕР -->
-
-<div id="scannerModal" class="modal hidden">
-  <div class="modal-box">
-    <div class="modal-head">
-      <h2 style="margin:0">Сканировать QR</h2>
-      <button class="iconbtn" data-close="scannerModal" type="button">✕</button>
-    </div>
-    <div class="scan-frame">
-      <video id="scannerVideo" class="scanner-video" autoplay playsinline muted></video>
-    </div>
-    <canvas id="scannerCanvas" class="hidden"></canvas>
-    <div id="scannerStatus" class="info" style="margin-top:10px">Наведи камеру на QR-код адреса SLX.</div>
-    <button id="stopScannerBtn" class="btn danger" type="button" style="margin-top:10px">Остановить камеру</button>
-  </div>
-</div>
-
-<div id="toast" class="toast"></div>
 
 <script>
-"use strict";
+'use strict';
 
-const API_BASE = "";
-const TOKEN_KEY = "slx_token";
-const ACTIVE_WALLET_KEY = "slx_active_wallet";
-const AVATAR_KEY = "slx_avatar";
-const NETWORK_VERSION_FALLBACK = "1.9.1";
+const API_BASE = '';
+const TOKEN_KEY = 'slx_token';
+const ACTIVE_WALLET_KEY = 'slx_active_wallet';
+const AVATAR_KEY = 'slx_avatar';
+const FEE = 0.1;
 
-let token = localStorage.getItem(TOKEN_KEY) || "";
-let me = null;
+let token = localStorage.getItem(TOKEN_KEY) || '';
+let currentUser = null;
 let wallets = [];
 let activeWallet = null;
-let networkData = null;
-let economyData = null;
-let scannerStream = null;
-let scannerTimer = null;
-let qrLibraryReady = false;
+let lastTransactions = [];
+let currentPage = 'home';
+let currentInterval = '15m';
+let chartCandles = [];
+let tickerData = null;
 let autoRefreshEnabled = true;
+let refreshTimer = null;
+let scannerStream = null;
+let scannerFrame = null;
+let pendingRecoveryCode = '';
+let toastTimer = null;
 
-document.addEventListener("DOMContentLoaded", () => {
-  window.addEventListener("error", e => {
-    console.error("SLX UI error:", e.error || e.message);
-  });
-
-  setupEvents();
-  setDefaultAvatar();
-  waitForQrLibrary();
-
-  if (token) {
-    startApp();
-  } else {
-    showAuth();
-  }
-});
-
-function $(id){
+function $(id) {
   return document.getElementById(id);
 }
 
-function escapeHtml(value){
-  return String(value ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
 }
 
-function formatNumber(value,max=8){
-  const n=Number(value);
-  if(!Number.isFinite(n)) return "0";
-
-  return n.toLocaleString("ru-RU",{
-    maximumFractionDigits:max
+function formatNumber(value, max = 8) {
+  return Number(value || 0).toLocaleString('en-US', {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: max
   });
 }
 
-function formatDate(value){
-  if(!value) return "—";
-
-  const d=new Date(value);
-
-  if(Number.isNaN(d.getTime())){
-    return String(value);
-  }
-
-  return d.toLocaleString("ru-RU");
+function formatPrice(value) {
+  return Number(value || 0).toLocaleString('en-US', {
+    minimumFractionDigits: 5,
+    maximumFractionDigits: 8
+  });
 }
 
-function setDefaultAvatar(){
-  const saved=localStorage.getItem(AVATAR_KEY);
-  const src=saved || makeAvatarData("SLX");
-
-  $("topAvatar").src=src;
-  $("avatarPreview").src=src;
+function formatDate(value) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? '—'
+    : d.toLocaleString('ru-RU', {
+        day: '2-digit',
+        month: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 }
 
-function makeAvatarData(text){
-  const letters=String(text || "SLX")
-    .slice(0,2)
-    .toUpperCase();
-
-  const svg=`
-  <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120">
-    <rect width="120" height="120" rx="60" fill="#111a2d"/>
-    <text x="60" y="70" text-anchor="middle" font-family="Arial" font-size="42" font-weight="800" fill="#ffffff">${letters}</text>
-  </svg>`;
-
-  return "data:image/svg+xml;charset=UTF-8,"+
-    encodeURIComponent(svg);
+function formatTime(value) {
+  const d = new Date(value);
+  return Number.isNaN(d.getTime())
+    ? '—'
+    : d.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
 }
 
-function toast(message,type=""){
-  const el=$("toast");
-
-  el.textContent=message;
-  el.className="toast show"+(type ? " "+type : "");
-
-  clearTimeout(toast._timer);
-
-  toast._timer=setTimeout(()=>{
-    el.classList.remove("show");
-  },3000);
+function formatCompact(value) {
+  return Number(value || 0).toLocaleString('en-US', {
+    notation: 'compact',
+    maximumFractionDigits: 2
+  });
 }
 
-/* API: токен сохраняется при входе и отправляется защищённым запросам. */
+function toast(message, type = 'ok') {
+  const node = $('toast');
+  node.textContent = message;
+  node.className = 'toast' + (type === 'error' ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => node.classList.add('hidden'), 3800);
+}
 
-async function api(path,options={}){
-  const headers=new Headers(options.headers || {});
+function saveToken(value) {
+  token = value || '';
 
-  if(options.body && typeof options.body!=="string"){
-    headers.set("Content-Type","application/json");
-    options.body=JSON.stringify(options.body);
-  }
-
-  if(token){
-    headers.set("Authorization","Bearer "+token);
-  }
-
-  let response;
-
-  try{
-    response=await fetch(API_BASE+path,{
-      ...options,
-      headers
-    });
-  }catch(err){
-    throw new Error("Нет соединения с сервером.");
-  }
-
-  const text=await response.text();
-  let data={};
-
-  try{
-    data=text ? JSON.parse(text) : {};
-  }catch{
-    data={message:text};
-  }
-
-  if(response.status===401){
-    token="";
+  if (token) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
     localStorage.removeItem(TOKEN_KEY);
-    showAuth();
+  }
+}
 
-    throw new Error(
-      data.message ||
-      "Сессия недействительна. Войди снова."
-    );
+async function api(path, options = {}) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(options.headers || {})
+  };
+
+  if (token) {
+    headers.Authorization = 'Bearer ' + token;
   }
 
-  if(!response.ok){
-    throw new Error(
-      data.message ||
-      data.error ||
-      `Ошибка HTTP ${response.status}`
-    );
+  const response = await fetch(API_BASE + path, {
+    ...options,
+    headers,
+    cache: 'no-store'
+  });
+
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch (_error) {}
+
+  if (!response.ok || data.ok === false) {
+    const message =
+      data.message || data.error || ('HTTP ' + response.status);
+
+    if (response.status === 401 && token) {
+      saveToken('');
+      showAuth();
+    }
+
+    throw new Error(message);
   }
 
   return data;
 }
 
-function saveToken(newToken){
-  token=newToken || "";
+/* ================================= AUTH ================================ */
 
-  if(token){
-    localStorage.setItem(TOKEN_KEY,token);
-  }else{
-    localStorage.removeItem(TOKEN_KEY);
-  }
+function setAuthTab(tab) {
+  $('tabLogin').classList.toggle('active', tab === 'login');
+  $('tabRegister').classList.toggle('active', tab === 'register');
+  $('loginForm').classList.toggle('hidden', tab !== 'login');
+  $('registerForm').classList.toggle('hidden', tab !== 'register');
+
+  $('authTitle').textContent =
+    tab === 'login'
+      ? 'Твой кошелёк в SLX'
+      : 'Создай SLX-кошелёк';
+
+  $('authSubtitle').textContent =
+    tab === 'login'
+      ? 'Управляй тестовыми токенами и изучай симуляцию рынка.'
+      : 'Аккаунт и первый тестовый кошелёк будут созданы сразу.';
 }
 
-function showAuth(){
-  $("authScreen").classList.remove("hidden");
-  $("appScreen").classList.add("hidden");
-}
-
-function showApp(){
-  $("authScreen").classList.add("hidden");
-  $("appScreen").classList.remove("hidden");
-}
-
-function setAuthTab(mode){
-  const login=mode==="login";
-
-  $("loginTab").classList.toggle("active",login);
-  $("registerTab").classList.toggle("active",!login);
-  $("loginForm").classList.toggle("hidden",!login);
-  $("registerForm").classList.toggle("hidden",login);
-}
-
-function showPage(page){
-  const allowed=[
-    "home","wallet","history","network","profile","settings"
-  ];
-
-  if(!allowed.includes(page)){
-    page="home";
-  }
-
-  allowed.forEach(p=>{
-    $("page-"+p).classList.toggle("hidden",p!==page);
-  });
-
-  document.querySelectorAll(".nav-btn").forEach(btn=>{
-    btn.classList.toggle(
-      "active",
-      btn.dataset.page===page
-    );
-  });
-
-  window.scrollTo({top:0,behavior:"instant"});
-
-  if(page==="history") loadHistory();
-  if(page==="network") loadNetwork();
-  if(page==="profile") loadMe();
-}
-
-async function startApp(){
-  showApp();
-
-  try{
-    await loadMe();
-    await loadWallets();
-    await loadNetwork();
-    await loadHistory();
-
-    renderAll();
-    showPage("home");
-  }catch(err){
-    console.error(err);
-
-    if(!token){
-      showAuth();
-    }else{
-      toast(
-        err.message || "Не удалось загрузить SLX Network",
-        "bad"
-      );
-    }
-  }
-}
-
-async function loadMe(){
-  const data=await api("/api/auth/me");
-
-  me=data.user || data.me || data;
-
-  $("homeUsername").textContent=
-    me?.username ? "@"+me.username : "—";
-
-  $("profileUsername").textContent=
-    me?.username || "—";
-
-  if($("profileUserSummary")){
-    $("profileUserSummary").textContent=
-      me?.username || "—";
-  }
-
-  if($("profileCreatedAt")){
-    $("profileCreatedAt").textContent=
-      me?.created_at
-        ? "Создан: "+formatDate(me.created_at)
-        : "Аккаунт SLX Network";
-  }
-
-  $("sessionInfo").textContent=token
-    ? "Авторизация активна. Токен сохранён на этом устройстве."
-    : "Сессия отсутствует.";
-
-  const saved=localStorage.getItem(AVATAR_KEY);
-  const src=saved || makeAvatarData(me?.username || "SLX");
-
-  $("topAvatar").src=src;
-  $("avatarPreview").src=src;
-}
-
-/* КОШЕЛЬКИ */
-
-async function loadWallets(){
-  const data=await api("/api/wallets");
-
-  wallets=Array.isArray(data)
-    ? data
-    : (data.wallets || []);
-
-  const savedId=localStorage.getItem(ACTIVE_WALLET_KEY);
-
-  activeWallet=
-    wallets.find(w=>String(w.id)===String(savedId)) ||
-    wallets[0] ||
-    null;
-
-  if(activeWallet){
-    await refreshActiveWallet();
-  }
-
-  renderWalletLists();
-}
-
-async function refreshActiveWallet(){
-  if(!activeWallet?.id) return;
-
-  const data=await api(
-    "/api/wallet/"+encodeURIComponent(activeWallet.id)
-  );
-
-  const wallet=data.wallet || data;
-
-  activeWallet={
-    ...activeWallet,
-    ...wallet
-  };
-
-  wallets=wallets.map(w=>
-    String(w.id)===String(activeWallet.id)
-      ? activeWallet
-      : w
-  );
-
-  localStorage.setItem(
-    ACTIVE_WALLET_KEY,
-    String(activeWallet.id)
-  );
-}
-
-async function selectWallet(id){
-  const data=await api("/api/wallet/select",{
-    method:"POST",
-    body:{walletId:id}
-  });
-
-  const selected=
-    data.wallet ||
-    wallets.find(w=>String(w.id)===String(id));
-
-  activeWallet=selected ||
-    wallets.find(w=>String(w.id)===String(id)) ||
-    null;
-
-  localStorage.setItem(
-    ACTIVE_WALLET_KEY,
-    String(id)
-  );
-
-  await refreshActiveWallet();
-  renderAll();
-
-  toast("Кошелёк выбран.","good");
-}
-
-async function createWallet(){
-  try{
-    const data=await api("/api/wallet/create",{
-      method:"POST",
-      body:{}
-    });
-
-    const created=data.wallet || data;
-
-    if(created?.id){
-      wallets.push(created);
-      await selectWallet(created.id);
-    }else{
-      await loadWallets();
-      renderAll();
-    }
-
-    toast("Новый кошелёк создан.","good");
-  }catch(err){
-    toast(
-      err.message || "Не удалось создать кошелёк.",
-      "bad"
-    );
-  }
-}
-
-function renderWalletLists(){
-  const containers=[
-    $("walletListHome"),
-    $("walletListPage")
-  ];
-
-  containers.forEach(container=>{
-    if(!container) return;
-
-    if(!wallets.length){
-      container.innerHTML=
-        '<div class="empty">Кошельков пока нет.</div>';
-      return;
-    }
-
-    container.innerHTML=wallets.map(w=>{
-      const isActive=
-        activeWallet &&
-        String(activeWallet.id)===String(w.id);
-
-      const address=w.address || "—";
-      const balance=formatNumber(w.balance);
-
-      const shortId=String(w.id || "").length>18
-        ? String(w.id).slice(0,10)+"…"+String(w.id).slice(-6)
-        : String(w.id || "—");
-
-      const shortAddress=address.length>22
-        ? address.slice(0,10)+"…"+address.slice(-8)
-        : address;
-
-      return `
-        <div class="wallet-item ${isActive ? "active" : ""}">
-          <div class="wallet-left">
-            <div class="wallet-name">
-              ${isActive ? "● " : ""}Кошелёк #${escapeHtml(shortId)}
-            </div>
-            <div class="wallet-mini" title="${escapeHtml(address)}">
-              ${escapeHtml(shortAddress)}
-            </div>
-            <div class="wallet-balance">${balance} SLX</div>
-          </div>
-          <div class="wallet-actions">
-            <button class="btn smallbtn" type="button"
-              data-wallet-qr="${escapeHtml(w.id)}">QR</button>
-            <button class="btn smallbtn" type="button"
-              data-select-wallet="${escapeHtml(w.id)}">
-              ${isActive ? "Выбран" : "Выбрать"}
-            </button>
-          </div>
-        </div>
-      `;
-    }).join("");
-  });
-}
-
-function renderHome(){
-  $("homeBalance").textContent=
-    formatNumber(activeWallet?.balance ?? 0);
-
-  $("homeAddress").textContent=
-    activeWallet?.address || "—";
-
-  $("walletReceiveAddress").textContent=
-    activeWallet?.address || "—";
-
-  $("sendBalance").textContent=
-    formatNumber(activeWallet?.balance ?? 0)+" SLX";
-
-  $("homeUsername").textContent=
-    me?.username ? "@"+me.username : "—";
-}
-
-function renderAll(){
-  renderHome();
-  renderWalletLists();
-  renderNetworkSummary();
-  updateSendTotal();
-}
-
-/* ИСТОРИЯ */
-
-async function loadHistory(){
-  const box=$("historyList");
-
-  if(!activeWallet?.id){
-    box.innerHTML='<div class="empty">Выбери кошелёк.</div>';
-    return;
-  }
-
-  box.innerHTML='<div class="empty">Загрузка…</div>';
-
-  try{
-    const data=await api(
-      "/api/wallet/"+encodeURIComponent(activeWallet.id)
-    );
-
-    const txs=
-      data.transactions ||
-      data.history ||
-      data.data?.transactions ||
-      [];
-
-    renderTransactions(box,txs);
-
-    renderTransactions(
-      $("homeHistory"),
-      txs.slice(0,5)
-    );
-  }catch(err){
-    box.innerHTML=
-      `<div class="empty">${escapeHtml(err.message)}</div>`;
-  }
-}
-
-function renderTransactions(box,txs){
-  if(!box) return;
-
-  if(!Array.isArray(txs) || !txs.length){
-    box.innerHTML='<div class="empty">Операций пока нет.</div>';
-    return;
-  }
-
-  box.innerHTML=txs.map(tx=>{
-    const type=String(tx.type || "TX").toUpperCase();
-    const amount=Number(tx.amount || 0);
-
-    const incoming=[
-      "RECEIVE","FAUCET","GENESIS","IN"
-    ].includes(type);
-
-    const sign=incoming ? "+" : "-";
-    const amountClass=incoming ? "plus" : "minus";
-
-    const counterparty=incoming
-      ? (tx.from_wallet || tx.fromAddress || "")
-      : (tx.to_wallet || tx.toAddress || "");
-
-    const fee=Number(tx.fee || 0);
-
-    return `
-      <div class="tx">
-        <div class="tx-head">
-          <div class="tx-type">${escapeHtml(type)}</div>
-          <div class="amount ${amountClass}">
-            ${sign}${formatNumber(amount)} SLX
-          </div>
-        </div>
-        <div class="tiny muted" style="margin-top:6px">
-          ${escapeHtml(formatDate(tx.created_at || tx.timestamp))}
-        </div>
-        ${counterparty ? `
-          <div class="tiny muted" style="margin-top:6px;word-break:break-all">
-            ${incoming ? "Отправитель: " : "Получатель: "}
-            ${escapeHtml(counterparty)}
-          </div>` : ""}
-        ${fee>0 ? `
-          <div class="tiny muted" style="margin-top:6px">
-            Комиссия: ${formatNumber(fee)} SLX
-          </div>` : ""}
-      </div>
-    `;
-  }).join("");
-}
-
-/* СЕТЬ */
-
-async function loadNetwork(){
-  try{
-    const [status,economy,blocks]=await Promise.all([
-      api("/api/status"),
-      api("/api/economy"),
-      api("/api/blocks")
-    ]);
-
-    networkData=status;
-    economyData=economy;
-
-    renderNetworkSummary();
-    renderBlocks(blocks.blocks || blocks);
-  }catch(err){
-    $("chainVerifyResult").textContent=
-      err.message || "Не удалось загрузить сеть.";
-  }
-}
-
-function renderNetworkSummary(){
-  const status=networkData || {};
-  const economy=economyData || {};
-  const network=status.network || status;
-
-  const total=
-    economy.totalSupply ??
-    economy.supply ??
-    economy.total_supply ??
-    "—";
-
-  const max=
-    economy.maxSupply ??
-    economy.max_supply ??
-    "—";
-
-  const fee=
-    network.transferFee ??
-    network.transfer_fee ??
-    economy.transferFee ??
-    economy.transfer_fee ??
-    0.1;
-
-  const version=
-    network.version ??
-    network.networkVersion ??
-    status.version ??
-    NETWORK_VERSION_FALLBACK;
-
-  const height=
-    network.height ??
-    network.blockHeight ??
-    network.latestBlock ??
-    status.height ??
-    status.blockHeight ??
-    "—";
-
-  const online=
-    status.status==="online" ||
-    status.online===true ||
-    network.status==="online";
-
-  $("topVersion").textContent=
-    "v"+version+" • testnet";
-
-  $("homeNetworkBadge").textContent=
-    online ? "TESTNET • ONLINE" : "TESTNET";
-
-  $("homeNetworkBadge").className=
-    "badge "+(online ? "good" : "warn");
-
-  $("networkInfo").innerHTML=`
-    <div>Статус</div>
-    <div><span class="badge ${online ? "good" : "warn"}">${online ? "ONLINE" : "—"}</span></div>
-    <div>Версия</div><div>${escapeHtml(version)}</div>
-    <div>Высота</div><div>${escapeHtml(height)}</div>
-    <div>Supply</div><div>${escapeHtml(formatNumber(total))} / ${escapeHtml(formatNumber(max))}</div>
-    <div>Fee</div><div>${escapeHtml(formatNumber(fee))} SLX</div>
-  `;
-
-  $("economyInfo").innerHTML=`
-    <div>Всего</div><div>${escapeHtml(formatNumber(total))} SLX</div>
-    <div>Максимум</div><div>${escapeHtml(formatNumber(max))} SLX</div>
-    <div>Комиссия</div><div>${escapeHtml(formatNumber(fee))} SLX</div>
-    <div>Faucet</div><div>10 SLX</div>
-  `;
-
-  $("sendFee").textContent=
-    formatNumber(fee)+" SLX";
-
-  updateSendTotal();
-}
-
-function renderBlocks(blocks){
-  const box=$("blocksList");
-
-  if(!Array.isArray(blocks) || !blocks.length){
-    box.innerHTML='<div class="empty">Блоков пока нет.</div>';
-    return;
-  }
-
-  const recent=[...blocks]
-    .sort((a,b)=>
-      Number(b.block_index ?? b.id ?? 0)-
-      Number(a.block_index ?? a.id ?? 0)
-    )
-    .slice(0,8);
-
-  box.innerHTML=recent.map(block=>`
-    <div class="tx">
-      <div class="row-between">
-        <strong>#${escapeHtml(block.block_index ?? block.id ?? "—")}</strong>
-        <span class="badge">${escapeHtml(String(block.transaction_count ?? 0))} tx</span>
-      </div>
-      <div class="tiny muted" style="margin-top:6px">
-        ${escapeHtml(formatDate(block.timestamp))}
-      </div>
-      <div class="tiny muted" style="margin-top:5px;word-break:break-all">
-        hash: ${escapeHtml(block.hash || "—")}
-      </div>
-    </div>
-  `).join("");
-}
-
-/* FAUCET */
-
-async function faucet(){
-  if(!activeWallet?.id){
-    toast("Сначала выбери кошелёк.","bad");
-    return;
-  }
-
-  $("faucetBtn").disabled=true;
-
-  try{
-    const data=await api("/api/faucet",{
-      method:"POST",
-      body:{walletId:activeWallet.id}
-    });
-
-    await loadWallets();
-    await loadHistory();
-
-    toast("Faucet: +10 SLX получено.","good");
-
-    if(data?.cooldown){
-      console.log("Faucet cooldown:",data.cooldown);
-    }
-  }catch(err){
-    toast(err.message || "Faucet сейчас недоступен.","bad");
-  }finally{
-    $("faucetBtn").disabled=false;
-  }
-}
-
-/* МОДАЛЬНЫЕ ОКНА */
-
-function openModal(id){
-  $(id).classList.remove("hidden");
-}
-
-function closeModal(id){
-  $(id).classList.add("hidden");
-
-  if(id==="scannerModal"){
-    stopScanner();
-  }
-}
-
-function openSend(){
-  if(!activeWallet){
-    toast("Сначала выбери кошелёк.","bad");
-    return;
-  }
-
-  $("sendTo").value="";
-  $("sendAmount").value="";
-
-  $("sendBalance").textContent=
-    formatNumber(activeWallet.balance || 0)+" SLX";
-
-  updateSendTotal();
-  openModal("sendModal");
-}
-
-function updateSendTotal(){
-  const amount=Number($("sendAmount")?.value || 0);
-
-  const feeText=$("sendFee")?.textContent || "0.1 SLX";
-
-  const fee=
-    Number(
-      String(feeText)
-        .replace(",",".")
-        .replace(/[^\d.-]/g,"")
-    ) || 0;
-
-  $("sendTotal").textContent=
-    formatNumber(amount+fee)+" SLX";
-}
-
-/* ОТПРАВКА */
-
-async function sendTransaction(e){
-  e.preventDefault();
-
-  if(!activeWallet?.id){
-    toast("Активный кошелёк не выбран.","bad");
-    return;
-  }
-
-  const toAddress=
-    $("sendTo").value.trim().toUpperCase();
-
-  const amount=Number($("sendAmount").value);
-
-  if(!/^SLXC[A-F0-9]{32}$/.test(toAddress)){
-    toast("Неверный адрес SLX. Ожидается SLXC + 32 hex символа.","bad");
-    return;
-  }
-
-  if(!Number.isFinite(amount) || amount<=0){
-    toast("Укажи корректную сумму.","bad");
-    return;
-  }
-
-  const fee=
-    Number(
-      String($("sendFee").textContent)
-        .replace(",",".")
-        .replace(/[^\d.-]/g,"")
-    ) || 0;
-
-  const balance=Number(activeWallet.balance || 0);
-
-  if(amount+fee>balance){
-    toast("Недостаточно SLX с учётом комиссии.","bad");
-    return;
-  }
-
-  try{
-    const data=await api("/api/send",{
-      method:"POST",
-      body:{
-        fromWalletId:activeWallet.id,
-        toAddress,
-        amount
-      }
-    });
-
-    await loadWallets();
-    await loadHistory();
-    await loadNetwork();
-
-    closeModal("sendModal");
-
-    toast(
-      `Отправлено ${formatNumber(amount)} SLX.`,
-      "good"
-    );
-
-    console.log("Send result:",data);
-  }catch(err){
-    toast(err.message || "Не удалось отправить транзакцию.","bad");
-  }
-}
-
-/* QR */
-
-function showQrForActive(){
-  if(!activeWallet?.address){
-    toast("Адрес кошелька пока недоступен.","bad");
-    return;
-  }
-
-  const address=activeWallet.address;
-
-  $("qrAddressText").textContent=address;
-  $("qrCode").innerHTML="";
-
-  openModal("qrModal");
-
-  if(!window.QRCode){
-    $("qrCode").innerHTML=
-      '<div style="color:#111;text-align:center;font-size:13px">QR-библиотека не загрузилась.<br>Используй адрес ниже.</div>';
-    return;
-  }
-
-  try{
-    new QRCode($("qrCode"),{
-      text:address,
-      width:216,
-      height:216,
-      correctLevel:QRCode.CorrectLevel.M
-    });
-  }catch(err){
-    console.error("QR error",err);
-
-    $("qrCode").innerHTML=
-      '<div style="color:#111;text-align:center;font-size:13px">Не удалось создать QR.</div>';
-  }
-}
-
-async function waitForQrLibrary(){
-  for(let i=0;i<50;i++){
-    if(window.QRCode){
-      qrLibraryReady=true;
-      return;
-    }
-
-    await new Promise(r=>setTimeout(r,100));
-  }
-}
-
-async function copyText(value,successMessage="Скопировано."){
-  if(!value) return;
-
-  try{
-    await navigator.clipboard.writeText(value);
-  }catch{
-    const ta=document.createElement("textarea");
-
-    ta.value=value;
-    ta.style.position="fixed";
-    ta.style.opacity="0";
-
-    document.body.appendChild(ta);
-    ta.select();
-    document.execCommand("copy");
-    ta.remove();
-  }
-
-  toast(successMessage,"good");
-}
-
-/* ПРОВЕРКА ЦЕПОЧКИ */
-
-async function verifyChain(){
-  const box=$("chainVerifyResult");
-  box.textContent="Проверяю цепочку…";
-
-  try{
-    const data=await api("/api/chain/verify");
-
-    const ok=
-      data.valid===true ||
-      data.verified===true ||
-      data.status==="valid";
-
-    box.innerHTML=ok
-      ? '<span class="badge good">CHAIN VALID</span>'
-      : '<span class="badge bad">CHAIN INVALID</span>';
-
-    toast(
-      ok
-        ? "Цепочка проверена: ошибок не найдено."
-        : "Проверка показала проблему в цепочке.",
-      ok ? "good" : "bad"
-    );
-  }catch(err){
-    box.textContent=err.message || "Проверка не удалась.";
-    toast("Не удалось проверить цепочку.","bad");
-  }
-}
-
-/* СМЕНА ПАРОЛЯ */
-
-async function changePassword(e){
-  e.preventDefault();
-
-  const currentPassword=$("oldPassword").value;
-  const newPassword=$("newPassword").value;
-
-  if(newPassword.length<6){
-    toast("Новый пароль слишком короткий.","bad");
-    return;
-  }
-
-  try{
-    const data=await api("/api/auth/password/change",{
-      method:"POST",
-      body:{currentPassword,newPassword}
-    });
-
-    if(data.token){
-      saveToken(data.token);
-    }
-
-    closeModal("passwordModal");
-    $("passwordForm").reset();
-
-    toast("Пароль изменён.","good");
-  }catch(err){
-    toast(err.message || "Не удалось изменить пароль.","bad");
-  }
-}
-
-/* ВОССТАНОВЛЕНИЕ ПАРОЛЯ */
-
-async function recoveryReset(e){
-  e.preventDefault();
-
-  const username=$("recoveryUsername").value.trim();
-  const recoveryCode=$("recoveryCode").value.trim().toUpperCase();
-  const newPassword=$("recoveryNewPassword").value;
-
-  try{
-    const data=await api("/api/auth/recovery/reset",{
-      method:"POST",
-      body:{username,recoveryCode,newPassword}
-    });
-
-    if(data.token){
-      saveToken(data.token);
-    }
-
-    closeModal("recoveryModal");
-    $("recoveryForm").reset();
-
-    toast("Пароль восстановлен.","good");
-
-    startApp();
-  }catch(err){
-    toast(err.message || "Не удалось восстановить пароль.","bad");
-  }
-}
-
-/* ВЫХОД */
-
-async function logout(){
+function showAuth() {
   stopScanner();
-
-  try{
-    await api("/api/auth/logout",{
-      method:"POST",
-      body:{}
-    });
-  }catch(err){
-    console.warn("Logout request:",err.message);
-  }
-
-  saveToken("");
-
-  me=null;
-  wallets=[];
-  activeWallet=null;
-
-  localStorage.removeItem(ACTIVE_WALLET_KEY);
-
-  showAuth();
-  toast("Ты вышел из аккаунта.","good");
+  $('authScreen').classList.remove('hidden');
+  $('appScreen').classList.add('hidden');
+  $('bottomNav').classList.add('hidden');
+  closeModal();
+  stopAutoRefresh();
 }
 
-/* ВХОД: сначала получаем и сохраняем JWT, затем проверяем сессию. */
+function showApp() {
+  $('authScreen').classList.add('hidden');
+  $('appScreen').classList.remove('hidden');
+  $('bottomNav').classList.remove('hidden');
+  startAutoRefresh();
+}
 
-async function login(e){
-  e.preventDefault();
+async function login(event) {
+  event.preventDefault();
 
-  const username=$("loginUsername").value.trim();
-  const password=$("loginPassword").value;
+  const username = $('loginUsername').value.trim();
+  const password = $('loginPassword').value;
 
-  const button=$("loginForm").querySelector('button[type="submit"]');
+  try {
+    const data = await api('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
+    });
 
-  if(!username || !password){
-    toast("Введи имя пользователя и пароль.","bad");
+    saveToken(data.token || data.accessToken);
+    await startApp();
+    toast('Вход выполнен. Добро пожаловать!');
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
+
+async function register(event) {
+  event.preventDefault();
+
+  const username = $('registerUsername').value.trim();
+  const password = $('registerPassword').value;
+  const password2 = $('registerPassword2').value;
+
+  if (password !== password2) {
+    toast('Пароли не совпадают', 'error');
     return;
   }
 
-  if(button){
-    button.disabled=true;
-    button.textContent="Входим…";
-  }
-
-  try{
-    // Публичный endpoint входа: старый токен ему не нужен.
-    const response=await fetch(API_BASE+"/api/auth/login",{
-      method:"POST",
-      headers:new Headers({"Content-Type":"application/json"}),
-      credentials:"include",
-      body:JSON.stringify({username,password})
+  try {
+    const data = await api('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify({ username, password })
     });
 
-    const raw=await response.text();
-    let data={};
-
-    try{
-      data=raw ? JSON.parse(raw) : {};
-    }catch{
-      throw new Error("Сервер вернул некорректный ответ на вход.");
-    }
-
-    if(!response.ok){
-      throw new Error(
-        data.message ||
-        data.error ||
-        `Ошибка входа (HTTP ${response.status}).`
-      );
-    }
-
-    const newToken=
-      data.token ||
-      data.accessToken ||
-      data.jwt;
-
-    if(!newToken){
-      throw new Error("Сервер не вернул токен авторизации.");
-    }
-
-    saveToken(String(newToken));
-
-    if(data.user){
-      me=data.user;
-    }
-
-    // Проверяем, что сервер принимает выданный токен.
-    await api("/api/auth/me");
-
-    $("loginForm").reset();
+    saveToken(data.token || data.accessToken);
+    pendingRecoveryCode = data.recoveryCode || data.recovery_code || '';
 
     await startApp();
 
-    toast("С возвращением.","good");
-  }catch(err){
-    console.error("SLX login error:",err);
-
-    toast(
-      err.message || "Не удалось войти.",
-      "bad"
-    );
-  }finally{
-    if(button){
-      button.disabled=false;
-      button.textContent="Войти";
+    if (pendingRecoveryCode) {
+      $('newRecoveryCode').textContent = pendingRecoveryCode;
+      openModal('recoveryCodeModal');
     }
+
+    toast('Кошелёк создан');
+  } catch (error) {
+    toast(error.message, 'error');
   }
 }
 
-/* РЕГИСТРАЦИЯ */
+async function resetRecovery(event) {
+  event.preventDefault();
 
-async function register(e){
-  e.preventDefault();
-
-  const username=$("registerUsername").value.trim();
-  const password=$("registerPassword").value;
-  const password2=$("registerPassword2").value;
-
-  if(password!==password2){
-    toast("Пароли не совпадают.","bad");
-    return;
-  }
-
-  if(password.length<6){
-    toast("Пароль должен содержать минимум 6 символов.","bad");
-    return;
-  }
-
-  try{
-    const data=await api("/api/auth/register",{
-      method:"POST",
-      body:{username,password}
+  try {
+    const data = await api('/api/auth/recovery/reset', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: $('recoveryUsername').value.trim(),
+        recoveryCode: $('recoveryCode').value.trim(),
+        newPassword: $('recoveryNewPassword').value
+      })
     });
 
-    const newToken=data.token || data.accessToken;
-    const recoveryCode=data.recoveryCode || data.recovery_code || "";
-
-    if(newToken){
-      saveToken(newToken);
-    }
-
-    $("recoveryCodeDisplay").textContent=
-      recoveryCode || "Код не получен";
-
-    openModal("registerSuccessModal");
-
-    if(!newToken){
-      toast("Аккаунт создан. Войди через форму входа.","good");
-    }else{
-      await startApp();
-    }
-  }catch(err){
-    toast(err.message || "Не удалось создать аккаунт.","bad");
+    saveToken(data.token || data.accessToken);
+    closeModal();
+    await startApp();
+    toast('Пароль изменён');
+  } catch (error) {
+    toast(error.message, 'error');
   }
 }
 
-/* НАСТРОЙКИ */
+async function startApp() {
+  try {
+    const me = await api('/api/auth/me');
+    currentUser = me.user;
 
-function toggleAutoRefresh(){
-  autoRefreshEnabled=!autoRefreshEnabled;
+    showApp();
 
-  const button=$("autoRefreshBtn");
+    $('profileUsername').textContent =
+      currentUser.username || 'SLX User';
 
-  button.textContent=
-    autoRefreshEnabled ? "Включено" : "Выключено";
+    $('avatarInitial').textContent =
+      (currentUser.username || 'S').slice(0, 1).toUpperCase();
 
-  button.classList.toggle("good",autoRefreshEnabled);
+    $('profileCreated').textContent =
+      'Создан: ' + formatDate(currentUser.createdAt);
 
-  button.setAttribute(
-    "aria-pressed",
-    String(autoRefreshEnabled)
-  );
+    await loadWallets();
+    await loadTransactions();
+    await loadNetwork();
+    await loadMarketTicker();
+
+    showPage(currentPage || 'home');
+  } catch (_error) {
+    if (token) {
+      saveToken('');
+      showAuth();
+    } else {
+      showAuth();
+    }
+  }
+}
+
+function showPage(page) {
+  const valid = [
+    'home',
+    'wallet',
+    'market',
+    'pair',
+    'history',
+    'network',
+    'profile'
+  ];
+
+  if (!valid.includes(page)) page = 'home';
+
+  currentPage = page;
+
+  document.querySelectorAll('.page').forEach(node => {
+    node.classList.toggle('active', node.id === 'page-' + page);
+  });
+
+  document.querySelectorAll('.nav-btn').forEach(node => {
+    node.classList.toggle(
+      'active',
+      node.dataset.page === (page === 'pair' ? 'market' : page)
+    );
+  });
+
+  const names = {
+    home: 'Wallet · Testnet v2.0',
+    wallet: 'Wallet management',
+    market: 'Market overview · Demo',
+    pair: 'SLX/USDT · Demo pair',
+    history: 'Transaction history',
+    network: 'Network explorer',
+    profile: 'Account & settings'
+  };
+
+  $('topSub').textContent = names[page] || 'SLX Network v2.0';
+
+  if (page === 'home') renderHome();
+  if (page === 'wallet') renderWalletPage();
+  if (page === 'history') renderHistoryPage();
+  if (page === 'network') loadNetwork();
+  if (page === 'market') loadMarketTicker();
+  if (page === 'pair') loadPairPage();
+}
+
+function startAutoRefresh() {
+  stopAutoRefresh();
+
+  if (!autoRefreshEnabled) return;
+
+  refreshTimer = setInterval(() => {
+    if (!token || document.hidden) return;
+    refreshCurrentPage().catch(() => {});
+  }, 20000);
+}
+
+function stopAutoRefresh() {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
+  }
+}
+
+function toggleAutoRefresh(enabled) {
+  autoRefreshEnabled = Boolean(enabled);
+
+  if (autoRefreshEnabled) {
+    startAutoRefresh();
+  } else {
+    stopAutoRefresh();
+  }
 
   toast(
     autoRefreshEnabled
-      ? "Автообновление включено."
-      : "Автообновление выключено.",
-    "good"
+      ? 'Автообновление включено'
+      : 'Автообновление выключено'
   );
 }
 
-/* АВАТАР */
+async function refreshCurrentPage() {
+  if (!token) return;
 
-function handleAvatar(file){
-  if(!file) return;
-
-  if(!file.type.startsWith("image/")){
-    toast("Выбери изображение.","bad");
-    return;
+  if (['home', 'wallet'].includes(currentPage)) {
+    await loadWallets();
+    await loadTransactions();
   }
 
-  if(file.size>3*1024*1024){
-    toast("Фото должно быть не больше 3 МБ.","bad");
-    return;
-  }
-
-  const reader=new FileReader();
-
-  reader.onload=()=>{
-    localStorage.setItem(AVATAR_KEY,reader.result);
-
-    $("topAvatar").src=reader.result;
-    $("avatarPreview").src=reader.result;
-
-    toast("Фото сохранено на этом устройстве.","good");
-  };
-
-  reader.onerror=()=>{
-    toast("Не удалось прочитать фото.","bad");
-  };
-
-  reader.readAsDataURL(file);
+  if (currentPage === 'history') await loadTransactions();
+  if (currentPage === 'network') await loadNetwork();
+  if (currentPage === 'market') await loadMarketTicker();
+  if (currentPage === 'pair') await loadPairPage();
 }
 
-/* ПОДКЛЮЧЕНИЕ КНОПОК */
+/* ================================ WALLETS ============================= */
 
-function setupEvents(){
-  $("loginTab").addEventListener(
-    "click",
-    ()=>setAuthTab("login")
-  );
+async function loadWallets() {
+  const data = await api('/api/wallets');
+  wallets = data.wallets || data.data || [];
 
-  $("registerTab").addEventListener(
-    "click",
-    ()=>setAuthTab("register")
-  );
+  const stored = localStorage.getItem(ACTIVE_WALLET_KEY);
 
-  $("loginForm").addEventListener("submit",login);
-  $("registerForm").addEventListener("submit",register);
+  activeWallet =
+    wallets.find(w => String(w.id) === String(stored)) ||
+    wallets[0] ||
+    null;
 
-  $("showRecoveryBtn").addEventListener(
-    "click",
-    ()=>openModal("recoveryModal")
-  );
+  if (activeWallet) {
+    localStorage.setItem(ACTIVE_WALLET_KEY, activeWallet.id);
 
-  document.querySelectorAll(".nav-btn").forEach(btn=>{
-    btn.addEventListener(
-      "click",
-      ()=>showPage(btn.dataset.page)
-    );
-  });
-
-  $("copyAddressBtn").addEventListener(
-    "click",
-    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
-  );
-
-  $("walletCopyBtn").addEventListener(
-    "click",
-    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
-  );
-
-  $("showQrBtn").addEventListener("click",showQrForActive);
-  $("walletQrBtn").addEventListener("click",showQrForActive);
-
-  $("homeCreateWalletBtn").addEventListener("click",createWallet);
-  $("walletCreateBtn").addEventListener("click",createWallet);
-  $("faucetBtn").addEventListener("click",faucet);
-  $("goSendBtn").addEventListener("click",openSend);
-
-  $("sendForm").addEventListener("submit",sendTransaction);
-  $("sendAmount").addEventListener("input",updateSendTotal);
-
-  $("historyRefreshBtn").addEventListener("click",loadHistory);
-  $("networkRefreshBtn").addEventListener("click",loadNetwork);
-  $("chainVerifyBtn").addEventListener("click",verifyChain);
-
-  $("changePasswordBtn").addEventListener(
-    "click",
-    ()=>openModal("passwordModal")
-  );
-
-  $("passwordForm").addEventListener("submit",changePassword);
-  $("recoveryForm").addEventListener("submit",recoveryReset);
-  $("logoutBtn").addEventListener("click",logout);
-  $("autoRefreshBtn").addEventListener("click",toggleAutoRefresh);
-
-  $("avatarInput").addEventListener(
-    "change",
-    e=>handleAvatar(e.target.files?.[0])
-  );
-
-  $("removeAvatarBtn").addEventListener("click",()=>{
-    localStorage.removeItem(AVATAR_KEY);
-    setDefaultAvatar();
-    toast("Локальное фото удалено.","good");
-  });
-
-  $("qrCopyBtn").addEventListener(
-    "click",
-    ()=>copyText(activeWallet?.address,"Адрес скопирован.")
-  );
-
-  $("copyRecoveryBtn").addEventListener(
-    "click",
-    ()=>copyText(
-      $("recoveryCodeDisplay").textContent,
-      "Код восстановления скопирован."
-    )
-  );
-
-  $("continueAfterRegisterBtn").addEventListener("click",()=>{
-    closeModal("registerSuccessModal");
-
-    if(token){
-      startApp();
-    }else{
-      setAuthTab("login");
-    }
-  });
-
-  $("scanQrBtn").addEventListener("click",startScanner);
-
-  $("stopScannerBtn").addEventListener("click",()=>{
-    stopScanner();
-    closeModal("scannerModal");
-  });
-
-  document.querySelectorAll("[data-close]").forEach(btn=>{
-    btn.addEventListener(
-      "click",
-      ()=>closeModal(btn.dataset.close)
-    );
-  });
-
-  document.querySelectorAll(".modal").forEach(modal=>{
-    modal.addEventListener("click",e=>{
-      if(e.target===modal){
-        closeModal(modal.id);
-      }
-    });
-  });
-
-  document.addEventListener("click",async e=>{
-    const qrBtn=e.target.closest("[data-wallet-qr]");
-
-    if(qrBtn){
-      const wallet=wallets.find(
-        w=>String(w.id)===String(qrBtn.dataset.walletQr)
+    try {
+      const detail = await api(
+        '/api/wallet/' + encodeURIComponent(activeWallet.id)
       );
 
-      if(!wallet?.address){
-        toast("Адрес кошелька недоступен.","bad");
-        return;
-      }
+      activeWallet = detail.wallet || activeWallet;
 
-      $("qrAddressText").textContent=wallet.address;
-      $("qrCode").innerHTML="";
+      const idx = wallets.findIndex(
+        w => String(w.id) === String(activeWallet.id)
+      );
 
-      openModal("qrModal");
+      if (idx >= 0) wallets[idx] = activeWallet;
+    } catch (_error) {}
+  }
 
-      if(window.QRCode){
-        try{
-          new QRCode($("qrCode"),{
-            text:wallet.address,
-            width:216,
-            height:216,
-            correctLevel:QRCode.CorrectLevel.M
-          });
-        }catch(err){
-          console.error("Wallet QR error:",err);
-        }
-      }
+  renderWalletLists();
+  renderHome();
+  renderWalletPage();
+}
 
-      return;
+async function selectWallet(walletId) {
+  try {
+    const data = await api('/api/wallet/select', {
+      method: 'POST',
+      body: JSON.stringify({ walletId })
+    });
+
+    activeWallet =
+      data.wallet ||
+      wallets.find(w => String(w.id) === String(walletId)) ||
+      null;
+
+    if (activeWallet) {
+      localStorage.setItem(ACTIVE_WALLET_KEY, activeWallet.id);
     }
 
-    const btn=e.target.closest("[data-select-wallet]");
+    await loadWallets();
+    await loadTransactions();
+    toast('Активный кошелёк изменён');
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
 
-    if(!btn) return;
+async function createWallet() {
+  try {
+    const data = await api('/api/wallet/create', {
+      method: 'POST',
+      body: JSON.stringify({})
+    });
 
-    await selectWallet(btn.dataset.selectWallet);
+    const wallet = data.wallet;
+
+    if (wallet) {
+      localStorage.setItem(ACTIVE_WALLET_KEY, wallet.id);
+    }
+
+    await loadWallets();
+    toast('Новый кошелёк создан');
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
+
+function walletCard(wallet, selected = false) {
+  return `
+    <button class="wallet-mini ${selected ? 'selected' : ''}" type="button"
+      onclick="selectWallet('${escapeHtml(wallet.id)}')">
+      <div class="coin-icon">S</div>
+      <div class="wallet-info">
+        <strong>${selected ? '✓ ' : ''}SLX Wallet</strong>
+        <small class="mono">${escapeHtml(wallet.address || '')}</small>
+      </div>
+      <div class="wallet-balance">
+        ${formatNumber(wallet.balance)} <span class="muted">SLX</span>
+      </div>
+    </button>
+  `;
+}
+
+function renderWalletLists() {
+  const home = $('homeWalletSwitcher');
+  const list = $('walletList');
+
+  $('walletCount').textContent = String(wallets.length);
+
+  if (!wallets.length) {
+    home.innerHTML = '<div class="empty">Кошельки ещё не созданы.</div>';
+    list.innerHTML = '<div class="empty">Создай первый кошелёк.</div>';
+    return;
+  }
+
+  home.innerHTML = wallets
+    .slice(0, 3)
+    .map(w => walletCard(
+      w,
+      activeWallet && String(w.id) === String(activeWallet.id)
+    ))
+    .join('');
+
+  list.innerHTML = wallets
+    .map(w => walletCard(
+      w,
+      activeWallet && String(w.id) === String(activeWallet.id)
+    ))
+    .join('');
+}
+
+function renderHome() {
+  $('homeBalance').innerHTML =
+    `${formatNumber(activeWallet?.balance)} <span>SLX</span>`;
+
+  $('homeAddress').textContent =
+    activeWallet?.address || 'Кошелёк не выбран';
+
+  $('metricWallets').textContent = String(wallets.length);
+
+  renderWalletLists();
+  renderHomeTransactions();
+}
+
+function renderWalletPage() {
+  $('walletBalance').innerHTML =
+    `${formatNumber(activeWallet?.balance)} <span>SLX</span>`;
+
+  $('walletAddress').textContent =
+    activeWallet?.address || 'Кошелёк не выбран';
+
+  renderWalletLists();
+}
+
+/* ================================ HISTORY ============================= */
+
+async function loadTransactions() {
+  try {
+    const data = await api('/api/transactions');
+
+    lastTransactions = data.transactions || data.data || [];
+
+    renderHomeTransactions();
+    renderHistoryPage();
+  } catch (error) {
+    if (token) toast(error.message, 'error');
+  }
+}
+
+function txAmountLabel(tx, walletAddressValue) {
+  const owned = new Set(
+    wallets.map(w => String(w.address || '').toUpperCase())
+  );
+
+  const addr = String(
+    walletAddressValue || activeWallet?.address || ''
+  ).toUpperCase();
+
+  const to = String(tx.to || tx.to_wallet || '').toUpperCase();
+  const from = String(tx.from || tx.from_wallet || '').toUpperCase();
+
+  const incoming =
+    owned.has(to) ||
+    to === addr ||
+    tx.type === 'genesis' ||
+    tx.type === 'faucet';
+
+  return {
+    incoming,
+    sign: incoming ? '+' : '−',
+    outgoing: owned.has(from)
+  };
+}
+
+function txTitle(tx) {
+  if (tx.type === 'genesis') return 'Начисление при создании';
+  if (tx.type === 'faucet') return 'Faucet · тестовые SLX';
+  if (tx.type === 'transfer') return 'Перевод SLX';
+  return tx.type || 'Операция';
+}
+
+function txRow(tx) {
+  const info = txAmountLabel(tx);
+  const amount = (info.incoming ? '+' : '−') + formatNumber(tx.amount);
+  const type = tx.type === 'faucet' ? '＋' : info.incoming ? '↓' : '↑';
+
+  return `
+    <div class="tx-row">
+      <div class="tx-icon">${type}</div>
+      <div class="tx-text">
+        <strong>${escapeHtml(txTitle(tx))}</strong>
+        <small>
+          ${escapeHtml(formatDate(tx.createdAt || tx.timestamp || tx.created_at))}
+          · ${(tx.hash || '').slice(0, 10)}…
+        </small>
+      </div>
+      <div class="tx-amount ${info.incoming ? 'positive' : 'negative'}">
+        ${amount}
+        <small class="muted" style="display:block">SLX</small>
+      </div>
+    </div>
+  `;
+}
+
+function renderHomeTransactions() {
+  const node = $('homeTransactions');
+  if (!node) return;
+
+  const list = lastTransactions.slice(0, 4);
+
+  node.innerHTML = list.length
+    ? list.map(txRow).join('')
+    : '<div class="empty"><div class="empty-icon">◷</div>Операций пока нет.</div>';
+}
+
+function renderHistoryPage() {
+  const node = $('historyList');
+  if (!node) return;
+
+  $('historyCount').textContent = String(lastTransactions.length);
+
+  node.innerHTML = lastTransactions.length
+    ? lastTransactions.map(txRow).join('')
+    : '<div class="empty"><div class="empty-icon">◷</div>История пока пуста.</div>';
+}
+
+/* =========================== SEND / RECEIVE ============================ */
+
+function copyText(text) {
+  if (!text) {
+    toast('Нет данных для копирования', 'error');
+    return;
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text)
+      .then(() => toast('Скопировано'))
+      .catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const input = document.createElement('textarea');
+
+  input.value = text;
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+
+  document.body.appendChild(input);
+  input.select();
+
+  try {
+    document.execCommand('copy');
+    toast('Скопировано');
+  } catch (_error) {
+    toast('Не удалось скопировать', 'error');
+  }
+
+  input.remove();
+}
+
+function copyActiveAddress() {
+  copyText(activeWallet?.address || '');
+}
+
+async function claimFaucet() {
+  if (!activeWallet) {
+    toast('Сначала выбери кошелёк', 'error');
+    return;
+  }
+
+  try {
+    const data = await api('/api/faucet', {
+      method: 'POST',
+      body: JSON.stringify({ walletId: activeWallet.id })
+    });
+
+    await loadWallets();
+    await loadTransactions();
+
+    toast(`Начислено ${formatNumber(data.amount || 10)} тестовых SLX`);
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
+
+function openModal(modalId) {
+  $('modalLayer').classList.remove('hidden');
+
+  document.querySelectorAll('#modalLayer .modal').forEach(node => {
+    node.classList.add('hidden');
+  });
+
+  $(modalId).classList.remove('hidden');
+
+  if (modalId === 'receiveModal') renderReceiveQr();
+  if (modalId === 'sendModal') updateSendTotal();
+}
+
+function closeModal() {
+  stopScanner();
+  $('modalLayer').classList.add('hidden');
+
+  document.querySelectorAll('#modalLayer .modal').forEach(node => {
+    node.classList.add('hidden');
   });
 }
 
-/* СКАНЕР QR ДЛЯ IPHONE/SAFARI */
-
-async function startScanner(){
-  if(!window.isSecureContext || !navigator.mediaDevices?.getUserMedia){
-    toast(
-      "Камера доступна через HTTPS и при разрешении браузера.",
-      "bad"
-    );
+function openSend() {
+  if (!activeWallet) {
+    toast('Сначала выбери кошелёк', 'error');
     return;
   }
 
-  stopScanner();
+  openModal('sendModal');
+}
 
-  openModal("scannerModal");
+function openReceive() {
+  if (!activeWallet) {
+    toast('Сначала выбери кошелёк', 'error');
+    return;
+  }
 
-  $("scannerStatus").textContent=
-    "Запрашиваю доступ к камере…";
+  openModal('receiveModal');
+}
 
-  try{
-    scannerStream=await navigator.mediaDevices.getUserMedia({
-      video:{
-        facingMode:{ideal:"environment"},
-        width:{ideal:1280},
-        height:{ideal:720}
-      },
-      audio:false
+function renderReceiveQr() {
+  const node = $('receiveQr');
+
+  node.innerHTML = '';
+  $('receiveAddress').textContent = activeWallet?.address || '—';
+
+  if (!activeWallet) return;
+
+  if (window.QRCode) {
+    new QRCode(node, {
+      text: activeWallet.address,
+      width: 180,
+      height: 180,
+      colorDark: '#08101d',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } else {
+    node.innerHTML = '<span style="color:#111">Библиотека QR недоступна</span>';
+  }
+}
+
+function updateSendTotal() {
+  const amount = Number($('sendAmount')?.value || 0);
+
+  $('sendFeeHint').textContent =
+    `Комиссия сети: ${formatNumber(FEE)} SLX`;
+
+  $('sendTotal').textContent = amount > 0
+    ? `К списанию: ${formatNumber(amount + FEE)} SLX`
+    : 'Итого: —';
+}
+
+async function sendTransaction(event) {
+  event.preventDefault();
+
+  if (!activeWallet) {
+    toast('Кошелёк не выбран', 'error');
+    return;
+  }
+
+  const to = $('sendTo').value.trim();
+  const amount = Number($('sendAmount').value);
+
+  if (!Number.isFinite(amount) || amount <= 0) {
+    toast('Введи сумму больше нуля', 'error');
+    return;
+  }
+
+  if (!confirm(
+    `Отправить ${formatNumber(amount)} SLX? Комиссия: ${formatNumber(FEE)} SLX. Это тестовый перевод.`
+  )) {
+    return;
+  }
+
+  try {
+    await api('/api/send', {
+      method: 'POST',
+      body: JSON.stringify({
+        to,
+        amount,
+        fromWalletId: activeWallet.id
+      })
     });
 
-    const video=$("scannerVideo");
+    closeModal();
+    $('sendForm').reset();
 
-    video.srcObject=scannerStream;
+    await loadWallets();
+    await loadTransactions();
 
-    await video.play();
+    toast('Тестовый перевод подтверждён');
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
 
-    $("scannerStatus").textContent=
-      "Наведи камеру на QR-код адреса SLX…";
+/* ================================ PROFILE ============================= */
 
-    const canvas=$("scannerCanvas");
-    const ctx=canvas.getContext(
-      "2d",
-      {willReadFrequently:true}
+async function changePassword(event) {
+  event.preventDefault();
+
+  try {
+    const data = await api('/api/auth/password/change', {
+      method: 'POST',
+      body: JSON.stringify({
+        currentPassword: $('currentPassword').value,
+        newPassword: $('newPassword').value
+      })
+    });
+
+    saveToken(data.token || data.accessToken);
+    $('passwordForm').reset();
+
+    toast('Пароль изменён. Текущая сессия обновлена.');
+  } catch (error) {
+    toast(error.message, 'error');
+  }
+}
+
+async function logout() {
+  try {
+    if (token) {
+      await api('/api/auth/logout', {
+        method: 'POST',
+        body: JSON.stringify({})
+      });
+    }
+  } catch (_error) {}
+
+  saveToken('');
+  currentUser = null;
+  wallets = [];
+  activeWallet = null;
+  lastTransactions = [];
+
+  showAuth();
+  toast('Ты вышел из аккаунта');
+}
+
+function copyRecoveryCode() {
+  copyText(pendingRecoveryCode);
+}
+
+/* ================================= NETWORK ============================ */
+
+async function loadNetwork() {
+  try {
+    const [status, economy, blockData] = await Promise.all([
+      api('/api/status'),
+      api('/api/economy'),
+      api('/api/blocks?limit=12')
+    ]);
+
+    $('metricHeight').textContent = formatNumber(status.height || 0, 0);
+    $('metricUsers').textContent = formatNumber(status.users || 0, 0);
+
+    $('netStatus').textContent =
+      status.status === 'online' ? 'ONLINE' : 'OFFLINE';
+
+    $('netHeight').textContent = formatNumber(status.height || 0, 0);
+    $('netFee').textContent =
+      formatNumber(status.transferFee ?? FEE) + ' SLX';
+
+    $('netSupply').textContent =
+      formatNumber(economy.totalSupply) + ' SLX';
+
+    $('netCirculating').textContent =
+      formatNumber(economy.circulatingSupply) + ' SLX';
+
+    $('netVersion').textContent = status.version || '2.0.0';
+
+    const blocks = blockData.blocks || blockData.data || [];
+
+    $('blockCount').textContent = String(blocks.length);
+
+    $('blocksList').innerHTML = blocks.length
+      ? blocks.map(block => `
+          <div class="block-card">
+            <div class="hrow between">
+              <strong>Блок #${escapeHtml(block.height ?? (Number(block.index) + 1))}</strong>
+              <span class="pill">${escapeHtml(block.transaction_count ?? (block.transactions || []).length)} tx</span>
+            </div>
+            <small>${escapeHtml(formatDate(block.timestamp))}</small>
+            <div class="tiny mono muted" style="margin-top:7px">
+              ${escapeHtml((block.hash || '').slice(0, 42))}…
+            </div>
+          </div>
+        `).join('')
+      : '<div class="empty">Пока нет блоков. Первые блоки появятся после операций.</div>';
+  } catch (error) {
+    $('netStatus').textContent = 'ERROR';
+    toast(error.message, 'error');
+  }
+}
+
+async function verifyChain() {
+  try {
+    $('chainResult').textContent = 'Проверяем…';
+
+    const data = await api('/api/chain/verify');
+
+    $('chainResult').innerHTML = data.valid
+      ? '<span class="positive">✓ Цепочка корректна</span> · Проверено блоков: ' + escapeHtml(data.blocks)
+      : '<span class="negative">✕ Ошибка проверки:</span> ' + escapeHtml(data.error || 'Unknown error');
+  } catch (error) {
+    $('chainResult').textContent = error.message;
+  }
+}
+
+/* =============================== DEMO MARKET ========================== */
+
+async function loadMarketTicker() {
+  try {
+    const data = await api('/api/market/ticker');
+
+    tickerData = data;
+
+    const price = formatPrice(data.price);
+    const change = Number(data.changePercent24h || 0);
+    const cls = change >= 0 ? 'positive' : 'negative';
+
+    $('overviewPrice').textContent = price + ' USDT';
+    $('overviewChange').textContent =
+      (change >= 0 ? '+' : '') + formatNumber(change, 2) + '% за 24ч';
+
+    $('overviewChange').className = 'small ' + cls;
+
+    $('overviewVol').textContent =
+      'Объём 24ч: ' + formatCompact(data.volume24h) + ' SLX';
+
+    if (currentPage === 'pair') {
+      renderTickerDetails(data);
+    }
+  } catch (error) {
+    if (token) toast('Демо-рынок: ' + error.message, 'error');
+  }
+}
+
+function renderTickerDetails(data) {
+  const change = Number(data.changePercent24h || 0);
+
+  $('pairPrice').innerHTML = `
+    ${formatPrice(data.price)}
+    <span style="font-size:13px;color:var(--muted);letter-spacing:0">USDT</span>
+  `;
+
+  $('pairChange').textContent =
+    `${change >= 0 ? '+' : ''}${formatNumber(change, 2)}% за 24ч · ` +
+    `${change >= 0 ? '+' : ''}${formatPrice(data.change24h)} USDT`;
+
+  $('pairChange').className =
+    'small ' + (change >= 0 ? 'positive' : 'negative');
+
+  $('pairHigh').textContent = formatPrice(data.high24h);
+  $('pairLow').textContent = formatPrice(data.low24h);
+  $('pairVolume').textContent = formatCompact(data.volume24h) + ' SLX';
+  $('pairUpdated').textContent = formatTime(data.timestamp);
+}
+
+function openPair() {
+  showPage('pair');
+}
+
+function setIntervalFrame(interval, button) {
+  if (!['15m', '1h', '4h', '1d'].includes(interval)) return;
+
+  currentInterval = interval;
+
+  document.querySelectorAll('.timeframes button').forEach(node => {
+    node.classList.toggle(
+      'active',
+      node.dataset.interval === interval
     );
+  });
 
-    let detector=null;
+  loadPairPage();
+}
 
-    if("BarcodeDetector" in window){
-      try{
-        const supported=await BarcodeDetector
-          .getSupportedFormats()
-          .catch(()=>[]);
+async function loadPairPage() {
+  try {
+    const [ticker, candles, depth, trades] = await Promise.all([
+      api('/api/market/ticker'),
+      api('/api/market/candles?interval=' + encodeURIComponent(currentInterval) + '&limit=56'),
+      api('/api/market/depth'),
+      api('/api/market/trades')
+    ]);
 
-        if(supported.includes("qr_code")){
-          detector=new BarcodeDetector({
-            formats:["qr_code"]
-          });
-        }
-      }catch(err){
-        console.debug("BarcodeDetector unavailable:",err);
-      }
-    }
+    tickerData = ticker;
 
-    const extractAddress=raw=>{
-      const text=String(raw || "").trim();
-      const match=text.match(/SLXC[A-Fa-f0-9]{32}/);
+    renderTickerDetails(ticker);
 
-      return match
-        ? match[0].toUpperCase()
-        : null;
-    };
+    chartCandles = candles.candles || candles.data || [];
 
-    const found=address=>{
-      if(!address) return false;
-
-      $("sendTo").value=address;
-
-      stopScanner();
-      closeModal("scannerModal");
-
-      toast("Адрес найден в QR.","good");
-
-      return true;
-    };
-
-    const scan=async()=>{
-      if(!scannerStream) return;
-
-      try{
-        if(detector){
-          const results=await detector.detect(video);
-
-          if(
-            results?.length &&
-            found(extractAddress(results[0].rawValue))
-          ){
-            return;
-          }
-        }
-
-        // Запасной QR-декодер для Safari/iPhone.
-        if(
-          window.jsQR &&
-          video.readyState>=2 &&
-          video.videoWidth>0
-        ){
-          const width=Math.min(video.videoWidth,1000);
-
-          const height=Math.round(
-            width*video.videoHeight/video.videoWidth
-          );
-
-          canvas.width=width;
-          canvas.height=height;
-
-          ctx.drawImage(
-            video,
-            0,
-            0,
-            width,
-            height
-          );
-
-          const image=ctx.getImageData(
-            0,
-            0,
-            width,
-            height
-          );
-
-          const code=window.jsQR(
-            image.data,
-            width,
-            height,
-            {inversionAttempts:"attemptBoth"}
-          );
-
-          if(
-            code?.data &&
-            found(extractAddress(code.data))
-          ){
-            return;
-          }
-        }
-      }catch(err){
-        console.debug("QR scan frame:",err);
-      }
-
-      scannerTimer=requestAnimationFrame(scan);
-    };
-
-    if(!detector && !window.jsQR){
-      $("scannerStatus").textContent=
-        "QR-библиотека не загрузилась. Обнови страницу и попробуй снова.";
-      return;
-    }
-
-    scannerTimer=requestAnimationFrame(scan);
-
-  }catch(err){
-    console.error("Camera error:",err);
-
-    stopScanner();
-
-    $("scannerStatus").textContent=
-      "Не удалось открыть камеру. Разреши доступ в Safari/Chrome.";
-
-    toast("Камера не запустилась.","bad");
+    drawCandles();
+    renderPriceHistory(chartCandles);
+    renderOrderBook(depth);
+    renderMarketTrades(trades.trades || trades.data || []);
+  } catch (error) {
+    toast('Не удалось обновить демо-рынок: ' + error.message, 'error');
   }
 }
 
-function stopScanner(){
-  if(scannerTimer){
-    cancelAnimationFrame(scannerTimer);
-    scannerTimer=null;
-  }
+function drawCandles() {
+  const canvas = $('candleChart');
+  if (!canvas) return;
 
-  if(scannerStream){
-    scannerStream.getTracks().forEach(t=>t.stop());
-    scannerStream=null;
-  }
+  const rect = canvas.getBoundingClientRect();
 
-  const video=$("scannerVideo");
+  const cssWidth = Math.max(
+    300,
+    rect.width || canvas.parentElement.clientWidth || 300
+  );
 
-  if(video){
-    video.pause();
-    video.srcObject=null;
-  }
-}
+  const cssHeight = Math.max(210, rect.height || 300);
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-window.addEventListener("beforeunload",stopScanner);
+  canvas.width = Math.round(cssWidth * dpr);
+  canvas.height = Math.round(cssHeight * dpr);
 
-/* Автообновление не запускается в скрытой вкладке или без сессии. */
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, cssWidth, cssHeight);
 
-setInterval(()=>{
-  if(
-    !autoRefreshEnabled ||
-    document.hidden ||
-    !token ||
-    $("appScreen").classList.contains("hidden")
-  ){
+  const data = chartCandles;
+
+  if (!data.length) {
+    ctx.fillStyle = '#8496b2';
+    ctx.font = '12px sans-serif';
+    ctx.fillText('Свечи пока недоступны', 14, 30);
     return;
   }
 
-  loadWallets()
-    .then(()=>renderAll())
-    .catch(err=>console.debug("Auto-refresh wallets:",err));
+  const left = 8;
+  const right = 58;
+  const top = 12;
+  const bottom = 26;
 
-  loadNetwork()
-    .catch(err=>console.debug("Auto-refresh network:",err));
-},20000);
+  const chartW = cssWidth - left - right;
+  const chartH = cssHeight - top - bottom;
+
+  const lows = data.map(candle => Number(candle.low));
+  const highs = data.map(candle => Number(candle.high));
+
+  let min = Math.min(...lows);
+  let max = Math.max(...highs);
+
+  const pad = (max - min) * 0.09 || 0.001;
+
+  min -= pad;
+  max += pad;
+
+  const y = price => top + (max - price) / (max - min) * chartH;
+
+  ctx.strokeStyle = '#223148';
+  ctx.lineWidth = 1;
+  ctx.fillStyle = '#7387a5';
+  ctx.font = '10px ui-monospace,monospace';
+  ctx.textAlign = 'left';
+
+  for (let i = 0; i <= 4; i++) {
+    const gy = top + chartH * i / 4;
+
+    ctx.beginPath();
+    ctx.moveTo(left, gy);
+    ctx.lineTo(left + chartW, gy);
+    ctx.stroke();
+
+    const value = max - (max - min) * i / 4;
+
+    ctx.fillText(
+      value.toFixed(5),
+      left + chartW + 6,
+      gy + 3
+    );
+  }
+
+  const step = chartW / data.length;
+  const candleW = Math.max(2, Math.min(9, step * 0.55));
+
+  for (let i = 0; i < data.length; i++) {
+    const candle = data[i];
+
+    const x = left + i * step + step / 2;
+    const openY = y(candle.open);
+    const closeY = y(candle.close);
+    const highY = y(candle.high);
+    const lowY = y(candle.low);
+
+    const up = candle.close >= candle.open;
+    const color = up ? '#27d6a0' : '#ff6d83';
+
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+
+    ctx.beginPath();
+    ctx.moveTo(x, highY);
+    ctx.lineTo(x, lowY);
+    ctx.stroke();
+
+    const bodyY = Math.min(openY, closeY);
+    const bodyH = Math.max(1, Math.abs(closeY - openY));
+
+    ctx.fillRect(
+      x - candleW / 2,
+      bodyY,
+      candleW,
+      bodyH
+    );
+  }
+
+  ctx.textAlign = 'left';
+  ctx.fillStyle = '#7f91ad';
+
+  const labelStep = Math.max(1, Math.floor(data.length / 4));
+
+  for (let i = 0; i < data.length; i += labelStep) {
+    const candle = data[i];
+    const date = new Date(candle.time);
+
+    const label = currentInterval === '1d'
+      ? date.toLocaleDateString('ru-RU', {
+          day: '2-digit',
+          month: '2-digit'
+        })
+      : date.toLocaleTimeString('ru-RU', {
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+
+    ctx.fillText(label, left + i * step, cssHeight - 7);
+  }
+
+  const last = data[data.length - 1];
+
+  ctx.fillStyle =
+    last.close >= last.open ? '#27d6a0' : '#ff6d83';
+
+  ctx.fillRect(
+    left + chartW - 40,
+    y(last.close) - 10,
+    42,
+    18
+  );
+
+  ctx.fillStyle = '#061019';
+  ctx.font = '9px ui-monospace,monospace';
+
+  ctx.fillText(
+    last.close.toFixed(5),
+    left + chartW - 38,
+    y(last.close) + 2
+  );
+}
+
+function renderPriceHistory(candles) {
+  const node = $('priceHistory');
+
+  $('chartRange').textContent =
+    `${candles.length} свечей · ${currentInterval}`;
+
+  const items = candles.slice(-8).reverse();
+
+  node.innerHTML = items.map(candle => `
+    <div class="tx-row">
+      <div class="tx-icon">${candle.close >= candle.open ? '↗' : '↘'}</div>
+      <div class="tx-text">
+        <strong>${escapeHtml(formatDate(candle.time))}</strong>
+        <small>
+          O ${formatPrice(candle.open)} ·
+          H ${formatPrice(candle.high)} ·
+          L ${formatPrice(candle.low)}
+        </small>
+      </div>
+      <div class="tx-amount ${candle.close >= candle.open ? 'positive' : 'negative'}">
+        ${formatPrice(candle.close)}
+        <small class="muted" style="display:block">
+          ${formatCompact(candle.volume)} SLX
+        </small>
+      </div>
+    </div>
+  `).join('') || '<div class="empty">Нет свечей.</div>';
+}
+
+function renderOrderBook(data) {
+  const asks = (data.asks || []).slice(0, 10).reverse();
+  const bids = (data.bids || []).slice(0, 10);
+
+  const maxQty = Math.max(
+    1,
+    ...asks.map(item => item.amount),
+    ...bids.map(item => item.amount)
+  );
+
+  $('asksList').innerHTML =
+    '<h4>Продажа · ASK</h4>' +
+    asks.map(row => `
+      <div class="book-row">
+        <i class="depth ask" style="width:${Math.min(100, row.amount / maxQty * 100)}%"></i>
+        <span class="negative">${formatPrice(row.price)}</span>
+        <span class="qty">${formatNumber(row.amount, 2)}</span>
+      </div>
+    `).join('');
+
+  $('bidsList').innerHTML =
+    '<h4>Покупка · BID</h4>' +
+    bids.map(row => `
+      <div class="book-row">
+        <i class="depth bid" style="width:${Math.min(100, row.amount / maxQty * 100)}%"></i>
+        <span class="positive">${formatPrice(row.price)}</span>
+        <span class="qty">${formatNumber(row.amount, 2)}</span>
+      </div>
+    `).join('');
+
+  $('bookMidPrice').textContent =
+    formatPrice(tickerData?.price || 0);
+
+  $('bookSpread').textContent =
+    'Демо-спред: ' + formatPrice(data.spread || 0) + ' USDT';
+}
+
+function renderMarketTrades(trades) {
+  $('marketTrades').innerHTML = trades.slice(0, 12).map(trade => `
+    <tr>
+      <td class="${trade.side === 'buy' ? 'positive' : 'negative'}">${formatPrice(trade.price)}</td>
+      <td>${formatNumber(trade.amount, 2)}</td>
+      <td class="muted">${formatTime(trade.time)}</td>
+    </tr>
+  `).join('') || '<tr><td colspan="3">Нет данных.</td></tr>';
+}
+
+/* ================================ QR SCANNER ========================== */
+
+async function openScanner() {
+  openModal('scannerModal');
+  await startScanner();
+}
+
+async function startScanner() {
+  const video = $('scannerVideo');
+  const message = $('scannerMessage');
+
+  if (!navigator.mediaDevices?.getUserMedia) {
+    message.textContent = 'Камера недоступна. Введи адрес вручную.';
+    return;
+  }
+
+  try {
+    scannerStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' } },
+      audio: false
+    });
+
+    video.srcObject = scannerStream;
+    await video.play();
+
+    message.textContent = 'Наведи камеру на QR-код SLX-адреса.';
+    scanLoop();
+  } catch (error) {
+    message.textContent =
+      'Не удалось открыть камеру. Проверь разрешение браузера или введи адрес вручную.';
+
+    toast(error.message || 'Камера недоступна', 'error');
+  }
+}
+
+function scanLoop() {
+  if (!scannerStream) return;
+
+  const video = $('scannerVideo');
+  const canvas = $('scannerCanvas');
+  const ctx = canvas.getContext('2d');
+
+  if (video.readyState >= 2 && window.jsQR) {
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    const image = ctx.getImageData(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    const code = jsQR(
+      image.data,
+      image.width,
+      image.height,
+      { inversionAttempts: 'attemptBoth' }
+    );
+
+    if (code && /^SLXC[A-Fa-f0-9]{32}$/.test(code.data.trim())) {
+      $('sendTo').value = code.data.trim().toUpperCase();
+
+      stopScanner();
+      closeModal();
+      openModal('sendModal');
+
+      toast('Адрес прочитан из QR');
+      return;
+    }
+  }
+
+  scannerFrame = requestAnimationFrame(scanLoop);
+}
+
+function stopScanner() {
+  if (scannerFrame) {
+    cancelAnimationFrame(scannerFrame);
+    scannerFrame = null;
+  }
+
+  if (scannerStream) {
+    scannerStream.getTracks().forEach(track => track.stop());
+    scannerStream = null;
+  }
+
+  const video = $('scannerVideo');
+
+  if (video) {
+    video.srcObject = null;
+  }
+}
+
+/* ================================= EVENTS ============================== */
+
+$('loginForm').addEventListener('submit', login);
+$('registerForm').addEventListener('submit', register);
+$('sendForm').addEventListener('submit', sendTransaction);
+$('recoveryForm').addEventListener('submit', resetRecovery);
+$('passwordForm').addEventListener('submit', changePassword);
+
+window.addEventListener('resize', () => {
+  if (currentPage === 'pair') drawCandles();
+});
+
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && token) {
+    refreshCurrentPage().catch(() => {});
+  }
+});
+
+(async function boot() {
+  if (token) {
+    await startApp();
+  } else {
+    showAuth();
+    setAuthTab('login');
+  }
+})();
 </script>
 </body>
 </html>
