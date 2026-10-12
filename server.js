@@ -10,29 +10,34 @@ const jwt = require('jsonwebtoken');
 const app = express();
 const PORT = Number(process.env.PORT) || 10000;
 const HOST = '0.0.0.0';
-
-const JWT_SECRET =
-  process.env.JWT_SECRET ||
-  'SLX_TESTNET_SECRET_CHANGE_ME_2026';
-
-const DATA_DIR =
-  process.env.SLX_DATA_DIR ||
-  path.join(__dirname, 'data');
-
-const DATA_FILE = path.join(DATA_DIR, 'slx-data.json');
-const PUBLIC_DIR = path.join(__dirname, 'public');
-
-const VERSION = '1.9.1';
+const VERSION = '2.0.0';
 const NETWORK = 'SLX-Testnet';
 const TRANSFER_FEE = 0.1;
 const FAUCET_AMOUNT = 10;
 const FAUCET_COOLDOWN_MS = 24 * 60 * 60 * 1000;
+const JWT_SECRET =
+  process.env.JWT_SECRET || 'SLX_TESTNET_SECRET_CHANGE_ME_2026';
+
+const DATA_DIR =
+  process.env.SLX_DATA_DIR || path.join(__dirname, 'data');
+
+const DATA_FILE = path.join(DATA_DIR, 'slx-data.json');
+const PUBLIC_DIR = path.join(__dirname, 'public');
 
 app.disable('x-powered-by');
+
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('Permissions-Policy', 'camera=(self)');
+  next();
+});
+
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 
-/* ============================== DATABASE ============================== */
+/* =============================== DATABASE ============================== */
 
 function emptyDB() {
   return {
@@ -66,68 +71,52 @@ function ensureDataFile() {
 function round(value) {
   const n = Number(value);
 
-  if (!Number.isFinite(n)) {
-    return 0;
-  }
-
-  return Math.round((n + Number.EPSILON) * 1e8) / 1e8;
+  return Number.isFinite(n)
+    ? Math.round((n + Number.EPSILON) * 1e8) / 1e8
+    : 0;
 }
 
 function loadDB() {
   ensureDataFile();
 
-  try {
-    const parsed = JSON.parse(
-      fs.readFileSync(DATA_FILE, 'utf8')
-    );
+  const parsed = JSON.parse(
+    fs.readFileSync(DATA_FILE, 'utf8')
+  );
 
-    const defaults = emptyDB();
+  const defaults = emptyDB();
 
-    parsed.users = Array.isArray(parsed.users)
-      ? parsed.users
-      : [];
-
-    parsed.wallets = Array.isArray(parsed.wallets)
-      ? parsed.wallets
-      : [];
-
-    parsed.transactions = Array.isArray(parsed.transactions)
-      ? parsed.transactions
-      : [];
-
-    parsed.blocks = Array.isArray(parsed.blocks)
-      ? parsed.blocks
-      : [];
-
-    parsed.faucetClaims = Array.isArray(parsed.faucetClaims)
-      ? parsed.faucetClaims
-      : [];
-
-    parsed.network = {
-      ...defaults.network,
-      ...(parsed.network && typeof parsed.network === 'object'
-        ? parsed.network
-        : {})
-    };
-
-    for (const user of parsed.users) {
-      if (!Object.prototype.hasOwnProperty.call(
-        user,
-        'activeWalletId'
-      )) {
-        user.activeWalletId = null;
-      }
-    }
-
-    for (const wallet of parsed.wallets) {
-      wallet.balance = round(wallet.balance);
-    }
-
-    return parsed;
-  } catch (error) {
-    console.error('[SLX] Database loading error:', error.message);
-    throw error;
+  for (const key of [
+    'users',
+    'wallets',
+    'transactions',
+    'blocks',
+    'faucetClaims'
+  ]) {
+    parsed[key] = Array.isArray(parsed[key]) ? parsed[key] : [];
   }
+
+  parsed.network = {
+    ...defaults.network,
+    ...(parsed.network && typeof parsed.network === 'object'
+      ? parsed.network
+      : {})
+  };
+
+  for (const user of parsed.users) {
+    if (!Object.prototype.hasOwnProperty.call(user, 'activeWalletId')) {
+      user.activeWalletId = null;
+    }
+
+    if (!Number.isInteger(user.tokenVersion)) {
+      user.tokenVersion = 0;
+    }
+  }
+
+  for (const wallet of parsed.wallets) {
+    wallet.balance = round(wallet.balance);
+  }
+
+  return parsed;
 }
 
 let db = loadDB();
@@ -146,17 +135,14 @@ function saveDB() {
   fs.renameSync(tempFile, DATA_FILE);
 }
 
-/* ================================ HELPERS ============================== */
+/* ================================= HELPERS ============================= */
 
 function id(prefix = '') {
   return prefix + crypto.randomBytes(12).toString('hex');
 }
 
 function walletAddress() {
-  return (
-    'SLXC' +
-    crypto.randomBytes(16).toString('hex').toUpperCase()
-  );
+  return 'SLXC' + crypto.randomBytes(16).toString('hex').toUpperCase();
 }
 
 function now() {
@@ -187,9 +173,7 @@ function publicWallet(wallet) {
 }
 
 function getUserWallets(userId) {
-  return db.wallets.filter(
-    wallet => wallet.userId === userId
-  );
+  return db.wallets.filter(wallet => wallet.userId === userId);
 }
 
 function getWallet(userId, walletId) {
@@ -200,9 +184,7 @@ function getWallet(userId, walletId) {
 }
 
 function getWalletByAddress(address) {
-  const normalized = String(address || '')
-    .trim()
-    .toUpperCase();
+  const normalized = String(address || '').trim().toUpperCase();
 
   return db.wallets.find(wallet =>
     String(wallet.address).toUpperCase() === normalized
@@ -242,12 +224,11 @@ function createToken(user) {
   return jwt.sign(
     {
       userId: user.id,
-      username: user.username
+      username: user.username,
+      ver: user.tokenVersion || 0
     },
     JWT_SECRET,
-    {
-      expiresIn: '30d'
-    }
+    { expiresIn: '30d' }
   );
 }
 
@@ -265,11 +246,7 @@ function auth(req, res, next) {
   const header = req.headers.authorization || '';
 
   if (!header.startsWith('Bearer ')) {
-    return sendError(
-      res,
-      401,
-      'Требуется авторизация'
-    );
+    return sendError(res, 401, 'Требуется авторизация');
   }
 
   try {
@@ -283,25 +260,28 @@ function auth(req, res, next) {
     );
 
     if (!user) {
+      return sendError(res, 401, 'Пользователь не найден');
+    }
+
+    if (
+      Number(decoded.ver || 0) !==
+      Number(user.tokenVersion || 0)
+    ) {
       return sendError(
         res,
         401,
-        'Пользователь не найден'
+        'Сессия завершена. Войди снова.'
       );
     }
 
     req.user = user;
     return next();
   } catch (_error) {
-    return sendError(
-      res,
-      401,
-      'Недействительная сессия'
-    );
+    return sendError(res, 401, 'Недействительная сессия');
   }
 }
 
-/* ============================== HEALTH ================================ */
+/* ================================= HEALTH ============================== */
 
 function healthPayload() {
   return {
@@ -335,11 +315,12 @@ app.get('/api/status', (_req, res) => {
     wallets: db.wallets.length,
     totalSupply: round(db.network.totalSupply),
     uptime: process.uptime(),
-    timestamp: now()
+    timestamp: now(),
+    marketMode: 'SIMULATED_DEMO'
   });
 });
 
-/* ============================ TRANSACTIONS ============================ */
+/* ============================== TRANSACTIONS ========================== */
 
 function addTransaction(data) {
   const transactionTime = now();
@@ -379,7 +360,6 @@ function addTransaction(data) {
   };
 
   db.transactions.push(tx);
-
   return tx;
 }
 
@@ -393,7 +373,7 @@ function transactionsForWallet(wallet) {
   ).slice().reverse();
 }
 
-/* ============================== BLOCKCHAIN ============================ */
+/* ================================ BLOCKCHAIN ========================== */
 
 function calculateBlockHash(block) {
   return crypto
@@ -472,7 +452,7 @@ function createWalletForUser(userId, initial = false) {
   return wallet;
 }
 
-/* ============================== REGISTER ============================== */
+/* ================================= REGISTER =========================== */
 
 app.post('/api/auth/register', async (req, res, next) => {
   try {
@@ -500,20 +480,17 @@ app.post('/api/auth/register', async (req, res, next) => {
       );
     }
 
-    if (password.length < 6 || password.length > 128) {
+    if (password.length < 8 || password.length > 128) {
       return sendError(
         res,
         400,
-        'Пароль должен содержать от 6 до 128 символов'
+        'Пароль должен содержать от 8 до 128 символов'
       );
     }
 
-    const exists = db.users.some(
-      user =>
-        user.username.toLowerCase() === username.toLowerCase()
-    );
-
-    if (exists) {
+    if (db.users.some(
+      user => user.username.toLowerCase() === username.toLowerCase()
+    )) {
       return sendError(
         res,
         409,
@@ -533,13 +510,13 @@ app.post('/api/auth/register', async (req, res, next) => {
       recoveryCodeHash: hashRecoveryCode(recoveryCode),
 
       createdAt: now(),
-      activeWalletId: null
+      activeWalletId: null,
+      tokenVersion: 0
     };
 
     db.users.push(user);
 
     const wallet = createWalletForUser(user.id, true);
-
     user.activeWalletId = wallet.id;
 
     saveDB();
@@ -573,8 +550,7 @@ app.post('/api/auth/login', async (req, res, next) => {
     );
 
     const user = db.users.find(
-      item =>
-        item.username.toLowerCase() === username.toLowerCase()
+      item => item.username.toLowerCase() === username.toLowerCase()
     );
 
     if (
@@ -582,11 +558,7 @@ app.post('/api/auth/login', async (req, res, next) => {
       !user.passwordHash ||
       !(await bcrypt.compare(password, user.passwordHash))
     ) {
-      return sendError(
-        res,
-        401,
-        'Неверный логин или пароль'
-      );
+      return sendError(res, 401, 'Неверный логин или пароль');
     }
 
     const token = createToken(user);
@@ -609,7 +581,10 @@ app.get('/api/auth/me', auth, (req, res) => {
   });
 });
 
-app.post('/api/auth/logout', auth, (_req, res) => {
+app.post('/api/auth/logout', auth, (req, res) => {
+  req.user.tokenVersion = Number(req.user.tokenVersion || 0) + 1;
+  saveDB();
+
   res.json({
     ok: true,
     message: 'Выход выполнен'
@@ -633,11 +608,11 @@ app.post(
         req.body?.newPassword || ''
       );
 
-      if (newPassword.length < 6 || newPassword.length > 128) {
+      if (newPassword.length < 8 || newPassword.length > 128) {
         return sendError(
           res,
           400,
-          'Новый пароль должен содержать от 6 до 128 символов'
+          'Новый пароль должен содержать от 8 до 128 символов'
         );
       }
 
@@ -659,6 +634,7 @@ app.post(
         12
       );
 
+      req.user.tokenVersion = Number(req.user.tokenVersion || 0) + 1;
       saveDB();
 
       const token = createToken(req.user);
@@ -705,39 +681,28 @@ app.post(
         );
       }
 
-      if (newPassword.length < 6 || newPassword.length > 128) {
+      if (newPassword.length < 8 || newPassword.length > 128) {
         return sendError(
           res,
           400,
-          'Пароль должен содержать от 6 до 128 символов'
+          'Пароль должен содержать от 8 до 128 символов'
         );
       }
 
       const user = db.users.find(
-        item =>
-          item.username.toLowerCase() === username.toLowerCase()
+        item => item.username.toLowerCase() === username.toLowerCase()
       );
 
       if (!user) {
-        return sendError(
-          res,
-          404,
-          'Пользователь не найден'
-        );
+        return sendError(res, 404, 'Пользователь не найден');
       }
 
       if (!recoveryCodeMatches(user, recoveryCode)) {
-        return sendError(
-          res,
-          403,
-          'Неверный код восстановления'
-        );
+        return sendError(res, 403, 'Неверный код восстановления');
       }
 
-      user.passwordHash = await bcrypt.hash(
-        newPassword,
-        12
-      );
+      user.passwordHash = await bcrypt.hash(newPassword, 12);
+      user.tokenVersion = Number(user.tokenVersion || 0) + 1;
 
       saveDB();
 
@@ -755,7 +720,7 @@ app.post(
   }
 );
 
-/* ================================ WALLETS ============================= */
+/* ================================= WALLETS ============================ */
 
 app.get('/api/wallets', auth, (req, res) => {
   const list = getUserWallets(req.user.id).map(publicWallet);
@@ -834,7 +799,6 @@ app.get('/api/wallet/:id', auth, (req, res) => {
 
 app.post('/api/send', auth, (req, res, next) => {
   try {
-    // Accept both the old and the frontend v1.8.2 field names.
     const to = String(
       req.body?.to ||
       req.body?.toAddress ||
@@ -1054,7 +1018,7 @@ app.get('/api/history', auth, (req, res) => {
   });
 });
 
-/* ============================== BLOCKS ================================ */
+/* ================================= BLOCKS ============================= */
 
 app.get('/api/blocks', (req, res) => {
   const rawLimit = Number.parseInt(
@@ -1079,8 +1043,6 @@ app.get('/api/blocks', (req, res) => {
     data: blocks
   });
 });
-
-/* ============================== ECONOMY =============================== */
 
 app.get('/api/economy', (_req, res) => {
   const circulating = db.wallets.reduce(
@@ -1150,8 +1112,6 @@ function sendChainVerification(_req, res) {
 app.get('/api/chain/verify', sendChainVerification);
 app.post('/api/chain/verify', sendChainVerification);
 
-/* ================================ DEBUG =============================== */
-
 app.get('/api/debug', auth, (req, res) => {
   res.json({
     version: VERSION,
@@ -1171,14 +1131,291 @@ app.get('/api/debug', auth, (req, res) => {
   });
 });
 
-/* ============================= FRONTEND =============================== */
+/* ============================= DEMO MARKET ============================ */
+
+// Все рыночные данные ниже искусственные.
+// Нет подключения к бирже, реального USDT или торговых ордеров.
+// Демо-рынок не изменяет балансы SLX.
+
+const MARKET = Object.freeze({
+  pair: 'SLX/USDT',
+  baseAsset: 'SLX',
+  quoteAsset: 'USDT',
+  basePrice: 0.125,
+  source: 'SIMULATED_TEST_DATA'
+});
+
+const intervalMap = Object.freeze({
+  '15m': 15 * 60 * 1000,
+  '1h': 60 * 60 * 1000,
+  '4h': 4 * 60 * 60 * 1000,
+  '1d': 24 * 60 * 60 * 1000
+});
+
+function wave(seed) {
+  const x = Math.sin(seed * 12.9898 + 78.233) * 43758.5453;
+  return (x - Math.floor(x)) * 2 - 1;
+}
+
+function simulatedPriceAt(timestamp) {
+  const t = Number(timestamp);
+
+  const trend =
+    Math.sin(t / (1000 * 60 * 60 * 7.3)) * 0.045;
+
+  const mid =
+    Math.sin(t / (1000 * 60 * 83)) * 0.023;
+
+  const short =
+    Math.sin(t / (1000 * 60 * 17)) * 0.009;
+
+  const noise =
+    wave(Math.floor(t / (1000 * 60 * 5))) * 0.004;
+
+  return Math.max(
+    0.001,
+    round(MARKET.basePrice * (1 + trend + mid + short + noise))
+  );
+}
+
+function makeCandles(interval, requestedLimit) {
+  const step = intervalMap[interval] || intervalMap['1h'];
+
+  const limit = Math.max(
+    10,
+    Math.min(100, Number(requestedLimit) || 60)
+  );
+
+  const end = Math.floor(Date.now() / step) * step;
+  const candles = [];
+
+  for (let i = limit - 1; i >= 0; i--) {
+    const time = end - i * step;
+
+    const open = simulatedPriceAt(time);
+    const close = simulatedPriceAt(time + step - 1);
+
+    const a = Math.abs(wave(time / step + 11));
+    const b = Math.abs(wave(time / step + 29));
+
+    const spreadHigh = 0.001 + a * 0.009;
+    const spreadLow = 0.001 + b * 0.009;
+
+    const high = round(
+      Math.max(open, close) * (1 + spreadHigh)
+    );
+
+    const low = round(
+      Math.max(0.001, Math.min(open, close) * (1 - spreadLow))
+    );
+
+    const volume = round(
+      500 + Math.abs(wave(time / step + 91)) * 14500
+    );
+
+    candles.push({
+      time,
+      open,
+      high,
+      low,
+      close,
+      volume
+    });
+  }
+
+  return candles;
+}
+
+function marketTicker() {
+  const price = simulatedPriceAt(Date.now());
+
+  const previous = simulatedPriceAt(
+    Date.now() - 24 * 60 * 60 * 1000
+  );
+
+  const change = round(price - previous);
+
+  const changePercent = previous
+    ? round((change / previous) * 100)
+    : 0;
+
+  const dayCandles = makeCandles('1h', 24);
+
+  return {
+    ok: true,
+    demo: true,
+    simulated: true,
+    mode: 'DEMO / TESTNET',
+    source: MARKET.source,
+
+    pair: MARKET.pair,
+    baseAsset: MARKET.baseAsset,
+    quoteAsset: MARKET.quoteAsset,
+
+    price,
+    lastPrice: price,
+
+    change24h: change,
+    changePercent24h: changePercent,
+    priceChangePercent: changePercent,
+
+    volume24h: round(
+      dayCandles.reduce((sum, candle) => sum + candle.volume, 0)
+    ),
+
+    high24h: round(
+      Math.max(...dayCandles.map(candle => candle.high))
+    ),
+
+    low24h: round(
+      Math.min(...dayCandles.map(candle => candle.low))
+    ),
+
+    timestamp: Date.now()
+  };
+}
+
+function marketDepth() {
+  const price = simulatedPriceAt(Date.now());
+  const bids = [];
+  const asks = [];
+
+  for (let i = 1; i <= 12; i++) {
+    const bidPrice = round(price * (1 - i * 0.0012));
+    const askPrice = round(price * (1 + i * 0.0012));
+
+    bids.push({
+      price: bidPrice,
+      amount: round(40 + Math.abs(wave(i * 13 + 2)) * 900),
+      total: 0
+    });
+
+    asks.push({
+      price: askPrice,
+      amount: round(40 + Math.abs(wave(i * 19 + 3)) * 900),
+      total: 0
+    });
+  }
+
+  for (const side of [bids, asks]) {
+    let total = 0;
+
+    for (const row of side) {
+      total = round(total + row.amount);
+      row.total = total;
+    }
+  }
+
+  return {
+    ok: true,
+    demo: true,
+    simulated: true,
+    pair: MARKET.pair,
+    bids,
+    asks,
+    spread: round(asks[0].price - bids[0].price),
+    timestamp: Date.now()
+  };
+}
+
+function marketTrades() {
+  const nowMs = Date.now();
+  const items = [];
+
+  for (let i = 0; i < 24; i++) {
+    const time =
+      nowMs -
+      i * (20000 + Math.floor(Math.abs(wave(i + 300)) * 45000));
+
+    items.push({
+      id: `demo-${Math.floor(time / 1000)}-${i}`,
+      price: simulatedPriceAt(time),
+      amount: round(0.5 + Math.abs(wave(i * 7 + 22)) * 200),
+      side: wave(i * 5 + 9) > 0 ? 'buy' : 'sell',
+      time
+    });
+  }
+
+  return items;
+}
+
+app.get('/api/market', (_req, res) => {
+  res.json(marketTicker());
+});
+
+app.get('/api/market/ticker', (_req, res) => {
+  res.json(marketTicker());
+});
+
+app.get('/api/market/summary', (_req, res) => {
+  res.json(marketTicker());
+});
+
+app.get('/api/market/candles', (req, res) => {
+  const interval = intervalMap[req.query.interval]
+    ? req.query.interval
+    : '1h';
+
+  const candles = makeCandles(interval, req.query.limit);
+
+  res.json({
+    ok: true,
+    demo: true,
+    simulated: true,
+    pair: MARKET.pair,
+    interval,
+    candles,
+    data: candles,
+    timestamp: Date.now()
+  });
+});
+
+app.get('/api/market/depth', (_req, res) => {
+  res.json(marketDepth());
+});
+
+app.get('/api/market/orderbook', (_req, res) => {
+  res.json(marketDepth());
+});
+
+app.get('/api/market/trades', (_req, res) => {
+  const trades = marketTrades();
+
+  res.json({
+    ok: true,
+    demo: true,
+    simulated: true,
+    pair: MARKET.pair,
+    trades,
+    data: trades
+  });
+});
+
+app.get('/api/market/history', (req, res) => {
+  const interval = intervalMap[req.query.interval]
+    ? req.query.interval
+    : '1h';
+
+  const candles = makeCandles(interval, req.query.limit || 60);
+
+  res.json({
+    ok: true,
+    demo: true,
+    simulated: true,
+    pair: MARKET.pair,
+    interval,
+    history: candles,
+    candles,
+    data: candles
+  });
+});
+
+/* ============================== FRONTEND ============================== */
 
 function findIndexFile() {
   const candidates = [
     path.join(PUBLIC_DIR, 'index.html'),
-    path.join(__dirname, 'index.html'),
-    path.join(__dirname, 'SLX_Network_v1_8_2_index.html'),
-    path.join(__dirname, 'SLX_Network_v1_9_0_index.html')
+    path.join(__dirname, 'index.html')
   ];
 
   return candidates.find(file => {
@@ -1190,7 +1427,6 @@ function findIndexFile() {
   }) || null;
 }
 
-// Static files inside /public are served normally.
 if (fs.existsSync(PUBLIC_DIR)) {
   app.use(express.static(PUBLIC_DIR, {
     index: 'index.html',
@@ -1198,7 +1434,6 @@ if (fs.existsSync(PUBLIC_DIR)) {
   }));
 }
 
-// FIX: the root URL now opens the interface when its HTML file exists.
 app.get('/', (_req, res) => {
   const indexFile = findIndexFile();
 
@@ -1216,8 +1451,6 @@ app.get('/', (_req, res) => {
   });
 });
 
-// Unknown API routes return JSON; other web routes can load the single-page UI.
-// Express 5 compatible: no app.get("*") wildcard is used.
 app.use((req, res, next) => {
   if (req.path.startsWith('/api/')) {
     return res.status(404).json({
@@ -1268,11 +1501,12 @@ app.listen(PORT, HOST, () => {
   console.log('Port:', PORT);
   console.log('Data file:', DATA_FILE);
   console.log('Frontend:', findIndexFile() || 'NOT FOUND');
+  console.log('Market:', `${MARKET.pair} (SIMULATED DEMO)`);
   console.log('Status: ONLINE');
 
   if (!process.env.JWT_SECRET) {
     console.warn(
-      '[SLX] JWT_SECRET is not set. Set a private secret in Render Environment.'
+      '[SLX] JWT_SECRET not set; configure a private secret in Render Environment before using beyond local testing.'
     );
   }
 
