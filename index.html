@@ -10,25 +10,602 @@
 <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
 
 <style>
+/* =========================================================
+   SLX NETWORK v2.2 — PREMIUM BLACK & GOLD THEME
+   UI ONLY — JS/API LOGIC НЕ МЕНЯЕТСЯ
+   ========================================================= */
+
 :root{
-  color-scheme:dark;
-
   --bg:#050505;
-  --panel:#0b0b0b;
+  --panel:#0a0a0a;
   --panel2:#111111;
-  --line:#29200d;
+  --line:#30250d;
 
-  --text:#f5f5f5;
-  --muted:#9b9b9b;
+  --text:#f7f4e8;
+  --muted:#9c988b;
 
   --gold:#d4af37;
   --gold-light:#f3d36a;
-  --gold-dark:#9a7b16;
+  --gold-dark:#8f7118;
 
   --green:#31d99a;
   --red:#ff647c;
+}
 
-  --safe:env(safe-area-inset-bottom,0px);
+/* GLOBAL */
+
+html,
+body{
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      #191305 0%,
+      #080705 35%,
+      #050505 70%
+    );
+  color:var(--text);
+}
+
+body{
+  background-color:#050505;
+}
+
+/* AUTH */
+
+.auth{
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      rgba(212,175,55,.08),
+      transparent 40%
+    ),
+    #050505;
+}
+
+.auth-card{
+  background:linear-gradient(
+    145deg,
+    #0d0d0d,
+    #080808
+  );
+  border:1px solid #3a2d10;
+  box-shadow:
+    0 25px 80px rgba(0,0,0,.65),
+    0 0 35px rgba(212,175,55,.04);
+}
+
+.logo-box,
+.top-logo,
+.avatar{
+  background:
+    linear-gradient(
+      145deg,
+      #f3d36a 0%,
+      #d4af37 45%,
+      #8f7118 100%
+    );
+  color:#080706;
+  box-shadow:
+    0 0 25px rgba(212,175,55,.18);
+}
+
+.logo-name,
+.top-title{
+  color:var(--gold-light);
+}
+
+.tabs{
+  background:#080808;
+  border-color:#30250d;
+}
+
+.tab.active{
+  background:
+    linear-gradient(
+      145deg,
+      #d4af37,
+      #9a7b16
+    );
+  color:#090805;
+  box-shadow:
+    0 0 18px rgba(212,175,55,.15);
+}
+
+.field label{
+  color:#c9c1a8;
+}
+
+.field input{
+  background:#080808;
+  border-color:#33280f;
+  color:#fff;
+}
+
+.field input:focus,
+.trade-input:focus{
+  border-color:var(--gold);
+  box-shadow:
+    0 0 0 2px rgba(212,175,55,.08);
+}
+
+/* BUTTONS */
+
+.btn{
+  background:#15130d;
+  border-color:#403314;
+  color:#eee8d6;
+}
+
+.btn:hover{
+  border-color:var(--gold-dark);
+}
+
+.btn.primary,
+.profile-btn.primary{
+  background:
+    linear-gradient(
+      145deg,
+      #f0cf62,
+      #d4af37 55%,
+      #9a7b16
+    );
+  border-color:transparent;
+  color:#080705;
+  box-shadow:
+    0 5px 20px rgba(212,175,55,.12);
+}
+
+.btn.green{
+  background:#0d2921;
+  border-color:#245b49;
+}
+
+.btn.red{
+  background:#35151d;
+  border-color:#63303b;
+}
+
+/* TOPBAR */
+
+.topbar{
+  background:
+    linear-gradient(
+      180deg,
+      rgba(5,5,5,.97),
+      rgba(5,5,5,.88)
+    );
+  border-bottom:1px solid #2c230f;
+  box-shadow:
+    0 5px 25px rgba(0,0,0,.35);
+}
+
+.version{
+  color:#8f8978;
+}
+
+.testnet{
+  background:#0d0c08;
+  border-color:#4a3911;
+  color:#d5c99d;
+}
+
+.dot{
+  background:var(--gold);
+  box-shadow:
+    0 0 10px rgba(212,175,55,.7);
+}
+
+/* CARDS */
+
+.card{
+  background:
+    linear-gradient(
+      145deg,
+      #101010,
+      #090909
+    );
+  border-color:#30250d;
+  box-shadow:
+    0 12px 35px rgba(0,0,0,.18);
+}
+
+/* WALLET */
+
+.wallet-number{
+  color:var(--gold-light);
+  text-shadow:
+    0 0 22px rgba(212,175,55,.12);
+}
+
+.wallet-address{
+  background:#070707;
+  border-color:#30250d;
+  color:#cfc6a9;
+}
+
+.wallet-action{
+  background:
+    linear-gradient(
+      145deg,
+      #17140d,
+      #0d0d0d
+    );
+  border-color:#3a2d10;
+  color:#e9e1c8;
+}
+
+.wallet-action:hover{
+  border-color:var(--gold-dark);
+  color:var(--gold-light);
+}
+
+/* MARKET */
+
+.pair-icon{
+  background:
+    linear-gradient(
+      145deg,
+      #f0cf62,
+      #d4af37 50%,
+      #8f7118
+    );
+  color:#090805;
+  box-shadow:
+    0 0 25px rgba(212,175,55,.14);
+}
+
+.pair-name{
+  color:#f3d36a;
+}
+
+.price{
+  color:#f4d66d;
+  text-shadow:
+    0 0 20px rgba(212,175,55,.1);
+}
+
+.metrics{
+  border-color:#30250d;
+}
+
+.metric-value{
+  color:#e9dfc3;
+}
+
+/* CHART */
+
+.chart-card{
+  background:
+    linear-gradient(
+      145deg,
+      #101010,
+      #080808
+    );
+  border-color:#30250d;
+}
+
+.timeframe.active{
+  background:
+    linear-gradient(
+      145deg,
+      #d4af37,
+      #9a7b16
+    );
+  color:#080705;
+}
+
+.timeframe:hover{
+  color:var(--gold-light);
+}
+
+/* TRADE */
+
+.trade-card{
+  border-color:#30250d;
+}
+
+.trade-tabs,
+.trade-input{
+  background:#080808;
+}
+
+.trade-tabs{
+  border:1px solid #2b220e;
+}
+
+.trade-side.buy.active{
+  background:#0c2921;
+  color:#43e5a4;
+}
+
+.trade-side.sell.active{
+  background:#35151d;
+  color:#ff7288;
+}
+
+.order-type.active{
+  color:var(--gold-light);
+  border-color:var(--gold);
+}
+
+.trade-input{
+  border-color:#30250d;
+}
+
+.percent button{
+  background:#15130d;
+  color:#a9a18e;
+  border:1px solid #29210e;
+}
+
+.percent button:hover{
+  border-color:var(--gold-dark);
+  color:var(--gold-light);
+}
+
+.trade-submit{
+  background:
+    linear-gradient(
+      145deg,
+      #f3d36a,
+      #d4af37,
+      #9a7b16
+    );
+  color:#080705;
+  box-shadow:
+    0 5px 22px rgba(212,175,55,.15);
+}
+
+.trade-submit.sell{
+  background:var(--red);
+  color:white;
+}
+
+/* ORDER BOOK */
+
+.book-card{
+  border-color:#30250d;
+}
+
+.mid-price{
+  border-color:#30250d;
+  color:var(--gold-light);
+}
+
+/* MARKET TABS */
+
+.market-tabs{
+  background:#0b0b0b;
+  border-color:#30250d;
+}
+
+.market-tab-buttons{
+  border-color:#30250d;
+}
+
+.market-tab.active{
+  color:var(--gold-light);
+  box-shadow:
+    inset 0 -3px var(--gold);
+}
+
+.trade-item,
+.order-item{
+  border-color:#241d0c;
+}
+
+.trade-price{
+  color:#e7dcc0;
+}
+
+.trade-total{
+  color:var(--green);
+}
+
+.cancel{
+  background:#281318;
+  border-color:#5b2b36;
+}
+
+/* PROFILE */
+
+.profile-name{
+  color:var(--gold-light);
+}
+
+.profile-btn{
+  background:
+    linear-gradient(
+      145deg,
+      #17140d,
+      #0c0c0c
+    );
+  color:#ddd4bb;
+  border:1px solid #33280f;
+}
+
+.profile-btn:hover{
+  border-color:var(--gold-dark);
+}
+
+/* NETWORK INFO */
+
+.network-info-card{
+  margin-top:14px;
+  padding:20px;
+  background:
+    linear-gradient(
+      145deg,
+      #101010,
+      #090909
+    );
+  border:1px solid #30250d;
+  border-radius:20px;
+}
+
+.network-info-title{
+  color:var(--gold-light);
+  font-size:18px;
+  font-weight:900;
+  margin-bottom:15px;
+}
+
+.network-info-row{
+  display:flex;
+  justify-content:space-between;
+  padding:11px 0;
+  border-bottom:1px solid #241d0c;
+  color:var(--muted);
+}
+
+.network-info-row:last-child{
+  border-bottom:0;
+}
+
+.network-info-row strong{
+  color:#e9dfc3;
+}
+
+.network-info-row .online{
+  color:var(--green);
+}
+
+/* MODAL */
+
+.modal-bg{
+  background:rgba(0,0,0,.82);
+  backdrop-filter:blur(5px);
+}
+
+.modal{
+  background:
+    linear-gradient(
+      145deg,
+      #11110f,
+      #080808
+    );
+  border-color:#3b2e10;
+  box-shadow:
+    0 -10px 50px rgba(0,0,0,.6);
+}
+
+.modal-title{
+  color:var(--gold-light);
+}
+
+.modal-close{
+  background:#15130d;
+  border-color:#33280f;
+  color:#e8dec3;
+}
+
+.modal-close:hover{
+  border-color:var(--gold);
+  color:var(--gold-light);
+}
+
+.qr{
+  box-shadow:
+    0 0 25px rgba(212,175,55,.1);
+}
+
+/* SCANNER */
+
+.scanner{
+  border:1px solid #3b2e10;
+}
+
+.scan-line{
+  background:var(--gold);
+  box-shadow:
+    0 0 15px var(--gold),
+    0 0 30px rgba(212,175,55,.45);
+}
+
+/* NAV */
+
+.bottom-nav{
+  background:
+    rgba(5,5,5,.94);
+  border-top:1px solid #30250d;
+  box-shadow:
+    0 -8px 30px rgba(0,0,0,.4);
+}
+
+.nav button{
+  color:#777365;
+}
+
+.nav button.active{
+  color:var(--gold-light);
+}
+
+.nav-icon{
+  color:inherit;
+}
+
+/* TOAST */
+
+.toast{
+  background:
+    linear-gradient(
+      145deg,
+      #f3d36a,
+      #d4af37
+    );
+  color:#080705;
+  box-shadow:
+    0 8px 30px rgba(0,0,0,.45),
+    0 0 20px rgba(212,175,55,.15);
+}
+
+/* IMPORTANT VALUES */
+
+#homeBalance,
+#walletBalance,
+#marketPrice,
+#homePrice,
+#midPrice{
+  color:var(--gold-light);
+}
+
+/* SCROLLBAR */
+
+::-webkit-scrollbar{
+  width:7px;
+}
+
+::-webkit-scrollbar-track{
+  background:#050505;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#4b3a12;
+  border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:var(--gold);
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+  .topbar{
+    background:rgba(5,5,5,.96);
+  }
+
+  .card{
+    box-shadow:
+      0 8px 25px rgba(0,0,0,.22);
+  }
+
+  .network-info-card{
+    margin-top:10px;
+    padding:16px;
+  }
+
 }
   
 
